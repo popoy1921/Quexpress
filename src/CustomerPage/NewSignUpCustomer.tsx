@@ -7,13 +7,17 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Paper } from '@mui/material';
-import Link from '@mui/material/Link';
+import { Checkbox, FormControlLabel, Paper } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import UniqueNumber from '../UniqueNumber'
+import UniqueNumber from '../UniqueNumber';
+import { useMediaQuery } from 'react-responsive';
 
 const Logo = require('../Photos/coollogo_com-178391066.png');
+
+const BackgroundMobile = require('../Photos/BackgroundMobile.jpg');
+const BackgroundTablet = require('../Photos/BackgroundTablet.jpg');
+const BackgroundDesktop = require('../Photos/BackgroundDesktop.jpg');
 
 // const uniqueNumber = <UniqueNumber/>;
 
@@ -21,10 +25,7 @@ function Copyright(props: any) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" fontFamily={"serif"} {...props}>
       {'Copyright © '}
-      
-      <Link color='inherit' href={'/'}>
         QuExpress
-      </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
     </Typography>
@@ -32,11 +33,62 @@ function Copyright(props: any) {
 }
 
 // TODO remove, this demo shouldn't need to reset the theme.
-const defaultTheme = createTheme();
+const defaultTheme = createTheme({
+  typography: {
+    fontFamily: 'serif',
+  },
+  components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        body: {
+          backgroundSize: 'cover',
+          backgroundAttachment: 'fixed',
+          backgroundPosition: 'center',
+
+          '@media (max-width:600px)': {
+            backgroundImage: `url(${BackgroundMobile})`,
+          },
+          
+          // Tablet styles
+          '@media (min-width:601px) and (max-width:1024px)': {
+            backgroundImage: `url(${BackgroundTablet})`,
+          },
+          
+          // Desktop styles
+          '@media (min-width:1025px)': {
+            backgroundImage: `url(${BackgroundDesktop})`,
+          },
+          
+          // Orientation styles
+          '@media (orientation: portrait)': {
+            // Adjustments for portrait orientation
+            backgroundSize: 'contain',
+          },
+          
+          '@media (orientation: landscape)': {
+            // Adjustments for landscape orientation
+            backgroundSize: 'cover',
+          },
+        }
+      }
+    }
+  }
+});
 
 export default function SignUpCustomer() {
 
   const navigate = useNavigate();
+
+  const isMobile = useMediaQuery({ query: '(max-width: 600px)' });
+  const isTablet = useMediaQuery({ query: '(min-width: 601px) and (max-width: 1024px)' });
+  const isDesktop = useMediaQuery({ query: '(min-width: 1025px)' });
+  const isPortrait = useMediaQuery({ query: '(orientation: portrait)' });
+
+  const [termsAccepted, setTermsAccepted] = React.useState(false);
+
+  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setTermsAccepted(event.target.checked);
+  };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -47,15 +99,15 @@ export default function SignUpCustomer() {
     const email = data.get('email');
     const accountId = UniqueNumber();
     
-    if (firstName === null){
+    if (!firstName){
       alert('First Name field is empty');
       return;
     }
-    if(lastName === null){
+    if(!lastName){
       alert('Last Name field is empty');
       return;
     }
-    if (email === null) {
+    if(!email) {
       alert('Email field is empty');
       return;
     }
@@ -63,6 +115,11 @@ export default function SignUpCustomer() {
     // Perform regex test on the email value
     if (!/^\S+@\S+\.\S+$/.test(email as string)) {
       alert('Invalid email format');
+      return;
+    }
+    
+    if (!termsAccepted) {
+      alert('You must accept the terms and conditions');
       return;
     }
 
@@ -94,22 +151,25 @@ export default function SignUpCustomer() {
 
   return (
     <ThemeProvider theme={defaultTheme}>
-      <Container component="main" maxWidth="xs" >
+      <Container component="main" maxWidth={isMobile ? "xs" : isTablet ? "sm" : isDesktop ? "sm" : "md"} >
         <CssBaseline />
         <Paper 
+          elevation={24}
           sx={{
-            marginTop: 8,
+            marginTop: 1,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            p: 3,
+            p: isMobile ? 2 : isTablet ? 4 : 6,
+            opacity:0.95,
+            width: isPortrait ? '100%' : 'auto',
           }}
         >
-          <img src={Logo} width={500} alt="" />
-          <Typography component="h1" variant="h3" fontFamily={"serif"} color={'grey'}>
+          <img src={Logo} width={isMobile ? 300 : isPortrait ? 400 : isDesktop ? 600 : 600} alt="" />
+          <Typography component="h1" variant={isMobile ? "h5" : isTablet ? "h4" : "h3"} fontFamily={"serif"} color={'grey'}>
             Sign up
           </Typography>
-          <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
+          <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
                 <TextField
@@ -142,6 +202,18 @@ export default function SignUpCustomer() {
                   autoComplete="email"
                 />
               </Grid>
+              <Grid item xs={12}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      color="primary"
+                      checked={termsAccepted}
+                      onChange={handleCheckboxChange}
+                    />
+                  }
+                  label="I agree to the Terms and Conditions"
+                />
+              </Grid>
             </Grid>
             <Button
               type="submit"
@@ -153,7 +225,7 @@ export default function SignUpCustomer() {
             </Button>
           </Box>
         </Paper>
-        <Copyright sx={{ mt: 5 }} />
+        <Copyright sx={{ mt: 1 }} />
       </Container>
     </ThemeProvider>
   );

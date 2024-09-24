@@ -12,19 +12,33 @@ import Link from '@mui/material/Link';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import bcrypt from 'bcryptjs';
+import Background from '../../Photos/peakpx.jpg';
 
 // Import the logo image
 const Logo = require('../../Photos/coollogo_com-178391066.png');
 
 // Define default theme
-const defaultTheme = createTheme();
+const defaultTheme = createTheme({
+  typography: {
+    fontFamily: 'serif',
+  },
+  components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        body: {
+          backgroundImage: `url(${Background})`,
+          backgroundSize: 'cover',
+          backgroundattachment: 'fixed',
+        }
+      }
+    }
+  }
+});
 
 const Copyright = (props: any) => (
   <Typography variant="body2" color="text.secondary" align="center" fontFamily={"serif"} {...props}>
     {'Copyright © '}
-    <Link color='inherit' href={'/'}>
       QuExpress
-    </Link>{' '}
     {new Date().getFullYear()}
     {'.'}
   </Typography>
@@ -225,7 +239,7 @@ export default function EditAccount() {
             </Button>
           </Box>
         </Paper>
-        <Copyright sx={{ mt: 5 }} />
+        <Copyright sx={{ mt: 1 }} />
       </Container>
     </ThemeProvider>
   );

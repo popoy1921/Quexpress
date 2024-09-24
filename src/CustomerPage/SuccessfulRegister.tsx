@@ -4,23 +4,23 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Paper } from '@mui/material';
-import Link from '@mui/material/Link';
+import { Button, Paper } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
-import CustomButton from '../CommonElements/CustomButton'
+import { useMediaQuery } from 'react-responsive';
+import React from 'react';
 
 const Logo = require('../Photos/coollogo_com-178391066.png');
+const BackgroundMobile = require('../Photos/BackgroundMobile.jpg');
+const BackgroundTablet = require('../Photos/BackgroundTablet.jpg');
+const BackgroundDesktop = require('../Photos/BackgroundDesktop.jpg');
 
 function Copyright(props: any) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" fontFamily={"serif"} {...props}>
       {'Copyright © '}
-      
-      <Link color='inherit' href={'/'}>
         QuExpress
-      </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
     </Typography>
@@ -28,80 +28,161 @@ function Copyright(props: any) {
 }
 
 // TODO remove, this demo shouldn't need to reset the theme.
-const defaultTheme = createTheme();
+const defaultTheme = createTheme({
+  typography: {
+    fontFamily: 'serif',
+  },
+  components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        body: {
+          backgroundSize: 'cover',
+          backgroundAttachment: 'fixed',
+          backgroundPosition: 'center',
+
+          '@media (max-width:600px)': {
+            backgroundImage: `url(${BackgroundMobile})`,
+          },
+          
+          // Tablet styles
+          '@media (min-width:601px) and (max-width:1024px)': {
+            backgroundImage: `url(${BackgroundTablet})`,
+          },
+          
+          // Desktop styles
+          '@media (min-width:1025px)': {
+            backgroundImage: `url(${BackgroundDesktop})`,
+          },
+          
+          // Orientation styles
+          '@media (orientation: portrait)': {
+            // Adjustments for portrait orientation
+            backgroundSize: 'contain',
+          },
+          
+          '@media (orientation: landscape)': {
+            // Adjustments for landscape orientation
+            backgroundSize: 'cover',
+          },
+        }
+      }
+    }
+  }
+});
 
 export default function SignUpCustomer() {
   const [errorMessage, setErrorMessage] = useState('');
 
   const navigate = useNavigate();
 
+  const isMobile = useMediaQuery({ query: '(max-width: 600px)' });
+  const isTablet = useMediaQuery({ query: '(min-width: 601px) and (max-width: 1024px)' });
+  const isDesktop = useMediaQuery({ query: '(min-width: 1025px)' });
+  const isPortrait = useMediaQuery({ query: '(orientation: portrait)' });
+
   var accountId = useParams().AccountId;
   
-  async function displayDetails(){
-    console.log(1);
+  async function displayDetails() {
     if (!accountId) {
       console.error('Account ID not found');
       return;
     }
-    const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/customer/get/${accountId}`)
-    .then(function (response) {
-      let CustomerAccountIdContainer = document.getElementById('CustomerAccountId') ?? document as unknown as HTMLElement;
-      CustomerAccountIdContainer.innerText = 'Account ID: ' + accountId;
-      let CustomerNameContainer = document.getElementById('CustomerName') ?? document as unknown as HTMLElement;
-      CustomerNameContainer.innerText = 'Customer Name: ' + response.data.customer_first_name + ' ' + response.data.customer_last_name;
-      let CustomerEmailContainer = document.getElementById('CustomerEmail') ?? document as unknown as HTMLElement;
-      CustomerEmailContainer.innerText = 'Customer Email: ' + response.data.customer_email;
-    })
-    .catch(function (error) {
+  
+    try {
+      const response = await axios.get<{ 
+        customer_first_name: string; 
+        customer_last_name: string; 
+        customer_email: string; 
+      }>(`${process.env.REACT_APP_OTHER_BACKEND_SERVER}/customer/get/${accountId}`);
+  
+      const customer = response.data;
+  
+      // Safely get and update DOM elements
+      const CustomerAccountIdContainer = document.getElementById('CustomerAccountId') as HTMLElement | null;
+      if (CustomerAccountIdContainer) {
+        CustomerAccountIdContainer.innerText = 'Account ID: ' + accountId;
+      }
+  
+      const CustomerNameContainer = document.getElementById('CustomerName') as HTMLElement | null;
+      if (CustomerNameContainer) {
+        CustomerNameContainer.innerText = `Customer Name: ${customer.customer_first_name} ${customer.customer_last_name}`;
+      }
+  
+      const CustomerEmailContainer = document.getElementById('CustomerEmail') as HTMLElement | null;
+      if (CustomerEmailContainer) {
+        CustomerEmailContainer.innerText = `Customer Email: ${customer.customer_email}`;
+      }
+    } catch (error) {
+      // Handle the error properly
       setErrorMessage('Server Error');
-      alert(' ' + error);
-    });
+      alert('Error: ' + error);
+    }
   }
+  
+  React.useEffect(() => {
+    displayDetails();
+  }, []);
 
-  displayDetails();
+  const proceedSignUp = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    navigate('/');
+  }
       // Send a request to your backend to retrieve user info based on the email
+      
+  const getFontSize = () => {
+    if (isMobile) return '16px';
+    if (isTablet) return '20px';
+    if (isDesktop) return '24px';
+    return '20px'; // Default size if none of the conditions match
+  };
      
   return (
     <ThemeProvider theme={defaultTheme}>
-      <Container component="main" maxWidth="xs" >
+      <Container component="main" maxWidth={isMobile ? "xs" : isTablet ? "sm" : isDesktop ? "xs" : "xs"} >
         <CssBaseline />
         <Paper 
+          elevation={24}
           sx={{
-            marginTop: 8,
+            marginTop: 1,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            p: 3,
+            p: isMobile ? 2 : isTablet ? 4 : 6,
+            opacity:0.95,
+            width: isPortrait ? '100%' : 'auto',
           }}
         >
           <img src={Logo} width={500} alt="" />
-          <Typography component="h1" variant="h5" fontFamily={"serif"} color={'grey'}>
-            You have successfully registered!
-            Please save information below
+          <Typography component="h1" variant={isMobile ? "h6" : isTablet ? "h6" : isDesktop ? "h6" : "h6"} fontFamily={"serif"} color={'grey'}>
+            <center>You have successfully registered!</center>
+            <center>(Please save information below)</center>
           </Typography>
-          <Box component="form" noValidate sx={{ mt: 3 }}>
+          <Box component="form" onSubmit={proceedSignUp} noValidate sx={{ mt: 1 }}>
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={6} id='CustomerAccountId'>
+              <Grid item xs={12} sm={6} id='CustomerAccountId' style={{fontSize: 18}}>
                 
               </Grid>
-              <Grid item xs={12} sm={6} id='CustomerName'>
+              <Grid item xs={12} sm={6} id='CustomerName' style={{fontSize: 18}}>
                 
               </Grid>
-              <Grid item xs={12} id='CustomerEmail'>
+              <Grid item xs={12} id='CustomerEmail' style={{fontSize: 18}}>
                 
               </Grid>
             </Grid>
             <Grid item xs={12} sm={6} id='CustomerName'>
-              <CustomButton
-                details= {''}
-                destination='/'
-              >
-                Return to Home Page
-              </CustomButton>
+              <Button
+                style={{minWidth:'auto', minHeight:'auto', fontSize: getFontSize(), fontFamily:'serif'}}
+                type="submit"
+                fullWidth
+                variant="contained"
+                sx={{ mt: 3, mb: 2 }}
+                >
+                Finish
+              </Button>
             </Grid>
           </Box>
         </Paper>
-        <Copyright sx={{ mt: 5 }} />
+        <Copyright sx={{ mt: 1 }} />
       </Container>
     </ThemeProvider>
   );

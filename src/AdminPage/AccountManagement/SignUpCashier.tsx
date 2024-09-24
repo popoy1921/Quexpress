@@ -12,6 +12,7 @@ import Link from '@mui/material/Link';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import bcrypt from 'bcryptjs';
+import Background from '../../Photos/peakpx.jpg';
 
 const Logo = require('../../Photos/coollogo_com-178391066.png');
 
@@ -19,10 +20,7 @@ function Copyright(props: any) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" fontFamily={"serif"} {...props}>
       {'Copyright © '}
-      
-      <Link color='inherit' href={'/'}>
         QuExpress
-      </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
     </Typography>
@@ -30,7 +28,22 @@ function Copyright(props: any) {
 }
 
 // TODO remove, this demo shouldn't need to reset the theme.
-const defaultTheme = createTheme();
+const defaultTheme = createTheme({
+  typography: {
+    fontFamily: 'serif',
+  },
+  components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        body: {
+          backgroundImage: `url(${Background})`,
+          backgroundSize: 'cover',
+          backgroundattachment: 'fixed',
+        }
+      }
+    }
+  }
+});
 
 export default function SignUp() {
 
@@ -113,12 +126,14 @@ export default function SignUp() {
       <Container component="main" maxWidth="xs" >
         <CssBaseline />
         <Paper 
+          elevation={24}
           sx={{
             marginTop: 8,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             p: 3,
+            opacity: 0.95,
           }}
         >
           <img src={Logo} width={500} alt="" />
@@ -177,16 +192,10 @@ export default function SignUp() {
             >
                 Sign Up
             </Button>
-            <Grid container justifyContent="center">
-              <Grid item>
-                  <Link href='/'>
-                    Already have an account? Sign in
-                  </Link>
-              </Grid>
-            </Grid>
+            
           </Box>
         </Paper>
-        <Copyright sx={{ mt: 5 }} />
+        <Copyright sx={{ mt: 1 }} />
       </Container>
     </ThemeProvider>
   );

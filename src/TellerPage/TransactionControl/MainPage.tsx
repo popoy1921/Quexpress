@@ -17,6 +17,7 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import { mainListItems } from '../ListItems';
 import TransactionControl from './TransactionControl'
 import TableQueue from './TableQueue'
+import { useNavigate } from 'react-router-dom';
 
 const Logo = require('../../Photos/coollogo_com-178391066.png');
 
@@ -24,9 +25,7 @@ function Copyright(props: any) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
       {'Copyright © '}
-      <Link color="inherit" href="/">
-        QuExpress,
-      </Link>{' '}
+        QuExpress
       {new Date().getFullYear()}
       {'.'}
     </Typography>
@@ -87,6 +86,14 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 const defaultTheme = createTheme();
 
 export default function Dashboard() {
+  const navigate = useNavigate();
+  
+  React.useEffect(() => {
+    if (!localStorage.getItem('UserEmail')) {
+      navigate('/SignInAccount'); 
+    }
+  }, [navigate]);
+  
   const [open, setOpen] = React.useState(true);
   const toggleDrawer = () => {
     setOpen(!open);

@@ -2,18 +2,20 @@ import * as React from 'react';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import Link from '@mui/material/Link';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Paper } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import Background from '../Photos/Artboard.jpg';
+import { useMediaQuery } from 'react-responsive';
 
 const Logo = require('../Photos/coollogo_com-178391066.png');
+const BackgroundMobile = require('../Photos/BackgroundMobile.jpg');
+const BackgroundTablet = require('../Photos/BackgroundTablet.jpg');
+const BackgroundDesktop = require('../Photos/BackgroundDesktop.jpg');
 
 if(localStorage.getItem('TransactionCodes') === null) {
   localStorage.setItem('TransactionCodes', JSON.stringify({
@@ -34,9 +36,7 @@ function Copyright(props: any) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" fontFamily={"serif"} {...props}>
       {'Copyright © '}
-      <Link color="inherit" href="/">
         QuExpress
-      </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
     </Typography>
@@ -52,8 +52,34 @@ const defaultTheme = createTheme({
     MuiCssBaseline: {
       styleOverrides: {
         body: {
-          backgroundImage: `url(${Background})`,
           backgroundSize: 'cover',
+          backgroundAttachment: 'fixed',
+          backgroundPosition: 'center',
+
+          '@media (max-width:600px)': {
+            backgroundImage: `url(${BackgroundMobile})`,
+          },
+          
+          // Tablet styles
+          '@media (min-width:601px) and (max-width:1024px)': {
+            backgroundImage: `url(${BackgroundTablet})`,
+          },
+          
+          // Desktop styles
+          '@media (min-width:1025px)': {
+            backgroundImage: `url(${BackgroundDesktop})`,
+          },
+          
+          // Orientation styles
+          '@media (orientation: portrait)': {
+            // Adjustments for portrait orientation
+            backgroundSize: 'contain',
+          },
+          
+          '@media (orientation: landscape)': {
+            // Adjustments for landscape orientation
+            backgroundSize: 'cover',
+          },
         }
       }
     }
@@ -65,11 +91,22 @@ const SignIn: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
 
+  const isMobile = useMediaQuery({ query: '(max-width: 600px)' });
+  const isTablet = useMediaQuery({ query: '(min-width: 601px) and (max-width: 1024px)' });
+  const isDesktop = useMediaQuery({ query: '(min-width: 1025px)' });
+  const isPortrait = useMediaQuery({ query: '(orientation: portrait)' });
+
+  useEffect(() => {
+    localStorage.removeItem('AccountId');
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMessage('');
       // Send a request to your backend to retrieve user info based on the email
       const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/customer/get/${accountId}`)
       .then(async function (response) {
+        console.log(response.data)
         if(response.data.account_id === accountId){
           localStorage.setItem('AccountId', response.data.account_id);
           localStorage.setItem('UserFirstName', response.data.customer_first_name);
@@ -83,30 +120,38 @@ const SignIn: React.FC = () => {
         setErrorMessage('Invalid Account ID');
       });
   }
+
+  const getFontSize = () => {
+    if (isMobile) return '16px';
+    if (isTablet) return '20px';
+    if (isDesktop) return '24px';
+    return '20px'; // Default size if none of the conditions match
+  };
   
   return (
     <ThemeProvider theme={defaultTheme}>
-      <Container component="main" maxWidth="sm">
+      <Container component="main" maxWidth={isMobile ? "xs" : isTablet ? "sm" : isDesktop ? "sm" : "md"}>
         <CssBaseline />
         <Paper
           elevation={24}
           sx={{
-            marginTop: 4,
+            marginTop: 1,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            p: 1.5,
+            p: isMobile ? 2 : isTablet ? 4 : 6,
             opacity:0.95,
+            width: isPortrait ? '100%' : 'auto',
           }}
         >
-          <img src={Logo} width={600} alt="" />
+          <img src={Logo} width={isMobile ? 300 : isPortrait ? 400 : isDesktop ? 600 : 600} alt="" />
           {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
-          <Typography component="h1" variant="h2" fontFamily={"serif"} color={'grey'}>
+          <Typography component="h1" variant={isMobile ? "h5" : isTablet ? "h4" : "h3"} fontFamily={"serif"} color={'grey'}>
             Sign in
           </Typography>
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
             <TextField
-              style={{minWidth:'auto', minHeight:'auto', fontSize: 30, fontFamily:'serif'}}
+              style={{minWidth:'auto', minHeight:'auto', fontSize: getFontSize(), fontFamily:'serif'}}
               margin="normal"
               required
               fullWidth
@@ -118,7 +163,7 @@ const SignIn: React.FC = () => {
               sx={{mb: 4 }}
             />
             <Button
-              style={{minWidth:'auto', minHeight:'auto', fontSize: 30, fontFamily:'serif'}}
+              style={{minWidth:'auto', minHeight:'auto', fontSize: getFontSize(), fontFamily:'serif'}}
               type="submit"
               fullWidth
               variant="contained"
@@ -128,7 +173,7 @@ const SignIn: React.FC = () => {
             </Button>
           </Box>
         </Paper>
-        <Copyright sx={{ mt: 8, mb: 4 }} />
+        <Copyright sx={{ mt: 1 }} />
       </Container>
     </ThemeProvider>
   );

@@ -25,7 +25,7 @@ export default function TotalServed() {
   useEffect(() => {
     // Fetch data when the component mounts
     const fetchData = async () => {
-      axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/all/done`)
+      axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/all/alldone`)
       .then(response => {
         setNumberOfServed(response.data.length);
       })

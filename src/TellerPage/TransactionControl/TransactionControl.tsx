@@ -15,16 +15,35 @@ export default function TransactonControl() {
   transactionCodes = JSON.parse(transactionCodeString);
   let transactionCode = transactionCodes[useParams().TransactionCode ?? ''];
 
+  async function updateForMonitorBlink (transactionCode : string)
+  {
+    await axios.put(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/updateBlink/` + transactionCode, {'blink' : 1});
+  }
+
   function nextNumber(event: any)
   {
     event.preventDefault();
     updateNumber('done');
+    if (document.getElementById('nowServing')?.innerText != 'No Available Number'){
+      updateForMonitorBlink(transactionCode)
+    }
+  }
+
+  function callAgain(event: any)
+  {
+    event.preventDefault();
+    if (document.getElementById('nowServing')?.innerText != 'No Available Number'){
+      updateForMonitorBlink(transactionCode)
+    }
   }
 
   function cancelNumber(event: any)
   {
     event.preventDefault();
     updateNumber('cancelled');
+    if (document.getElementById('nowServing')?.innerText != 'No Available Number'){
+      updateForMonitorBlink(transactionCode)
+    }
   }
 
   function updateNumber(nextTransactionStatus: string)
@@ -102,6 +121,9 @@ export default function TransactonControl() {
     let transactionRef = localStorage.getItem(transactionCode + 'NowServing') as string;
     toCashier(transactionRef);
     updateNumber('done');
+    if (document.getElementById('nowServing')?.innerText != 'No Available Number'){
+      updateForMonitorBlink(transactionCode)
+    }
   }
 
   async function toCashier(transactionRef: string)
@@ -192,6 +214,7 @@ export default function TransactonControl() {
                       fullWidth
                       size='medium'
                       variant="contained"
+                      onClick={callAgain}
                       sx={{ mt: 2, mb: 2}} 
                     >
                       CALL AGAIN   
@@ -271,6 +294,7 @@ export default function TransactonControl() {
                       size='medium'
                       variant="contained"
                       sx={{ mt: 2, mb: 2}} 
+                      onClick={callAgain}
                     >
                       CALL AGAIN   
                     </Button>

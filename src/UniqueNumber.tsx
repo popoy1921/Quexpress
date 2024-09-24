@@ -1,53 +1,24 @@
 import React from 'react';
 
 const UniqueNumber = (): string => {
-  // Get current date and time
-  const currentDateTime = new Date();
+    const generateUniqueNumber = (): string => {
+        const now = new Date();
+        
+        const year = now.getFullYear().toString().slice(-2); 
+        const month = String(now.getMonth() + 1).padStart(2, '0'); 
+        const day = String(now.getDate()).padStart(2, '0'); 
 
-  // Extract year, month, day, hour, minute, second
-    if((currentDateTime.getMonth() + 1) < 10){
-        if(currentDateTime.getDate() < 10){
-            const year = currentDateTime.getFullYear();
-            const month = '0' + (currentDateTime.getMonth() + 1); // Month is zero-indexed, so add 1
-            const day = '0' + currentDateTime.getDate();
-            const hour = currentDateTime.getHours();
-            const minute = currentDateTime.getMinutes();
-            const second = currentDateTime.getSeconds();
-            return year+''+month+''+day+''+hour+''+minute+''+second;
-        }
-        else
-        {
-            const year = currentDateTime.getFullYear();
-            const month = '0' + (currentDateTime.getMonth() + 1); // Month is zero-indexed, so add 1
-            const day =  currentDateTime.getDate();
-            const hour = currentDateTime.getHours();
-            const minute = currentDateTime.getMinutes();
-            const second = currentDateTime.getSeconds();
-            return year+''+month+''+day+''+hour+''+minute+''+second;
-        }
-    }
-    else
-    {
-        if(currentDateTime.getDate() < 10){
-            const year = currentDateTime.getFullYear();
-            const month = (currentDateTime.getMonth() + 1); // Month is zero-indexed, so add 1
-            const day = '0' + currentDateTime.getDate();
-            const hour = currentDateTime.getHours();
-            const minute = currentDateTime.getMinutes();
-            const second = currentDateTime.getSeconds();
-            return year+''+month+''+day+''+hour+''+minute+''+second;
-        }
-        else
-        {
-            const year = currentDateTime.getFullYear();
-            const month = (currentDateTime.getMonth() + 1); // Month is zero-indexed, so add 1
-            const day =  currentDateTime.getDate();
-            const hour = currentDateTime.getHours();
-            const minute = currentDateTime.getMinutes();
-            const second = currentDateTime.getSeconds();
-            return year+''+month+''+day+''+hour+''+minute+''+second;
-        }
-    }
+        
+        const base = `${year}${month}${day}`;
+        const randomPart = Math.floor(Math.random() * 10000).toString().padStart(4, '0'); 
+
+        
+        const uniqueNumber = (parseInt(base + randomPart, 10) % 1000000).toString().padStart(6, '0');
+        
+        return uniqueNumber;
+    };
+
+    return generateUniqueNumber();
 };
 
 export default UniqueNumber;

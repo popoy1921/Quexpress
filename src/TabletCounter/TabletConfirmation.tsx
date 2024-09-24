@@ -6,23 +6,29 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Button, Grid, Paper } from '@mui/material';
-import CancelButton from '../CommonElements/CancelButton';
 import axios from 'axios';
-import { format } from 'date-fns';
-import ConfirmButton from '../CommonElements/ConfirmButton';
-import Background from '../Photos/Artboard.jpg';
+import { format, formatDate } from 'date-fns';
+import returnDateTime from '../TimeStamp';
+import { useNavigate } from 'react-router-dom';
+import { useMediaQuery } from 'react-responsive';
 
 const Logo = require('../Photos/coollogo_com-178391066.png');
+const { formattedDate, formattedTime } = returnDateTime();
 
 const transactionType = localStorage.getItem('TransactionType');
+const customerFirstName = localStorage.getItem('UserFirstName');
+const accountId = localStorage.getItem('AccountId');
+const customerId = localStorage.getItem('UserID');
+
+const BackgroundMobile = require('../Photos/BackgroundMobile.jpg');
+const BackgroundTablet = require('../Photos/BackgroundTablet.jpg');
+const BackgroundDesktop = require('../Photos/BackgroundDesktop.jpg');
 
 function Copyright(props: any) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" fontFamily={"serif"} {...props}>
       {'Copyright © '}
-      <Link color="inherit" href="/">
         QuExpress
-      </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
     </Typography>
@@ -42,19 +48,45 @@ const defaultTheme = createTheme({
     MuiCssBaseline: {
       styleOverrides: {
         body: {
-          backgroundImage: `url(${Background})`,
           backgroundSize: 'cover',
-          backgroundattachment: 'fixed',
+          backgroundAttachment: 'fixed',
+          backgroundPosition: 'center',
+
+          '@media (max-width:600px)': {
+            backgroundImage: `url(${BackgroundMobile})`,
+          },
+          
+          // Tablet styles
+          '@media (min-width:601px) and (max-width:1024px)': {
+            backgroundImage: `url(${BackgroundTablet})`,
+          },
+          
+          // Desktop styles
+          '@media (min-width:1025px)': {
+            backgroundImage: `url(${BackgroundDesktop})`,
+          },
+          
+          // Orientation styles
+          '@media (orientation: portrait)': {
+            // Adjustments for portrait orientation
+            backgroundSize: 'contain',
+          },
+          
+          '@media (orientation: landscape)': {
+            // Adjustments for landscape orientation
+            backgroundSize: 'cover',
+          },
         }
       }
     }
   }
 });
 
-export default function confirmQueue() {
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-      // Send a request to your backend to retrieve user info based on the transaction type
+
+export default function ConfirmQueue() {
+  const navigate = useNavigate();
+  getQueueNumber();
+  async function getQueueNumber() {
     const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transactions/get/${transactionType}`)
     .then(async function (response) {
       if(transactionType !== null) {
@@ -74,13 +106,68 @@ export default function confirmQueue() {
           }
           // get current counter
           let transactionCodeCounter = (parseInt(localStorage.getItem(transactionDesc + '#') ?? '0') + 1).toString().padStart(5, '0');
-          localStorage.setItem(transactionDesc + '#', transactionCodeCounter);
-          localStorage.setItem('QueueNumber', transactionCodes[transactionDesc] +''+ transactionCodeCounter);
+          // localStorage.setItem(transactionDesc + '#', transactionCodeCounter);
           var queueNumberContainer = document.getElementById("QueueNumber") ?? document as unknown as HTMLElement;            
           queueNumberContainer.innerText = transactionCodes[transactionDesc] +''+ transactionCodeCounter;
+          
         }
       }
     })
+  }
+
+  const yesButton = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transactions/get/${transactionType}`)
+    .then(async function (response) {
+      if(transactionType !== null) {
+        const transactionDesc = capitalizeAndRemoveSpaces(transactionType);
+        let transactionCodeCounter = (parseInt(localStorage.getItem(transactionDesc + '#') ?? '0') + 1).toString().padStart(5, '0');
+        localStorage.setItem(transactionDesc + '#', transactionCodeCounter);
+        localStorage.setItem('QueueNumber', (document.getElementById("QueueNumber") ?? document as unknown as HTMLElement).innerText);
+      }
+    })
+    const response2 = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transactions/get/${transactionType}`)
+      .then(async function (response2) {
+
+        // Send a request to your backend to retrieve user info based on the email
+        const transactionData = {
+          transactionId        : response2.data.transaction_id,
+          customerId           : customerId,
+          customerAccountId    : accountId,
+          queueNumber          : localStorage.getItem('QueueNumber'),
+          windowId             : response2.data.transaction_id,
+          staffId              : null,
+          date                 : formattedDate,
+          startTime            : null,
+          endTime              : null,
+        }
+        createLog(transactionData);
+        
+        printExternal();
+        navigate("/SignInCustomer");
+      })
+      .catch(function (error) {
+        alert(' ' + error);
+      });
+  }
+  
+  
+  const noButton = (e: React.FormEvent) => {
+    e.preventDefault();
+    navigate("/CounterTablet");
+  }
+
+  function createLog(transactionData : Object)
+  {
+    axios.post(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/create`, transactionData)
+    .then(response => {
+      
+    })
+    .catch(error => {
+      // Handle error
+      console.error('Error:', error);
+    });
   }
 
   function printExternal(): void {
@@ -89,73 +176,72 @@ export default function confirmQueue() {
       printWindow.addEventListener('load', () => {
         setTimeout(() => {
           printWindow?.print();
-          // printWindow.close();
+          printWindow.close();
         }, 500); // Adjust the delay as needed
       }, true);
     }
   }
-
-  window.onafterprint = function() {
-    window.location.href = '/SignInCustomer';
-  };
-
-
+  const isMobile = useMediaQuery({ query: '(max-width: 600px)' });
+  const isTablet = useMediaQuery({ query: '(min-width: 601px) and (max-width: 1024px)' });
+  const isDesktop = useMediaQuery({ query: '(min-width: 1025px)' });
+  const isPortrait = useMediaQuery({ query: '(orientation: portrait)' });
 
   return (
     <ThemeProvider theme={defaultTheme}>
-      <Container component="main" maxWidth="xl">
+      <Container component="main" maxWidth={isMobile ? "xs" : isTablet ? "xs" : isDesktop ? "xs" : "xs"}>
         <CssBaseline />
         <Paper
           elevation={24}
           sx={{
-            marginTop: 8,
+            marginTop: 1,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            p: 5,
+            p: isMobile ? 2 : isTablet ? 4 : 6,
             opacity:0.95,
+            width: isPortrait ? '100%' : 'auto',
           }}
         >
-          <img src={Logo} width={500} alt="" />
-          <Typography component="h1" variant="h5" fontFamily={"serif"} color={'grey'} marginTop={4}>
-            PLEASE CONFIRM YOUR TRANSACTION
+          <img src={Logo} width={isMobile ? 500 : isPortrait ? 500 : isDesktop ? 500 : 500} alt="" />
+          <Typography component="h1" variant="h6" fontFamily={"serif"} color={'grey'} marginTop={4}>
+            YOUR TRANSACTION
           </Typography>
-          <Typography component="h1" variant="h2" fontFamily={"serif"} marginTop={1}>
+          <Typography component="h1" variant="h5" fontFamily={"serif"} marginTop={1}>
             {transactionType}
           </Typography>
-          <Typography component="h1" variant="h1" fontFamily={"serif"} marginTop={1} id="QueueNumber">
+          <Typography component="h1" variant="h3" fontFamily={"serif"} marginTop={1} id="QueueNumber">
 
           </Typography>
-          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 3, mb: 10 }}>
+          <Box component="form" noValidate sx={{ mt: 2, mb: 2 }}>
             <Grid container spacing={2}>
               <Grid item xs={6}>
                 <Button
-                  style={{minWidth:500, minHeight:150, fontSize: 30, fontFamily:'serif'}}
+                  style={{minWidth:'auto', minHeight:'auto', fontSize: 30, fontFamily:'serif'}}
                   type='submit'
                   fullWidth
                   size='large'
                   variant="contained"
                   sx={{ mt: 3, mb: 2}}
-                  onClick={printExternal}>
+                  onClick={yesButton}>
                   YES  
                 </Button>
               </Grid>
               <Grid item xs={6}>
                 <Button
-                  style={{minWidth:500, minHeight:150, fontSize: 30, fontFamily:'serif'}}
+                  style={{minWidth:'auto', minHeight:'auto', fontSize: 30, fontFamily:'serif'}}
                   type='submit'
                   fullWidth
                   size='large'
                   variant="contained"
                   sx={{ mt: 3, mb: 2}}
-                  >
+                  onClick={noButton}>
                   NO  
                 </Button>
               </Grid>
             </Grid>
           </Box>
         </Paper>
-        <Copyright sx={{ mt: 8, mb: 4 }} />
+        <Copyright sx={{ mt: 1 }} />
       </Container>
     </ThemeProvider>
   );

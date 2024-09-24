@@ -9,9 +9,14 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Grid, Paper } from '@mui/material';
 import CustomButton from '../CommonElements/CustomButton';
 import CancelButton from '../CommonElements/CancelButton';
-import Background from '../Photos/Artboard.jpg';
+import { useMediaQuery } from 'react-responsive';
+import { useNavigate } from 'react-router-dom';
 
 const Logo = require('../Photos/coollogo_com-178391066.png');
+const BackgroundMobile = require('../Photos/BackgroundMobile.jpg');
+const BackgroundTablet = require('../Photos/BackgroundTablet.jpg');
+const BackgroundDesktop = require('../Photos/BackgroundDesktop.jpg');
+
 
 const transactionType = localStorage.getItem('TransactionType');
 
@@ -37,9 +42,34 @@ const defaultTheme = createTheme({
     MuiCssBaseline: {
       styleOverrides: {
         body: {
-          backgroundImage: `url(${Background})`,
           backgroundSize: 'cover',
-          backgroundattachment: 'fixed',
+          backgroundAttachment: 'fixed',
+          backgroundPosition: 'center',
+
+          '@media (max-width:600px)': {
+            backgroundImage: `url(${BackgroundMobile})`,
+          },
+          
+          // Tablet styles
+          '@media (min-width:601px) and (max-width:1024px)': {
+            backgroundImage: `url(${BackgroundTablet})`,
+          },
+          
+          // Desktop styles
+          '@media (min-width:1025px)': {
+            backgroundImage: `url(${BackgroundDesktop})`,
+          },
+          
+          // Orientation styles
+          '@media (orientation: portrait)': {
+            // Adjustments for portrait orientation
+            backgroundSize: 'contain',
+          },
+          
+          '@media (orientation: landscape)': {
+            // Adjustments for landscape orientation
+            backgroundSize: 'cover',
+          },
         }
       }
     }
@@ -47,6 +77,14 @@ const defaultTheme = createTheme({
 });
 
 export default function SignIn() {
+  const navigate = useNavigate();
+  
+  React.useEffect(() => {
+    if (!localStorage.getItem('AccountId')) {
+      navigate('/SignInCustomer'); 
+    }
+  }, [navigate]);
+  
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -56,26 +94,32 @@ export default function SignIn() {
     });
   };
 
+  const isMobile = useMediaQuery({ query: '(max-width: 600px)' });
+  const isTablet = useMediaQuery({ query: '(min-width: 601px) and (max-width: 1024px)' });
+  const isDesktop = useMediaQuery({ query: '(min-width: 1025px)' });
+  const isPortrait = useMediaQuery({ query: '(orientation: portrait)' });
+
   return (
     <ThemeProvider theme={defaultTheme}>
-      <Container component="main" maxWidth="xl">
+      <Container component="main" maxWidth={isMobile ? "xs" : isTablet ? "md" : isDesktop ? "lg" : "lg"}>
         <CssBaseline />
         <Paper
           elevation={24}
           sx={{
-            marginTop: 4,
+            marginTop: 1,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            p: 5,
+            p: isMobile ? 2 : isTablet ? 4 : 6,
             opacity:0.95,
+            width: isPortrait ? '100%' : 'auto',
           }}
         >
-          <img src={Logo} width={500} alt="" />
-          <Typography component="h1" variant="h2" fontFamily={"serif"} marginTop={1}>
+          <img src={Logo} width={isMobile ? 300 : isPortrait ? 400 : isDesktop ? 600 : 600} alt="" />
+          <Typography component="h1" variant={isMobile ? "h5" : isTablet ? "h4" : "h3"} fontFamily={"serif"} marginTop={1}>
             {transactionType}
           </Typography>
-          <Typography component="h1" variant="h5" color={'grey'} marginTop={1}>
+          <Typography component="h1" variant={isMobile ? "h5" : isTablet ? "h4" : "h3"} color={'grey'} marginTop={1}>
             PLEASE CHOOSE TRANSACTION
           </Typography>
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 2 }}>
@@ -116,7 +160,7 @@ export default function SignIn() {
                
           </Box>
         </Paper>
-        <Copyright sx={{ mt: 8, mb: 4 }} />
+        <Copyright sx={{ mt: 1 }} />
       </Container>
     </ThemeProvider>
   );

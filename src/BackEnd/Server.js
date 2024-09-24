@@ -1,5 +1,9 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
+const fs = require('fs');
+const multer = require('multer');
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -73,7 +77,7 @@ app.get('/users/get/:email', async (req, res) => {
       queryString += ' WHERE user_name = $1'
       queryParameters.push(userName);
     } else {
-      queryString += ' WHERE (access_id = 2 or access_id = 3) and removed = 0';
+      queryString += ' WHERE (access_id = 2 or access_id = 3) and (removed = 0 or (removed is null))';
     }
     const client = await pool.connect();
     const queryResult = await client.query(queryString, queryParameters);
@@ -234,9 +238,10 @@ app.post('/transaction_log/create', async (req, res) => {
 app.get('/transaction_log/get/:transactionCode', async (req, res) => {
   let transactionCode = req.params.transactionCode + '%';
   try {    
-    var queryString = 'Select MAX(transactions_queue) FROM quexpress.tbl_quexpress_transaction_log'
-    + ' where transactions_queue like $1'
-    + ' and transaction_datetime >= CURRENT_DATE';
+    var queryString = 'SELECT * FROM quexpress.tbl_quexpress_transaction_log'
+    + ' WHERE transactions_queue = (SELECT MAX(transactions_queue) FROM quexpress.tbl_quexpress_transaction_log'
+    + ' WHERE transactions_queue LIKE $1 AND transaction_datetime >= CURRENT_DATE AND transaction_status IS NOT NULL)'
+    + ' AND transactions_queue LIKE $1 AND transaction_datetime >= CURRENT_DATE AND transaction_status IS NOT NULL';
     var queryParameters = [transactionCode];
     const client = await pool.connect();
     const result = await client.query(queryString, queryParameters);
@@ -279,14 +284,17 @@ app.get('/transaction_log/get/:transactionCode/:transactionStatus', async (req, 
       queryString += ' and (transaction_status IS NULL)';
     } else if (transactionStatus === 'notForQueue') {
       if (transactionCode === 'all' || transactionCode === 'today') {
-        queryString += ' and transaction_datetime <= CURRENT_DATE)';
+        queryString += ' or transaction_datetime >= CURRENT_DATE)';
       } else {
         queryString += ' and (transaction_datetime <= CURRENT_DATE or transaction_datetime >= CURRENT_DATE)';
       }
       queryString += ' and (transaction_status IS NOT NULL)';
     } else if (transactionStatus === 'all') {
       queryString += ')';
-    }else {
+    } else if (transactionStatus === 'alldone') {
+      queryString += ' or transaction_datetime >= CURRENT_DATE)';
+      queryString += ' and (transaction_status IS NOT NULL)';
+    } else {
       queryString += ') and transaction_status = $' + transactionCodeIndex;
       queryParameters.push(transactionStatus);
     }
@@ -339,6 +347,101 @@ app.put('/transaction_log/update', async (req, res) => {
 
 // Route to admin dashboard
 
+// Set up multer storage for file uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/'); // Ensure this directory exists
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname)); // Append timestamp to file name
+  },
+});
+
+const upload = multer({ storage });
+
+// Ensure uploads directory exists
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir);
+}
+
+// Serve uploaded files
+app.use('/uploads', express.static(uploadsDir));
+
+// Route for video ads upload
+app.put('/users/updateAdvertisement', upload.single('file'), async(req, res) => {
+  try {
+    // File Upload
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file uploaded.' });
+    }
+    const fileUrl = `http://localhost:${PORT}/uploads/${req.file.filename}`; // Adjust URL as needed
+    res.json({ file: fileUrl });
+    // END - File Upload
+
+    // Update user table for advertisement
+    var queryString = 'UPDATE quexpress.tbl_quexpress_users'
+      + ' SET advertisement = $1'
+      + ' where access_id = 1'
+      + ' RETURNING *';
+    var advertisement = [fileUrl]
+    const client = await pool.connect();
+    const result = await client.query(queryString, advertisement);
+    client.release();
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server Error');
+  }
+});
+
+// Route to get user details
+app.get('/users/getAdvertisement', async (req, res) => {
+  const userId = req.params.userId;
+  try {
+    const client = await pool.connect();
+    const result = await client.query('SELECT * FROM quexpress.tbl_quexpress_users WHERE access_id = 1');
+    res.json(result.rows[0]);
+    client.release();
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server Error');
+  }
+});
+
+// Route for video ads upload
+app.put('/transaction_log/updateBlink/:transactionLogId', async (req, res) => {
+  try {
+    const transactionLogId = req.params.transactionLogId;
+    const requestBody    = req.body;
+    const transactionBlink   = requestBody.blink;
+    var queryString = 'UPDATE quexpress.tbl_quexpress_transactions'
+      + ' SET blink = $1'
+      + ' where transaction_code = $2'
+      + ' RETURNING *';
+    var transactionData = [transactionBlink, transactionLogId];
+    const client = await pool.connect();
+    const result = await client.query(queryString, transactionData);
+    res.json(true);
+    client.release();
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server Error');
+  }
+});
+
+// Route for transaction types blink status
+app.get('/transactions/getBlink/:transactionCode', async (req, res) => {
+  const transactionCode = req.params.transactionCode;
+  try {
+    const client = await pool.connect();
+    const result = await client.query('SELECT * FROM quexpress.tbl_quexpress_transactions WHERE transaction_code = $1', [transactionCode]);
+    res.json(result.rows[0]);
+    client.release();
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server Error');
+  }
+});
 
 // Start server
 app.listen(PORT, () => {

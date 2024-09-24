@@ -12,15 +12,11 @@ import IconButton from '@mui/material/IconButton';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
-import Link from '@mui/material/Link';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import { mainListItems } from '../ListItems';
-import Queue from './Queued';
-import Served from './Served';
-import Cancel from './Cancel';
-import TotalServed from './TotalServed';
 import { useNavigate } from 'react-router-dom';
+import UploadPage from './UploadPage';
 
 const Logo = require('../../Photos/coollogo_com-178391066.png');
 
@@ -135,7 +131,7 @@ export default function Dashboard() {
               noWrap
               sx={{ flexGrow: 1 }}
             >
-              DASHBOARD
+              ADS DISPLAY
             </Typography>
           </Toolbar>
         </AppBar>
@@ -172,72 +168,25 @@ export default function Dashboard() {
           }}
         >
           <Toolbar />
-          <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+          <Container maxWidth="lg" sx={{ mt: 1 }}>
             <Grid container spacing={10}>
               {/* Total Served */}
-              <Grid item xs={12} md={4} lg={5}>
+              <Grid item xs={12} lg={12}>
                 <Paper
                   elevation={24}
                   sx={{
                     p: 2,
                     display: 'flex',
                     flexDirection: 'column',
-                    height: 240,
+                    height: 500,
                     opacity: 0.95,
                   }}
                 >
-                  <TotalServed />
-                </Paper>
-              </Grid>
-              <Grid item xs={12}>
-
-              </Grid>
-              {/* Queued */}
-              <Grid item xs={12} md={4} lg={3}>
-                <Paper
-                  elevation={24}
-                  sx={{
-                    p: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    height: 240,
-                    opacity: 0.95,
-                  }}
-                >
-                  <Queue />
-                </Paper>
-              </Grid>
-              {/* Served */}
-              <Grid item xs={12} md={4} lg={3}>
-                <Paper
-                  elevation={24}
-                  sx={{
-                    p: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    height: 240,
-                    opacity: 0.95,
-                  }}
-                >
-                  <Served />
-                </Paper>
-              </Grid>
-              {/* Cancelled */}
-              <Grid item xs={12} md={4} lg={3}>
-                <Paper 
-                  elevation={24}
-                  sx={{ 
-                    p: 2, 
-                    display: 'flex', 
-                    flexDirection: 'column',
-                    height: 240,
-                    opacity: 0.95,  
-                  }}>
-                  <Cancel />
+                <UploadPage />
                 </Paper>
               </Grid>
             </Grid>
-            <Copyright sx={{ pt: 4 }} />
+            <Copyright sx={{ mt: 1 }} />
           </Container>
         </Box>
       </Box>

@@ -9,11 +9,12 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { FormControl, InputLabel, MenuItem, Paper, Select, SelectChangeEvent } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 import bcrypt from 'bcryptjs'
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
+import Background from '../Photos/peakpx.jpg';
 
 const Logo = require('../Photos/coollogo_com-178391066.png');
 
@@ -36,9 +37,7 @@ function Copyright(props: any) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" fontFamily={"serif"} {...props}>
       {'Copyright © '}
-      <Link color="inherit" href="/">
         QuExpress
-      </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
     </Typography>
@@ -46,7 +45,22 @@ function Copyright(props: any) {
 }
 
 // TODO remove, this demo shouldn't need to reset the theme.
-const defaultTheme = createTheme();
+const defaultTheme = createTheme({
+  typography: {
+    fontFamily: 'serif',
+  },
+  components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        body: {
+          backgroundImage: `url(${Background})`,
+          backgroundSize: 'cover',
+          backgroundattachment: 'fixed',
+        }
+      }
+    }
+  }
+});
 
 const SignIn: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -55,9 +69,12 @@ const SignIn: React.FC = () => {
   const [transaction, setTransaction] = React.useState('');
   const navigate = useNavigate();
 
+  useEffect(() => {
+    localStorage.removeItem('UserEmail');
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-      // Send a request to your backend to retrieve user info based on the email
       const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/users/get/${email}`)
       .then(async function (response) {
         const isMatch = await comparePasswords(password, response.data.user_pass);
@@ -147,12 +164,14 @@ const SignIn: React.FC = () => {
       <Container component="main" maxWidth="xs">
         <CssBaseline />
         <Paper
+          elevation={24}
           sx={{
             marginTop: 8,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             p: 3,
+            opacity: 0.95,
           }}
         >
           <img src={Logo} width={500} alt="" />
@@ -212,16 +231,9 @@ const SignIn: React.FC = () => {
             >
                 Sign In
             </Button>
-            <Grid container justifyContent="center">
-              <Grid item >
-                <Link href="/SignUpCustomer" variant="body2">
-                  Forgot password?
-                </Link>
-              </Grid>
-            </Grid>
           </Box>
         </Paper>
-        <Copyright sx={{ mt: 8, mb: 4 }} />
+        <Copyright sx={{ mt: 1 }} />
       </Container>
     </ThemeProvider>
   );
