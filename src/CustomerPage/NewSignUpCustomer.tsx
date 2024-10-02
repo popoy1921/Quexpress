@@ -72,6 +72,9 @@ const defaultTheme = createTheme({
         }
       }
     }
+  },
+  palette: {
+    primary: {main: '#228B22'},
   }
 });
 
@@ -123,6 +126,7 @@ export default function SignUpCustomer() {
       return;
     }
 
+    
     alert('Successful submission');
 
     const userDetails = {
@@ -133,6 +137,11 @@ export default function SignUpCustomer() {
     }
 
     registerUser(userDetails);
+
+    localStorage.setItem('CustomerFirstName', firstName.toString());
+    localStorage.setItem('CustomerLastName', lastName.toString());
+    localStorage.setItem('CustomerEmail', email.toString());
+    localStorage.setItem('CustomerAccountID', accountId.toString());
 
     navigate('/SuccessfulRegistration/' + accountId);
   }

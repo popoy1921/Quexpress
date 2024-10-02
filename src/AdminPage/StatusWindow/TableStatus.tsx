@@ -3,22 +3,22 @@ import DataTable from 'react-data-table-component';
 import DataTableExtensions from "react-data-table-component-extensions";
 import "react-data-table-component-extensions/dist/index.css";
 import axios from 'axios';
-import { Container } from '@mui/material';
+import { Container, CircularProgress, Typography, Alert } from '@mui/material';
 
 const App = () => {
-  const [tableData, setData] = useState([]);
+  const [tableData, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   interface Row {
-    window_id :  number,
-    window_desc : string,
-    transactions_queue :  string,
+    window_id: number;
+    window_desc: string;
+    transactions_queue: string;
   }
 
   useEffect(() => {
     // Fetch data when the component mounts
-    axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/window/get`)
+    axios.get(`${process.env.REACT_APP_OTHER_BACKEND_SERVER}/window/get`)
       .then(response => {
         setData(response.data); // Set the data for the table
         setLoading(false); // Turn off the loading indicator
@@ -31,40 +31,45 @@ const App = () => {
 
   // Define the columns for the DataTable
   const tableTransactionLogColumns = [
-    {name : 'Window Number' , sortable: true, selector : (row : Row)  => row.window_id},
-    {name : 'Description'   , sortable: true, selector : (row : Row)  => row.window_desc},
-    {name : 'Queue Number'  , sortable: true, selector : (row : Row)  => row.transactions_queue},
+    { name: 'Window Number', sortable: true, selector: (row: Row) => row.window_id },
+    { name: 'Description', sortable: true, selector: (row: Row) => row.window_desc },
+    { name: 'Queue Number', sortable: true, selector: (row: Row) => row.transactions_queue },
   ];
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
 
   const tableDataForTableExtension = {
     columns: tableTransactionLogColumns,
     data: tableData,
     export: false,
     print: false,
-    Filter: false,
+    filter: false,
   };
 
   return (
-    <div>
-      <DataTableExtensions {...tableDataForTableExtension}>
-        <Container maxWidth='xl' sx={{mt:2}}>
+    <Container maxWidth='xl' sx={{ mt: 4 }}>
+      {loading ? (
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+          <CircularProgress />
+          <Typography variant="h6" sx={{ ml: 2 }}>Loading Data...</Typography>
+        </div>
+      ) : error ? (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          Error: {error}
+        </Alert>
+      ) : (
+        <DataTableExtensions {...tableDataForTableExtension}>
           <DataTable
             columns={tableTransactionLogColumns}
             data={tableData}
             pagination
+            responsive
+            highlightOnHover
+            pointerOnHover
+            striped
+            style={{ boxShadow: '0px 2px 10px rgba(0, 0, 0, 0.1)' }} // Add shadow to DataTable
           />
-        </Container>
-      </DataTableExtensions>
-    </div>
-    
+        </DataTableExtensions>
+      )}
+    </Container>
   );
 };
 

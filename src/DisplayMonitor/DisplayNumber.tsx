@@ -5,7 +5,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Box, Paper } from '@mui/material';
 import axios from 'axios';
 import Grid from '@mui/material/Grid';
-import Background from '../Photos/peakpx.jpg';
+import Background from '../Photos/BackgroundDesktop.jpg';
 import DigitalClock from './DigitalClock';
 
 const Ping = require('../Sounds/din-ding-89718.mp3');
@@ -39,6 +39,9 @@ const defaultTheme = createTheme({
         }
       }
     }
+  },
+  palette: {
+    primary: {main: '#228B22'},
   }
 });
 
@@ -157,6 +160,7 @@ export default function DisplayMonitor() {
               }}
             >
               <center>
+              <DigitalClock />
               {/* Show video advertisement if available, fallback to logo otherwise */}
                 {showVideoAd && videoUrl ? (
                   <video key={vidKey} width={850} height={700} autoPlay loop muted onEnded={handleVideoEnd}>
@@ -166,7 +170,7 @@ export default function DisplayMonitor() {
                 ) : (
                   <img src={MLogo} width={850} height={850} alt="MLogo" />
                 )}
-                <DigitalClock />
+                
               </center>
             </Paper>
           </center>

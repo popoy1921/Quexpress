@@ -31,7 +31,7 @@ function Copyright(props: any) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
       {'Copyright © '}
-        QuExpress
+      QuExpress
       {new Date().getFullYear()}
       {'.'}
     </Typography>
@@ -88,18 +88,24 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
   }),
 );
 
-// TODO remove, this demo shouldn't need to reset the theme.
-const defaultTheme = createTheme();
+const defaultTheme = createTheme({
+  typography: {
+    fontFamily: 'serif',
+  },
+  palette: {
+    primary: { main: '#228B22' },
+  },
+});
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  
+
   React.useEffect(() => {
     if (!localStorage.getItem('UserEmail')) {
       navigate('/SignInAdmin'); 
     }
   }, [navigate]);
-  
+
   const [open, setOpen] = React.useState(true);
   const toggleDrawer = () => {
     setOpen(!open);
@@ -125,18 +131,16 @@ export default function Dashboard() {
                 ...(open && { display: 'none' }),
               }}
             >
-                
               <MenuIcon />
             </IconButton>
-            <Typography
-              component="h1"
-              variant="h6"
-              color="inherit"
-              noWrap
-              sx={{ flexGrow: 1 }}
-            >
+            <Typography component="h1" variant="h6" color="inherit" noWrap sx={{ flexGrow: 1 }}>
               DASHBOARD
             </Typography>
+            {Username && (
+              <Typography variant="body1" color="inherit" sx={{ marginLeft: 2 }}>
+                Welcome, {Username}
+              </Typography>
+            )}
           </Toolbar>
         </AppBar>
         <Drawer variant="permanent" open={open}>
@@ -149,7 +153,7 @@ export default function Dashboard() {
             }}
           >
             <IconButton onClick={toggleDrawer}>
-            <img src={Logo} width={180} alt="" />
+              <img src={Logo} width={180} alt="Logo" />
               <ChevronLeftIcon />
             </IconButton>
           </Toolbar>
@@ -173,68 +177,70 @@ export default function Dashboard() {
         >
           <Toolbar />
           <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-            <Grid container spacing={10}>
-              {/* Total Served */}
-              <Grid item xs={12} md={4} lg={5}>
+            <Grid container spacing={3}>
+              {/* Total Served - Larger and on its own row */}
+              <Grid item xs={6}>
                 <Paper
                   elevation={24}
                   sx={{
                     p: 2,
                     display: 'flex',
                     flexDirection: 'column',
-                    height: 240,
-                    opacity: 0.95,
+                    height: '290px', // Set a fixed height for consistency
+                    borderRadius: 2,
                   }}
                 >
                   <TotalServed />
                 </Paper>
               </Grid>
-              <Grid item xs={12}>
 
-              </Grid>
-              {/* Queued */}
-              <Grid item xs={12} md={4} lg={3}>
-                <Paper
-                  elevation={24}
-                  sx={{
-                    p: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    height: 240,
-                    opacity: 0.95,
-                  }}
-                >
-                  <Queue />
-                </Paper>
-              </Grid>
-              {/* Served */}
-              <Grid item xs={12} md={4} lg={3}>
-                <Paper
-                  elevation={24}
-                  sx={{
-                    p: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    height: 240,
-                    opacity: 0.95,
-                  }}
-                >
-                  <Served />
-                </Paper>
-              </Grid>
-              {/* Cancelled */}
-              <Grid item xs={12} md={4} lg={3}>
-                <Paper 
-                  elevation={24}
-                  sx={{ 
-                    p: 2, 
-                    display: 'flex', 
-                    flexDirection: 'column',
-                    height: 240,
-                    opacity: 0.95,  
-                  }}>
-                  <Cancel />
-                </Paper>
+              {/* Second row with Queued, Served, and Cancelled */}
+              <Grid container item spacing={3}>
+                {/* Queued */}
+                <Grid item xs={12} md={4}>
+                  <Paper
+                    elevation={24}
+                    sx={{
+                      p: 2,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      height: '290px',
+                      borderRadius: 2,
+                    }}
+                  >
+                    <Queue />
+                  </Paper>
+                </Grid>
+                {/* Served */}
+                <Grid item xs={12} md={4}>
+                  <Paper
+                    elevation={24}
+                    sx={{
+                      p: 2,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      height: '290px',
+                      borderRadius: 2,
+                    }}
+                  >
+                    <Served />
+                  </Paper>
+                </Grid>
+                {/* Cancelled */}
+                <Grid item xs={12} md={4}>
+                  <Paper
+                    elevation={24}
+                    sx={{
+                      p: 2,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      height: '290px',
+                      borderRadius: 2,
+                    }}
+                  >
+                    <Cancel />
+                  </Paper>
+                </Grid>
               </Grid>
             </Grid>
             <Copyright sx={{ pt: 4 }} />

@@ -12,7 +12,7 @@ import Link from '@mui/material/Link';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import bcrypt from 'bcryptjs';
-import Background from '../../Photos/peakpx.jpg';
+import Background from '../../Photos/BackgroundDesktop.jpg';
 
 const Logo = require('../../Photos/coollogo_com-178391066.png');
 
@@ -42,7 +42,10 @@ const defaultTheme = createTheme({
         }
       }
     }
-  }
+  },
+  palette: {
+    primary: { main: '#228B22' },
+  },
 });
 
 export default function SignUp() {
@@ -113,7 +116,7 @@ export default function SignUp() {
     axios.post(`http://localhost:5000/users/create`, userDetails)
     .then(response => {
       console.log('Response:', response.data);
-      navigate('/SignInAccount');
+      navigate('/AdminAccountManagement');
     })
     .catch(error => {
       // Handle error

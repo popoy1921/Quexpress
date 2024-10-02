@@ -82,7 +82,14 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 );
 
 // TODO remove, this demo shouldn't need to reset the theme.
-const defaultTheme = createTheme();
+const defaultTheme = createTheme({
+  typography: {
+    fontFamily: 'serif',
+  },
+  palette: {
+    primary: { main: '#228B22' },
+  },
+});
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -174,7 +181,7 @@ export default function Dashboard() {
 
               </Grid>
             </Grid>
-            <Copyright sx={{ pt: 4 }} />
+            <Copyright sx={{ pt: 1 }} />
           </Container>
         </Box>
       </Box>

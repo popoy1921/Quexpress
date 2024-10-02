@@ -31,8 +31,8 @@ const CustomButton: React.FC<ButtonProps> = ({ details, destination, children}) 
 
   const getFontSize = () => {
     if (isMobile) return '10px';
-    if (isTablet) return '20px';
-    if (isDesktop) return '24px';
+    if (isTablet) return '15px';
+    if (isDesktop) return '23px';
     return '20px'; // Default size if none of the conditions match
   };
 

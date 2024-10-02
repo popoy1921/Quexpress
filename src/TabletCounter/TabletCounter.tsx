@@ -20,9 +20,7 @@ function Copyright(props: any) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" fontFamily={"serif"} {...props}>
       {'Copyright © '}
-      <Link color="inherit" href="/">
         QuExpress
-      </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
     </Typography>
@@ -69,6 +67,9 @@ const defaultTheme = createTheme({
         }
       }
     }
+  },
+  palette: {
+    primary: {main: '#228B22'},
   }
 });
 
@@ -115,36 +116,49 @@ export default function SignIn() {
           <Typography component="h1" variant={isMobile ? "h5" : isTablet ? "h4" : "h3"} color={'black'} marginTop={1}>
             Welcome {localStorage.getItem('UserFirstName')} {localStorage.getItem('UserLastName')}
           </Typography>
-          <Typography component="h1" variant={isMobile ? "h6" : isTablet ? "h5" : "h4"} color={'grey'} marginTop={1}>
+          <Typography component="h1" variant={isMobile ? "h6" : isTablet ? "h5" : "h5"} color={'grey'} marginTop={1}>
             PLEASE CHOOSE TRANSACTION
           </Typography>
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 2 }}>
             <Grid container spacing={1}>
-              <Grid item xs={6}>
-                <CustomButton details={'BUSINESS PERMIT'} destination='/CounterBusinessPermit'>
-                    BUSINESS PERMIT
+              <Grid item xs={4}>
+                <CustomButton details={'SANITARY'} destination='/CounterConfirmation'>
+                SANITARY
+                </CustomButton>
+                <CustomButton details={'BUILDING PERMIT'} destination='/CounterConfirmation'>
+                BUILDING PERMIT
+                </CustomButton>
+                <CustomButton details={'ZONING'} destination='/CounterConfirmation'>
+                ZONING
                 </CustomButton>
               </Grid>
 
-              <Grid item xs={6}>
-                <CustomButton details={'LOCAL CIVIL REGISTRY'} destination='/CounterLocalCivilRegistry'>
-                    LOCAL CIVIL REGISTRY
+              <Grid item xs={4}>
+                <CustomButton details={'BIRTH CERTIFICATE'} destination='/CounterConfirmation'>
+                BIRTH CERTIFICATE
+                </CustomButton>
+                <CustomButton details={'DEATH CERTIFICATE'} destination='/CounterConfirmation'>
+                DEATH CERTIFICATE
+                </CustomButton>
+                <CustomButton details={'MARRIAGE CERTIFICATE'} destination='/CounterConfirmation'>
+                MARRIAGE CERTIFICATE
                 </CustomButton>
               </Grid>
 
-              <Grid item xs={6}>
+              <Grid item xs={4}>
                 <CustomButton details={'CEDULA'} destination='/CounterConfirmation'>
-                    CEDULA
+                CEDULA
                 </CustomButton>
-              </Grid>
-
-              <Grid item xs={6}>
                 <CustomButton details={'REAL PROPERTY TAX'} destination='/CounterConfirmation'>
-                    REAL PROPERTY TAX
+                REAL PROPERTY TAX
+                </CustomButton>
+                <CustomButton details={'FIRE SAFETY INSPECTION CERTIFICATE'} destination='/CounterConfirmation'>
+                FIRE SAFETY CERTIFICATE
                 </CustomButton>
               </Grid>
               <Grid item xs={2}/>
               <Grid item xs={8}>
+                
                 <CancelButton details={'BACK'} destination='/SignInCustomer'>
                     lOGOUT
                 </CancelButton>

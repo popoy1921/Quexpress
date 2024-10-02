@@ -10,11 +10,17 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useMediaQuery } from 'react-responsive';
 import React from 'react';
+import { Refresh } from '@mui/icons-material';
 
 const Logo = require('../Photos/coollogo_com-178391066.png');
 const BackgroundMobile = require('../Photos/BackgroundMobile.jpg');
 const BackgroundTablet = require('../Photos/BackgroundTablet.jpg');
 const BackgroundDesktop = require('../Photos/BackgroundDesktop.jpg');
+
+const firstName = localStorage.getItem('CustomerFirstName');
+const lastName = localStorage.getItem('CustomerLastName');
+const email = localStorage.getItem('CustomerEmail');
+const accountId = localStorage.getItem('CustomerAccountId');
 
 function Copyright(props: any) {
   return (
@@ -67,6 +73,9 @@ const defaultTheme = createTheme({
         }
       }
     }
+  },
+  palette: {
+    primary: {main: '#228B22'},
   }
 });
 
@@ -87,37 +96,54 @@ export default function SignUpCustomer() {
       console.error('Account ID not found');
       return;
     }
-  
-    try {
-      const response = await axios.get<{ 
-        customer_first_name: string; 
-        customer_last_name: string; 
-        customer_email: string; 
-      }>(`${process.env.REACT_APP_OTHER_BACKEND_SERVER}/customer/get/${accountId}`);
-  
-      const customer = response.data;
-  
-      // Safely get and update DOM elements
-      const CustomerAccountIdContainer = document.getElementById('CustomerAccountId') as HTMLElement | null;
-      if (CustomerAccountIdContainer) {
-        CustomerAccountIdContainer.innerText = 'Account ID: ' + accountId;
-      }
-  
-      const CustomerNameContainer = document.getElementById('CustomerName') as HTMLElement | null;
-      if (CustomerNameContainer) {
-        CustomerNameContainer.innerText = `Customer Name: ${customer.customer_first_name} ${customer.customer_last_name}`;
-      }
-  
-      const CustomerEmailContainer = document.getElementById('CustomerEmail') as HTMLElement | null;
-      if (CustomerEmailContainer) {
-        CustomerEmailContainer.innerText = `Customer Email: ${customer.customer_email}`;
-      }
-    } catch (error) {
-      // Handle the error properly
-      setErrorMessage('Server Error');
-      alert('Error: ' + error);
+    
+    const CustomerAccountIdContainer = document.getElementById('CustomerAccountId') as HTMLElement | null;
+    console.log(CustomerAccountIdContainer);
+    if (CustomerAccountIdContainer) {
+      CustomerAccountIdContainer.innerText = 'Account ID: ' + accountId;
+    }
+    const CustomerNameContainer = document.getElementById('CustomerName') as HTMLElement | null;
+    console.log(CustomerNameContainer);
+    if (CustomerNameContainer) {
+      CustomerNameContainer.innerText = 'Customer Name: ' + firstName + ' ' + lastName;
+    }
+    const CustomerEmailContainer = document.getElementById('CustomerEmail') as HTMLElement | null;
+    console.log(CustomerEmailContainer);
+    if (CustomerEmailContainer) {
+      CustomerEmailContainer.innerText = 'Email: ' + email;
     }
   }
+  
+  //   try {
+  //     const response = await axios.get<{ 
+  //       customer_first_name: string; 
+  //       customer_last_name: string; 
+  //       customer_email: string; 
+  //     }>(`${process.env.REACT_APP_OTHER_BACKEND_SERVER}/customer/get/${accountId}`);
+  
+  //     const customer = response.data;
+  
+  //     // Safely get and update DOM elements
+  //     const CustomerAccountIdContainer = document.getElementById('CustomerAccountId') as HTMLElement | null;
+  //     if (CustomerAccountIdContainer) {
+  //       CustomerAccountIdContainer.innerText = 'Account ID: ' + accountId;
+  //     }
+  
+  //     const CustomerNameContainer = document.getElementById('CustomerName') as HTMLElement | null;
+  //     if (CustomerNameContainer) {
+  //       CustomerNameContainer.innerText = `Customer Name: ${customer.customer_first_name} ${customer.customer_last_name}`;
+  //     }
+  
+  //     const CustomerEmailContainer = document.getElementById('CustomerEmail') as HTMLElement | null;
+  //     if (CustomerEmailContainer) {
+  //       CustomerEmailContainer.innerText = `Customer Email: ${customer.customer_email}`;
+  //     }
+  //   } catch (error) {
+  //     // Handle the error properly
+  //     setErrorMessage('Server Error');
+  //     alert('Error: ' + error);
+  //   }
+  // }
   
   React.useEffect(() => {
     displayDetails();
@@ -125,6 +151,10 @@ export default function SignUpCustomer() {
 
   const proceedSignUp = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    localStorage.removeItem('CustomerFirstName');
+    localStorage.removeItem('CustomerLastName');
+    localStorage.removeItem('CustomerEmail');
+    localStorage.removeItem('CustomerAccountId');
     navigate('/');
   }
       // Send a request to your backend to retrieve user info based on the email

@@ -13,7 +13,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import bcrypt from 'bcryptjs';
 import { useNavigate } from 'react-router-dom';
-import Background from '../Photos/peakpx.jpg';
+import Background from '../Photos/BackgroundDesktop.jpg';
 
 const Logo = require('../Photos/coollogo_com-178391066.png');
 
@@ -45,6 +45,9 @@ const defaultTheme = createTheme({
         }
       }
     }
+  },
+  palette: {
+    primary: {main: '#228B22'},
   }
 });
 

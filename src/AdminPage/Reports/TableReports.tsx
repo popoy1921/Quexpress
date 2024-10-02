@@ -3,7 +3,8 @@ import DataTable from 'react-data-table-component';
 import DataTableExtensions from "react-data-table-component-extensions";
 import "react-data-table-component-extensions/dist/index.css";
 import axios from 'axios';
-import { Container } from '@mui/material';
+import { Alert, CircularProgress, Container, Typography } from '@mui/material';
+import { hover } from '@testing-library/user-event/dist/hover';
 
 const App = () => {
   const [tableData, setData] = useState([]);
@@ -62,21 +63,40 @@ const App = () => {
 
   const tableDataForTableExtension = {
     columns: tableTransactionLogColumns,
-    data: tableData
+    data: tableData,
+    filter: true,
   };
 
   return (
-    <div>
-      <DataTableExtensions {...tableDataForTableExtension}>
-        <Container maxWidth='xl' sx={{mt:2}}>
-          <DataTable
-            columns={tableTransactionLogColumns}
-            data={tableData}
-            pagination
-          />
-        </Container>
-      </DataTableExtensions>
-    </div>
+    <Container maxWidth='xl' sx={{ mt: 2 }}>
+      {loading ? (
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+          <CircularProgress />
+          <Typography variant="h6" sx={{ ml: 2 }}>Loading Data...</Typography>
+        </div>
+      ) : error ? (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          Error: {error}
+        </Alert>
+      ) : (
+        <DataTableExtensions {...tableDataForTableExtension}>
+            <div style={{ marginTop: '20px' }}>
+            <DataTable
+              columns={tableTransactionLogColumns}
+              data={tableData}
+              pagination
+              responsive
+              highlightOnHover
+              pointerOnHover
+              striped
+              style={{ 
+                boxShadow: '0px 2px 10px rgba(0, 0, 0, 0.1)',
+              }} 
+            />
+            </div>
+        </DataTableExtensions>
+      )}
+    </Container>
     
   );
 };

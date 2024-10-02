@@ -12,7 +12,7 @@ import Link from '@mui/material/Link';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import bcrypt from 'bcryptjs';
-import Background from '../../Photos/peakpx.jpg';
+import Background from '../../Photos/BackgroundDesktop.jpg';
 
 // Import the logo image
 const Logo = require('../../Photos/coollogo_com-178391066.png');
@@ -32,6 +32,9 @@ const defaultTheme = createTheme({
         }
       }
     }
+  },
+  palette: {
+    primary: {main: '#228B22'},
   }
 });
 
