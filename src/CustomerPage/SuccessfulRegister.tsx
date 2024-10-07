@@ -104,12 +104,28 @@ export default function SignUpCustomer() {
     }
   }  
   
-  React.useEffect(() => {
-    if (refreshCount < 1) {
-      displayDetails(); // Fetch customer details
-      setTimeout(() => setRefreshCount(prev => prev + 1), 1000); // Simulate a "refresh" after 1 second delay
+  useEffect(() => {
+    // Trigger data fetching only when the component mounts
+    displayDetails();
+  }, []);
+  
+  useEffect(() => {
+    if (refreshCount === 1) {
+      // Trigger refresh when refreshCount is 1 (after initial delay)
+      displayDetails();
     }
   }, [refreshCount]);
+  
+  useEffect(() => {
+    // Set a timeout for refresh after 1 second delay (to simulate refresh)
+    const refreshTimer = setTimeout(() => {
+      setRefreshCount(1);
+    }, 1000);
+  
+    // Clear the timeout if the component unmounts
+    return () => clearTimeout(refreshTimer);
+  }, []);
+  
 
   const proceedSignUp = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
