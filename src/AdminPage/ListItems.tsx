@@ -8,6 +8,7 @@ import PeopleIcon from '@mui/icons-material/PeopleRounded';
 import LogoutIcon from '@mui/icons-material/Logout';
 import AssignmentIcon from '@mui/icons-material/AssignmentRounded';
 import PlayCircleIcon from '@mui/icons-material/PlayCircle';
+import AnnouncementIcon from '@mui/icons-material/Announcement';
 
 export const mainListItems = (
   <React.Fragment>
@@ -40,6 +41,12 @@ export const mainListItems = (
         <PlayCircleIcon />
       </ListItemIcon>
       <ListItemText primary="Ads Display" />
+    </ListItemButton>
+    <ListItemButton href="/AdminAnnouncement">
+      <ListItemIcon>
+        <AnnouncementIcon />
+      </ListItemIcon>
+      <ListItemText primary="Announcement" />
     </ListItemButton>
     <ListItemButton href="/SignInAdmin" >
       <ListItemIcon>

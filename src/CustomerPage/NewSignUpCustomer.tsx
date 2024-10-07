@@ -99,7 +99,7 @@ export default function SignUpCustomer() {
 
     const firstName = data.get('firstName');
     const lastName = data.get('lastName');
-    const email = data.get('email');
+    const mobileNumber = data.get('mobileNumber');
     const accountId = UniqueNumber();
     
     if (!firstName){
@@ -110,14 +110,13 @@ export default function SignUpCustomer() {
       alert('Last Name field is empty');
       return;
     }
-    if(!email) {
-      alert('Email field is empty');
+    if (!mobileNumber) {
+      alert('Mobile Number field is empty');
       return;
     }
 
-    // Perform regex test on the email value
-    if (!/^\S+@\S+\.\S+$/.test(email as string)) {
-      alert('Invalid email format');
+    if (!/^\+?\d{10,15}$/.test(mobileNumber as string)) {
+      alert('Invalid mobile number format');
       return;
     }
     
@@ -130,17 +129,17 @@ export default function SignUpCustomer() {
     alert('Successful submission');
 
     const userDetails = {
-      firstName : firstName,
-      lastName  : lastName,
-      email     : email,
-      accountId : accountId,
+      firstName     : firstName,
+      lastName      : lastName,
+      mobileNumber  : mobileNumber,
+      accountId     : accountId,
     }
 
     registerUser(userDetails);
 
     localStorage.setItem('CustomerFirstName', firstName.toString());
     localStorage.setItem('CustomerLastName', lastName.toString());
-    localStorage.setItem('CustomerEmail', email.toString());
+    localStorage.setItem('CustomerMobileNumber', mobileNumber.toString());
     localStorage.setItem('CustomerAccountID', accountId.toString());
 
     navigate('/SuccessfulRegistration/' + accountId);
@@ -205,10 +204,11 @@ export default function SignUpCustomer() {
                 <TextField
                   required
                   fullWidth
-                  id="email"
-                  label="Email Address"
-                  name="email"
-                  autoComplete="email"
+                  id="mobileNumber"
+                  label="Mobile Number"
+                  name="mobileNumber"
+                  autoComplete="tel-national"
+                  type="tel"
                 />
               </Grid>
               <Grid item xs={12}>

@@ -145,14 +145,14 @@ app.put('/users/update/:userId', async (req, res) => {
 
 //route for customer registration
 app.post('/customer/create', async (req, res) => {
-  const userDetails = req.body;
-  const accountId = userDetails.accountId;
-  const firstName = userDetails.firstName;
-  const lastName  = userDetails.lastName;
-  const email  = userDetails.email;
+  const userDetails   = req.body;
+  const accountId     = userDetails.accountId;
+  const firstName     = userDetails.firstName;
+  const lastName      = userDetails.lastName;
+  const mobileNumber  = userDetails.mobileNumber;
   try {
     const client = await pool.connect();
-    const result = await client.query('INSERT INTO quexpress.tbl_quexpress_customers (account_id, customer_first_name, customer_last_name, customer_email) VALUES ($1, $2, $3, $4) RETURNING *', [accountId , firstName, lastName, email]);
+    const result = await client.query('INSERT INTO quexpress.tbl_quexpress_customers (account_id, customer_first_name, customer_last_name, customer_number) VALUES ($1, $2, $3, $4) RETURNING *', [accountId , firstName, lastName, mobileNumber]);
     res.json(result.rows[0]);
     client.release();
   } catch (err) {
@@ -239,9 +239,28 @@ app.get('/transaction_log/get/:transactionCode', async (req, res) => {
   let transactionCode = req.params.transactionCode + '%';
   try {    
     var queryString = 'SELECT * FROM quexpress.tbl_quexpress_transaction_log'
-    + ' WHERE transactions_queue = (SELECT MAX(transactions_queue) FROM quexpress.tbl_quexpress_transaction_log'
-    + ' WHERE transactions_queue LIKE $1 AND transaction_datetime >= CURRENT_DATE AND transaction_status IS NOT NULL)'
-    + ' AND transactions_queue LIKE $1 AND transaction_datetime >= CURRENT_DATE AND transaction_status IS NOT NULL';
+      + ' WHERE transactions_queue = (SELECT MAX(transactions_queue) FROM quexpress.tbl_quexpress_transaction_log'
+      + ' WHERE transactions_queue LIKE $1 AND transaction_datetime >= CURRENT_DATE AND transaction_status IS NOT NULL)'
+      + ' AND transactions_queue LIKE $1 AND transaction_datetime >= CURRENT_DATE AND transaction_status IS NOT NULL';
+    var queryParameters = [transactionCode];
+    const client = await pool.connect();
+    const result = await client.query(queryString, queryParameters);
+    res.json(result.rows[0]);
+    client.release();
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server Error');
+  }
+});
+
+// Route for CSH Displaying QueueNumber to monitor
+app.get('/transaction_log/CSH/:transactionCode', async (req, res) => {
+  let transactionCode = req.params.transactionCode + '%';
+  try {    
+    var queryString = 'SELECT * FROM quexpress.tbl_quexpress_transaction_log'
+      + ' WHERE transactions_queue = (SELECT MAX(transactions_queue) FROM quexpress.tbl_quexpress_transaction_log'
+      + ' WHERE transactions_queue LIKE $1 AND transaction_datetime >= CURRENT_DATE AND transaction_status IS NOT NULL)'
+      + ' AND transactions_queue LIKE $1 AND transaction_datetime >= CURRENT_DATE AND transaction_status IS NOT NULL';
     var queryParameters = [transactionCode];
     const client = await pool.connect();
     const result = await client.query(queryString, queryParameters);
@@ -259,46 +278,63 @@ app.get('/transaction_log/get/:transactionCode/:transactionStatus', async (req, 
   const transactionStatus = req.params.transactionStatus;
   try {
     var queryParameters = [];
-    var queryString = 'SELECT * FROM quexpress.tbl_quexpress_transaction_log';
-    var transactionCodeIndex = 2;
-    if (transactionCode === 'all') {
-      // for admin reports
-      queryString += ' where (transaction_datetime <= CURRENT_DATE';
-      transactionCodeIndex = 1;
-    } else if (transactionCode === 'today') {
-      // for admin today reports
-      queryString += ' where (transaction_datetime >= CURRENT_DATE';
-      transactionCodeIndex = 1;
-    }else {
-      // for teller reports
-      queryString += ' where transactions_queue LIKE $1';
+    if (!/^CSH/.test(transactionCode)) {
+      var queryString = 'SELECT * FROM quexpress.tbl_quexpress_transaction_log';
+      var transactionCodeIndex = 2;
+      if (transactionCode === 'all') {
+        // for admin reports
+        queryString += ' where (transaction_datetime <= CURRENT_DATE';
+        transactionCodeIndex = 1;
+      } else if (transactionCode === 'today') {
+        // for admin today reports
+        queryString += ' where (transaction_datetime >= CURRENT_DATE';
+        transactionCodeIndex = 1;
+      }else {
+        // for teller reports
+        queryString += ' where transactions_queue LIKE $1';
+        transactionCode += '%';
+        queryParameters.push(transactionCode);
+      }
+      
+      if (transactionStatus === 'toQueue') {
+        queryString += ' and transaction_datetime >= CURRENT_DATE';
+        if (transactionCode === 'all' || transactionCode === 'today') {
+          queryString += ')';
+        }
+        queryString += ' and (transaction_status IS NULL)';
+      } else if (transactionStatus === 'notForQueue') {
+        if (transactionCode === 'all' || transactionCode === 'today') {
+          queryString += ' or transaction_datetime >= CURRENT_DATE)';
+        } else {
+          queryString += ' and (transaction_datetime <= CURRENT_DATE or transaction_datetime >= CURRENT_DATE)';
+        }
+        queryString += ' and (transaction_status IS NOT NULL)';
+      } else if (transactionStatus === 'all') {
+        queryString += ')';
+      } else if (transactionStatus === 'alldone') {
+        queryString += ' or transaction_datetime >= CURRENT_DATE)';
+        queryString += ' and (transaction_status IS NOT NULL)';
+      } else {
+        queryString += ') and transaction_status = $' + transactionCodeIndex;
+        queryParameters.push(transactionStatus);
+      }
+    } else {
+      var queryString = 'SELECT * FROM quexpress.tbl_quexpress_transaction_log'
+      + ' where transactions_queue LIKE $1';
       transactionCode += '%';
       queryParameters.push(transactionCode);
+
+      if (transactionStatus === 'toQueue') {
+        queryString += ' and transaction_datetime >= CURRENT_DATE'
+        + ' and (transaction_status IS NULL)';
+        
+      } else if (transactionStatus === 'notForQueue') {
+        queryString += ' and (transaction_datetime <= CURRENT_DATE or transaction_datetime >= CURRENT_DATE)'
+        + ' and (transaction_status IS NOT NULL)';
+      } 
     }
     
-    if (transactionStatus === 'toQueue') {
-      queryString += ' and transaction_datetime >= CURRENT_DATE';
-      if (transactionCode === 'all' || transactionCode === 'today') {
-        queryString += ')';
-      }
-      queryString += ' and (transaction_status IS NULL)';
-    } else if (transactionStatus === 'notForQueue') {
-      if (transactionCode === 'all' || transactionCode === 'today') {
-        queryString += ' or transaction_datetime >= CURRENT_DATE)';
-      } else {
-        queryString += ' and (transaction_datetime <= CURRENT_DATE or transaction_datetime >= CURRENT_DATE)';
-      }
-      queryString += ' and (transaction_status IS NOT NULL)';
-    } else if (transactionStatus === 'all') {
-      queryString += ')';
-    } else if (transactionStatus === 'alldone') {
-      queryString += ' or transaction_datetime >= CURRENT_DATE)';
-      queryString += ' and (transaction_status IS NOT NULL)';
-    } else {
-      queryString += ') and transaction_status = $' + transactionCodeIndex;
-      queryParameters.push(transactionStatus);
-    }
-    queryString += ' order by transaction_datetime asc';
+    queryString += ' order by transactions_queue asc';
     const client = await pool.connect();
     const result = await client.query(queryString, queryParameters);
     res.json(result.rows);
@@ -312,29 +348,58 @@ app.get('/transaction_log/get/:transactionCode/:transactionStatus', async (req, 
 
 // Route to update status and end time
 app.put('/transaction_log/update', async (req, res) => {
-  const transactionData    = req.body;
-  const transactionQueue   = transactionData.transactionQueue;
-  const status             = transactionData.status;
+  const transactionData = req.body;
+  const transactionQueue = transactionData.transactionQueue;
+  const status = transactionData.status;
+  const transactionRef = transactionData.transactionRef ?? null; 
   const transactionEndTime = transactionData.transactionEndTime ?? null;
   const transactionStartTime = transactionData.transactionStartTime ?? null;
-  
-  try {
-    var queryString = 'UPDATE quexpress.tbl_quexpress_transaction_log SET transaction_status = $1,';
-    var transactionLogDetails = [
-      status,
-      transactionQueue,
-    ];
 
-    if(transactionStartTime !== null) {
-      queryString += ' transaction_starttime = $3';
+  try {
+    let queryString = 'UPDATE quexpress.tbl_quexpress_transaction_log SET transaction_status = $1';
+    let transactionLogDetails = [status];
+
+    if (transactionStartTime !== null) {
+      queryString += ', transaction_starttime = $2';
       transactionLogDetails.push(transactionStartTime);
     } else {
-      queryString += ' transaction_endtime = $3';
+      queryString += ', transaction_endtime = $2';
       transactionLogDetails.push(transactionEndTime);
     }
-    queryString += ' where transactions_queue = $2'
-    + ' and transaction_datetime >= CURRENT_DATE'
-    + ' RETURNING *';
+
+    if (transactionRef) {
+      queryString += ' WHERE transaction_ref = $3';
+      transactionLogDetails.push(transactionRef);
+    } else {
+      queryString += ' WHERE transactions_queue = $3';
+      transactionLogDetails.push(transactionQueue);
+    }
+
+    queryString += ' AND transaction_datetime >= CURRENT_DATE RETURNING *';
+    const client = await pool.connect();
+    const result = await client.query(queryString, transactionLogDetails);
+    res.json(result.rows[0]);
+    client.release();
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server Error');
+  }
+});
+
+
+// Route to update staff id 
+app.put('/transaction_log/updateStaff', async (req, res) => {
+  const transactionData    = req.body;
+  const transactionLogId   = transactionData.transactionLogId;
+  const staffId   = transactionData.staffId;
+  
+  try {
+    var queryString = 'UPDATE quexpress.tbl_quexpress_transaction_log SET staff_id = $1 where transaction_log_id = $2 RETURNING *';
+    var transactionLogDetails = [
+      staffId,
+      transactionLogId,
+    ];
+
     const client = await pool.connect();
     const result = await client.query(queryString, transactionLogDetails);
     res.json(result.rows[0]);
@@ -397,6 +462,37 @@ app.put('/users/updateAdvertisement', upload.single('file'), async(req, res) => 
 // Route to get user details
 app.get('/users/getAdvertisement', async (req, res) => {
   const userId = req.params.userId;
+  try {
+    const client = await pool.connect();
+    const result = await client.query('SELECT * FROM quexpress.tbl_quexpress_users WHERE access_id = 1');
+    res.json(result.rows[0]);
+    client.release();
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server Error');
+  }
+});
+
+// Route for Announcement
+app.put('/users/updateAnnouncement', async (req, res) => {
+  const { announcement } = req.body;
+  try {
+    const queryString = 'UPDATE quexpress.tbl_quexpress_users SET announcement = $1 WHERE access_id = 1 RETURNING *';
+    const transactionLogDetails = [announcement];
+
+    const client = await pool.connect();
+    const result = await client.query(queryString, transactionLogDetails);
+    res.json(result.rows[0]);
+    client.release();
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server Error');
+  }
+});
+
+// Route to get Announcement
+app.get('/users/getAnnouncement', async (req, res) => {
+  
   try {
     const client = await pool.connect();
     const result = await client.query('SELECT * FROM quexpress.tbl_quexpress_users WHERE access_id = 1');

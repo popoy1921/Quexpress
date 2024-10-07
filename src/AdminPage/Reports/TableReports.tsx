@@ -4,7 +4,7 @@ import DataTableExtensions from "react-data-table-component-extensions";
 import "react-data-table-component-extensions/dist/index.css";
 import axios from 'axios';
 import { Alert, CircularProgress, Container, Typography } from '@mui/material';
-import { hover } from '@testing-library/user-event/dist/hover';
+import "../../index.css";
 
 const App = () => {
   const [tableData, setData] = useState([]);
@@ -80,7 +80,6 @@ const App = () => {
         </Alert>
       ) : (
         <DataTableExtensions {...tableDataForTableExtension}>
-            <div style={{ marginTop: '20px' }}>
             <DataTable
               columns={tableTransactionLogColumns}
               data={tableData}
@@ -93,7 +92,6 @@ const App = () => {
                 boxShadow: '0px 2px 10px rgba(0, 0, 0, 0.1)',
               }} 
             />
-            </div>
         </DataTableExtensions>
       )}
     </Container>

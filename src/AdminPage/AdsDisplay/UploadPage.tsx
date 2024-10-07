@@ -67,7 +67,7 @@ const UploadPage: React.FC = () => {
       }}
     >
       <Paper 
-        elevation={8} 
+        elevation={24} 
         sx={{ 
           padding: 4, 
           width: 400, 
@@ -91,7 +91,7 @@ const UploadPage: React.FC = () => {
                   width: '100%',
                   marginTop: 8,
                   padding: '8px',
-                  border: '2px dashed #2196f3',
+                  border: '2px dashed #228B22',
                   borderRadius: '8px',
                   transition: 'border-color 0.3s',
                   fontFamily:'serif',
@@ -111,7 +111,7 @@ const UploadPage: React.FC = () => {
                   fontFamily:'serif',
                   transition: 'background-color 0.3s, transform 0.3s',
                   '&:hover': {
-                    backgroundColor: '#1976d2',
+                    backgroundColor: '#228B22',
                     transform: 'scale(1.05)',
                   },
                 }}

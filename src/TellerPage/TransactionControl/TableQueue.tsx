@@ -7,104 +7,80 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import axios from 'axios';
-import { useState } from 'react';
-import { Container, Grid, Box } from '@mui/material';
+import { useState, useEffect } from 'react';
+import { Container, Grid } from '@mui/material';
 import Title from '../Title';
 
-export default function BasicTable() {  
-  setInterval(populateTable, 1000);
+export default function BasicTable() {
+  const [queueNumbers, setQueueNumbers] = useState<any[]>([]);
 
-  async function populateTable() {
-    const transaction = localStorage.getItem('TransactionAccess');
-    let transactionCodeString = localStorage.getItem('TransactionCodes') as string;
-    let transactionCodes : {[key: string]: string}= {};
-    transactionCodes = JSON.parse(transactionCodeString);
-    let transactionCode = transactionCodes[transaction ?? ''];
-    
-    
-    const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/${transactionCode}/toQueue`)
-    .then(async function (response) {
-      let queueNumbers = response.data;
-      let newRow;
-      let columnQueueNumber;
-      let columnCustomerAccountId;
-      let tableQueue = document.getElementById('QueueTable') ?? document;
-      let tableQueueBody = tableQueue.getElementsByTagName('tbody')[0];
-      tableQueueBody.innerHTML = "";
-      queueNumbers.forEach(function (element : any) {
-        newRow = document.createElement('tr');
-        columnQueueNumber = document.createElement('td');
-        columnCustomerAccountId = document.createElement('td');
-        setColumnProperties(columnQueueNumber, element.transactions_queue);
-        setColumnProperties(columnCustomerAccountId, element.customer_account_id);
-        newRow.append(columnQueueNumber);
-        newRow.append(columnCustomerAccountId);
-        setRowProperties(newRow);
-        tableQueueBody.append(newRow);
-      });
-    });
-  }
+  useEffect(() => {
+    const fetchQueueNumbers = async () => {
+      const transaction = localStorage.getItem('TransactionAccess');
+      let transactionCodeString = localStorage.getItem('TransactionCodes') as string;
+      let transactionCodes: { [key: string]: string } = {};
+      transactionCodes = JSON.parse(transactionCodeString);
+      let transactionCode = transactionCodes[transaction ?? ''];
 
-  function setColumnProperties(column : any, content : string)
-  {
-    const columnClasses = [
-      'MuiTableCell-root',
-      'MuiTableCell-body',
-      'MuiTableCell-alignRight',
-      'MuiTableCell-sizeMedium',
-      'css-177gid-MuiTableCell-root',
-      'text-left'
-    ];
+      try {
+        const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/${transactionCode}/toQueue`);
+        setQueueNumbers(response.data);
+      } catch (error) {
+        console.error('Error fetching queue numbers:', error);
+      }
+    };
 
-    columnClasses.forEach(function(className){
-      column.classList.add(className);
-    });
-    column.append(content);
-  }
+    fetchQueueNumbers(); // Initial fetch
 
-  function setRowProperties(row : any)
-  {
-    const rowClasses = [
-      'MuiTableRow-root',
-      'css-34nofg-MuiTableRow-root'
-    ];
+    const intervalId = setInterval(fetchQueueNumbers, 1000); // Set interval to fetch every second
 
-    rowClasses.forEach(function(className){
-      row.classList.add(className);
-    });
-  }
+    return () => clearInterval(intervalId); // Cleanup interval on unmount
+  }, []);
 
   return (
     <React.Fragment>
       <Container maxWidth="lg" sx={{ mt: 5, mb: 1 }}>
         <Grid container spacing={10}>
-            <Grid item xs={1}/>
-            <Grid item xs={10}>
-                <Paper
-                    sx={{
-                    p: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    height: 300,
-                    }}
-                >
-                <Title>Next in Queue</Title>
-                  <TableContainer component={Paper}>
-                    <Table sx={{ minWidth: 650 }} aria-label="simple table" id="QueueTable">
-                      <TableHead>
-                        <TableRow>
-                          <TableCell>Queue Number</TableCell>
-                          <TableCell>Customer Account Number</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </Paper>
-              </Grid>
-            </Grid>
-        </Container>
+          <Grid item xs={1} />
+          <Grid item xs={10}>
+            <Paper
+            elevation={24}
+              sx={{
+                p: 2,
+                display: 'flex',
+                flexDirection: 'column',
+                height: 'auto',
+              }}
+            >
+              <Title>Next in Queue</Title>
+              <TableContainer component={Paper}>
+                <Table sx={{ minWidth: 650 }} aria-label="simple table" id="QueueTable">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Queue Number</TableCell>
+                      <TableCell>Customer Account Number</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {queueNumbers.map((element, index) => (
+                      <TableRow key={index}>
+                        <TableCell>
+                          {localStorage.getItem('AccessId') === '3' 
+                            ? element.transaction_ref 
+                            : localStorage.getItem('AccessId') === '2'
+                            ? element.transactions_queue
+                            : null }
+                        </TableCell>
+                        <TableCell>{element.customer_account_id}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Paper>
+          </Grid>
+        </Grid>
+      </Container>
     </React.Fragment>
   );
 }

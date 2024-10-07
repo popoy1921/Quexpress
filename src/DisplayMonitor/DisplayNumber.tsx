@@ -58,10 +58,15 @@ function useTransactionData(transactionCode: string) {
   React.useEffect(() => {
     const interval = setInterval(async () => {
       try {
-        const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/${transactionCode}`);
-        let queueNumber = response.data.transactions_queue;
+        let queueNumber = '';
+        if(transactionCode === 'CSH') {
+          const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/CSH/${transactionCode}`);
+          queueNumber = response.data.transaction_ref;
+        } else {
+          const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/${transactionCode}`);
+          queueNumber = response.data.transactions_queue;
+        }
         let nowServingContainer = document.getElementById('NowServing' + transactionCode);
-
         if (nowServingContainer) {
           const blinkResponse = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transactions/getBlink/${transactionCode}`);
           if (blinkResponse.data['blink'] === 1) {
@@ -77,6 +82,7 @@ function useTransactionData(transactionCode: string) {
             }, 2000);
           } else if (queueNumber === undefined) {
             nowServingContainer.innerText = transactionCode+'00000';
+            nowServingContainer.style.opacity = '0';
           }
           else {
             nowServingContainer.innerText = queueNumber;
@@ -85,21 +91,20 @@ function useTransactionData(transactionCode: string) {
       } catch (error) {
         console.error('Error fetching transaction status:', error);
       }
-    }, 3000); // Refresh every 3 seconds for this specific transaction code
+    }, 3000); 
 
-    return () => clearInterval(interval); // Cleanup on component unmount
+    return () => clearInterval(interval); 
   }, [transactionCode]);
 }
 
 export default function DisplayMonitor() {
-  // State to toggle between logo and video advertisement
   const [videoUrl, setVideoUrl] = React.useState<string | null>('');
-  const [vidKey, setVidKey] = React.useState<any>('');; // Initially show the video ad
-  const [showVideoAd, setShowVideoAd] = React.useState(true); // Initially show the video ad
+  const [vidKey, setVidKey] = React.useState<any>('');; 
+  const [showVideoAd, setShowVideoAd] = React.useState(true);
+  const [announcement, setAnnouncement] = React.useState<string>('');
 
-  // Handle when the video ends
   const handleVideoEnd = () => {
-    setShowVideoAd(false); // Switch to the logo when the video ends
+    setShowVideoAd(false); 
   };
 
   var currentAdvertisementLink = '';
@@ -119,16 +124,31 @@ export default function DisplayMonitor() {
     }, 3000);
   }
 
+  var currentAnnouncement = '';
+  function updateDisplayedAnnouncement () {
+    var displayAsInterval = setInterval(async () => {
+      axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + '/users/getAnnouncement')
+      .then(response => {
+        if (currentAnnouncement !== response.data.announcement) {
+          currentAnnouncement = response.data.announcement;
+          setAnnouncement(currentAnnouncement);
+        }
+      })
+      .catch(err => {
+        console.log(err);
+      })
+    }, 3000);
+  }
+
   React.useEffect(() => {
     updateDisplayedAdsLink();
+    updateDisplayedAnnouncement();
   }, []);
 
   function callMe() {
     console.log(1);
   }
 
-
-  // Directly call `useTransactionData` for each transaction code separately.
   useTransactionData('BPS');
   useTransactionData('BPB');
   useTransactionData('BPZ');
@@ -163,14 +183,57 @@ export default function DisplayMonitor() {
               <DigitalClock />
               {/* Show video advertisement if available, fallback to logo otherwise */}
                 {showVideoAd && videoUrl ? (
-                  <video key={vidKey} width={850} height={700} autoPlay loop muted onEnded={handleVideoEnd}>
+                  <video key={vidKey} width={850} height={600} autoPlay loop muted onEnded={handleVideoEnd}>
                     <source src={videoUrl} type="video/mp4" />
                     Your browser does not support the video tag.
                   </video>
                 ) : (
-                  <img src={MLogo} width={850} height={850} alt="MLogo" />
+                  <img src={MLogo} width={600} height={600} alt="MLogo" />
                 )}
-                
+
+                {/* Scrolling Announcement */}
+                <div
+                  style={{
+                    overflow: 'hidden',
+                    whiteSpace: 'nowrap',
+                    width: '100%',
+                    marginTop: '20px',
+                    position: 'relative',
+                    height: '90px',
+                    background: 'linear-gradient(135deg, #4CAF50, #228B22)',
+                    borderRadius: '8px',
+                    padding: '10px 20px',
+                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+                  }}
+                >
+                  <Typography
+                    variant="h3"
+                    color="white"
+                    sx={{
+                      display: 'inline-block',
+                      animation: 'scroll-text 30s linear 0s infinite forwards',
+                      mt: 1,
+                      textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)',
+                      '&:hover': {
+                        textDecoration: 'underline',
+                        cursor: 'pointer',
+                      },
+                    }}
+                  >
+                    {announcement || 'Have a wonderful day to everyone'}
+                  </Typography>
+                </div>
+
+                {/* Scroll Animation CSS */}
+                <style>
+                  {`
+                    @keyframes scroll-text {
+                      0% { transform: translateX(100%); }
+                      100% { transform: translateX(-100%); }
+                    }
+                  `}
+                </style>
+
               </center>
             </Paper>
           </center>
@@ -192,13 +255,13 @@ export default function DisplayMonitor() {
                 }}
               >
                 <Typography component="h1" variant="h3" align="center" fontFamily={"serif"} color={'primary'}>
-                  WINDOW {index + 1}
+                  {transactionCode === 'CSH' ? 'CASHIER' : `WINDOW ${index + 1}`}
                 </Typography>
                 <Typography component="h1" variant="h6" align="center" marginTop={0} marginBottom={0} fontFamily={"serif"} color={'grey'}>
                   NOW SERVING
                 </Typography>
                 <Typography component="h1" variant="h1" align="center" fontFamily={"serif"} color={'black'} marginTop={0} id={'NowServing' + transactionCode}>
-                   {/* display queueNumber */}
+                  {/* display queueNumber */}
                 </Typography>
               </Paper>
             </Grid>

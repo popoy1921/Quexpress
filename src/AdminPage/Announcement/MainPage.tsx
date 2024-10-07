@@ -11,21 +11,23 @@ import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
-import Link from '@mui/material/Link';
+import Paper from '@mui/material/Paper';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import { mainListItems } from './ListItems';
-import TableReports from './TableReports'
+import { mainListItems } from '../ListItems';
+import { useNavigate } from 'react-router-dom';
+import Announcement from './Announcement';
 
 const Logo = require('../../Photos/coollogo_com-178391066.png');
+
+const userInfo = localStorage.getItem('User');
+const Username = localStorage.getItem('Username');
 
 function Copyright(props: any) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
       {'Copyright © '}
-      <Link color="inherit" href="/">
-        QuExpress,
-      </Link>{' '}
+        QuExpress
       {new Date().getFullYear()}
       {'.'}
     </Typography>
@@ -83,9 +85,24 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 );
 
 // TODO remove, this demo shouldn't need to reset the theme.
-const defaultTheme = createTheme();
+const defaultTheme = createTheme({
+  typography: {
+    fontFamily: 'serif',
+  },
+  palette: {
+    primary: { main: '#228B22' },
+  },
+});
 
 export default function Dashboard() {
+  const navigate = useNavigate();
+  
+  React.useEffect(() => {
+    if (!localStorage.getItem('UserEmail')) {
+      navigate('/SignInAdmin'); 
+    }
+  }, [navigate]);
+  
   const [open, setOpen] = React.useState(true);
   const toggleDrawer = () => {
     setOpen(!open);
@@ -121,7 +138,7 @@ export default function Dashboard() {
               noWrap
               sx={{ flexGrow: 1 }}
             >
-              Reports
+              Announcement
             </Typography>
           </Toolbar>
         </AppBar>
@@ -157,10 +174,26 @@ export default function Dashboard() {
             overflow: 'auto',
           }}
         >
-          <TableReports/>
           <Toolbar />
-          <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-            <Copyright sx={{ pt: 4 }} />
+          <Container maxWidth="lg" sx={{ mt: 1 }}>
+            <Grid container spacing={10}>
+              {/* Total Served */}
+              <Grid item xs={12} lg={12}>
+                <Paper
+                  elevation={24}
+                  sx={{
+                    p: 2,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    height: 500,
+                    opacity: 0.95,
+                  }}
+                >
+                <Announcement />
+                </Paper>
+              </Grid>
+            </Grid>
+            <Copyright sx={{ mt: 1 }} />
           </Container>
         </Box>
       </Box>

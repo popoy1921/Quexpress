@@ -14,6 +14,7 @@ import AdminAccountManagement from './AdminPage/AccountManagement/MainPage'
 import AdminReports from './AdminPage/Reports/MainPage'
 import AdminStatus from './AdminPage/StatusWindow/MainPage'
 import AdminAds from './AdminPage/AdsDisplay/MainPage'
+import AdminAnnouncement from './AdminPage/Announcement/MainPage'
 import UploadPage from './AdminPage/AdsDisplay/UploadPage'
 import TabletCounter from './TabletCounter/TabletCounter'
 import TabletBusinessPermit from './TabletCounter/TabletBusinessPermit'
@@ -23,8 +24,6 @@ import TabletPrint from './TabletCounter/CounterPrint'
 import DisplayMonitor from './DisplayMonitor/DisplayNumber'
 import TellerControl from './TellerPage/TransactionControl/MainPage'
 import TellerReports from './TellerPage/Reports/MainPage'
-import CashierReports from './CashierPage/Reports/Dashboard'
-import CashierControl from './CashierPage/Dashboard'
 import { FileProvider } from './AdminPage/AdsDisplay/FileContext';
 
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
@@ -48,11 +47,10 @@ const App: React.FC = () => {
           <Route path="/AdminReport" element={<AdminReports/>} />
           <Route path="/AdminStatusWindow" element={<AdminStatus/>} />
           <Route path="/AdminAds" element={<AdminAds />} />
+          <Route path="/AdminAnnouncement" element={<AdminAnnouncement />} />
           <Route path="/AdminAdsUpload" element={<UploadPage/>} />
           <Route path="/Teller/:TransactionCode" element={<TellerControl/>} />
           <Route path='/TellerReports/:TransactionCode' element={<TellerReports/>} />
-          <Route path="/Cashier" element={<CashierControl/>} />
-          <Route path="/CashierReports" element={<CashierReports/>} />
           <Route path="/Counter" element={<TabletCounter/>} />
           <Route path="/CounterTablet" element={<TabletCounter/>} />
           <Route path="/CounterBusinessPermit" element={<TabletBusinessPermit/>} />

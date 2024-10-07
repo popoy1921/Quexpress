@@ -11,3 +11,33 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.dlink {
+  text-decoration: none !important;
+  color: #20683b !important; /* Green link color */
+}
+
+.data-table-extensions-filter {
+  border: 1px solid rgb(32, 102, 58); /* Green border */
+  border-radius: 50px;
+  padding: 3px 5px;
+  width: 70%;
+  margin-bottom:2%;
+}
+
+.data-table-extensions-filter > .icon {
+  filter: hue-rotate(-100deg);
+}
+
+.first {
+  padding-right: 10px !important;
+}
+
+.filter-text {
+  border: none !important;
+  width: 80%;
+}
+
+.data-table-extensions-action {
+  filter: hue-rotate(-100deg);
+}

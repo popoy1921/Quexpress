@@ -2,8 +2,6 @@ import * as React from 'react';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import Link from '@mui/material/Link';
-import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
@@ -14,7 +12,7 @@ import axios from 'axios';
 import bcrypt from 'bcryptjs'
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
-import Background from '../Photos/peakpx.jpg';
+import Background from '../Photos/BackgroundDesktop.jpg';
 
 const Logo = require('../Photos/coollogo_com-178391066.png');
 
@@ -59,7 +57,10 @@ const defaultTheme = createTheme({
         }
       }
     }
-  }
+  },
+  palette: {
+    primary: { main: '#228B22' },
+  },
 });
 
 const SignIn: React.FC = () => {
@@ -217,7 +218,7 @@ const SignIn: React.FC = () => {
                 <MenuItem value={'FIRESAFETYINSPECTIONCERTIFICATE'}>FIRE SAFETY INSPECTION CERTIFICATE</MenuItem>
                 <MenuItem value={'BIRTHCERTIFICATE'}>BIRTH CERTIFICATE</MenuItem>
                 <MenuItem value={'DEATHCERTIFICATE'}>DEATH CERTIFICATE</MenuItem>
-                <MenuItem value={'MARRIAGE CERTIFICATE'}>MARRIAGE CERTIFICATE</MenuItem>
+                <MenuItem value={'MARRIAGECERTIFICATE'}>MARRIAGE CERTIFICATE</MenuItem>
                 <MenuItem value={'CEDULA'}>CEDULA</MenuItem>
                 <MenuItem value={'REALPROPERTYTAX'}>REAL PROPERTY TAX</MenuItem>
                 <MenuItem value={'CASHIER'}>CASHIER</MenuItem>
