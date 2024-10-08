@@ -86,6 +86,7 @@ function useTransactionData(transactionCode: string) {
           }
           else {
             nowServingContainer.innerText = queueNumber;
+            nowServingContainer.style.opacity = '1';
           }
         }
       } catch (error) {

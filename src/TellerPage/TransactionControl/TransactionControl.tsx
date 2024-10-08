@@ -13,11 +13,27 @@ import CashierIcon from '@mui/icons-material/AttachMoney'; // Pass to cashier bu
 
 const { formattedDate } = returnDateTime();
 
-export default function TransactionControl() {
+export default function TransactionControl() {  
+  const [accessId, setAccessId] = React.useState(localStorage.getItem('AccessId'));
+
+  // Set interval to update accessId
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      const newAccessId = localStorage.getItem('AccessId');
+      if (newAccessId !== accessId) {
+        setAccessId(newAccessId);
+      }
+    }, 5000); // Update every 5 seconds
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(interval);
+  }, [accessId]);
+
   let transactionCodeString = localStorage.getItem('TransactionCodes') as string;
   let transactionCodes: { [key: string]: string } = {};
   transactionCodes = JSON.parse(transactionCodeString);
   let transactionCode = transactionCodes[useParams().TransactionCode ?? ''];
+
 
   async function updateForMonitorBlink(transactionCode: string) {
     await axios.put(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/updateBlink/` + transactionCode, { 'blink': 1 });
@@ -55,12 +71,16 @@ export default function TransactionControl() {
     // current number move to done
     let date: Date = new Date();
     let transactionQueue = localStorage.getItem(transactionCode + 'NowServing');
-    let transactionData = {
-      transactionQueue: transactionQueue,
+    let transactionData: any = {
       status: nextTransactionStatus,
       transactionEndTime: format(date, 'HH:mm:ss'),
-      transactionRef: transactionQueue,
     };
+    if (accessId === '2') {
+      transactionData.transactionQueue = transactionQueue;
+    } else if (accessId === '3') {
+        transactionData.transactionRef = transactionQueue;
+    }
+
     if (transactionQueue === '0') {
       return false;
     }
@@ -87,12 +107,16 @@ export default function TransactionControl() {
     if (rows.length > 0) {
       // move next number to on going
       queueNumber = rows[0].getElementsByTagName("td")[0].innerText;
-      let transactionData = {
-        transactionQueue: queueNumber,
+      let transactionData: any = {
         status: 'on going',
         transactionStartTime: format(date, 'HH:mm:ss'),
-        transactionRef: queueNumber,
       };
+      if (accessId === '2') {
+        transactionData.transactionQueue = queueNumber;
+      } else if (accessId === '3') {
+          transactionData.transactionRef = queueNumber;
+      }
+
       await axios.put(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/update`, transactionData)
         .then(response => { })
         .catch(error => {
@@ -167,7 +191,7 @@ export default function TransactionControl() {
       });
   }
 
-  var accessId = localStorage.getItem('AccessId');
+
 
   return (
     <React.Fragment>
