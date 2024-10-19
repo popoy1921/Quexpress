@@ -98,11 +98,12 @@ function useTransactionData(transactionCode: string) {
   }, [transactionCode]);
 }
 
-export default function DisplayMonitor() {
+export default function DisplayMonitor1() {
   const [videoUrl, setVideoUrl] = React.useState<string | null>('');
   const [vidKey, setVidKey] = React.useState<any>('');; 
   const [showVideoAd, setShowVideoAd] = React.useState(true);
   const [announcement, setAnnouncement] = React.useState<string>('');
+  let cshIndex = 1;
 
   const handleVideoEnd = () => {
     setShowVideoAd(false); 
@@ -150,16 +151,17 @@ export default function DisplayMonitor() {
     console.log(1);
   }
 
+  useTransactionData('BPLO1');
+  useTransactionData('BPLO2');
   useTransactionData('BPS');
   useTransactionData('BPB');
   useTransactionData('BPZ');
   useTransactionData('BPF');
-  useTransactionData('LCB');
-  useTransactionData('LCD');
-  useTransactionData('LCM');
-  useTransactionData('CDL');
-  useTransactionData('RPT');
-  useTransactionData('CSH');
+  useTransactionData('DTI');
+  useTransactionData('LBI');
+  useTransactionData('LDI');
+  useTransactionData('LMI');
+  useTransactionData('LCI');
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -243,7 +245,8 @@ export default function DisplayMonitor() {
 
         {/* Render transaction windows in two columns */}
         <Grid container item xs={12} sm={6}>
-          {['BPS', 'BPB', 'BPZ', 'BPF', 'LCB', 'LCD', 'LCM', 'CDL', 'RPT', 'CSH'].map((transactionCode, index) => (
+          {['BPLO1', 'BPLO2', 'BPS', 'BPB', 'BPZ', 'BPF', 'DTI', 'LBI', 'LDI', 'LMI', 'LCI',
+            ].map((transactionCode, index) => (
             <Grid item xs={12} sm={6} key={transactionCode}>
               <Paper
                 elevation={24}
@@ -255,13 +258,13 @@ export default function DisplayMonitor() {
                   opacity: 0.95,
                 }}
               >
-                <Typography component="h1" variant="h3" align="center" fontFamily={"serif"} color={'primary'}>
-                  {transactionCode === 'CSH' ? 'CASHIER' : `WINDOW ${index + 1}`}
+                <Typography component="h1" variant="h4" align="center" fontFamily={"serif"} color={'primary'}>
+                {transactionCode?.startsWith('CSH') ? `CASHIER ${cshIndex++}` : `WINDOW ${index + 1}`}
                 </Typography>
                 <Typography component="h1" variant="h6" align="center" marginTop={0} marginBottom={0} fontFamily={"serif"} color={'grey'}>
                   NOW SERVING
                 </Typography>
-                <Typography component="h1" variant="h1" align="center" fontFamily={"serif"} color={'black'} marginTop={0} id={'NowServing' + transactionCode}>
+                <Typography component="h1" variant="h2" align="center" fontFamily={"serif"} color={'black'} marginTop={0} id={'NowServing' + transactionCode}>
                   {/* display queueNumber */}
                 </Typography>
               </Paper>

@@ -11,7 +11,7 @@ const Logo = require('../Photos/coollogo_com-178391066.png');
 const { formattedDate } = returnDateTime();
 
 const queueNumber = localStorage.getItem('QueueNumber');
-
+const transactionType = localStorage.getItem('TransactionType');
 
 const defaultTheme = createTheme({
   typography: {
@@ -38,9 +38,11 @@ export default function CounterPrint() {
             opacity:0.95,
           }}
         >
-          
-          <img src={Logo} width={300} alt="" />
-          
+          <center>
+          <Typography component="h1" variant="h5" fontFamily={"serif"} marginTop={1}>
+            {transactionType}
+          </Typography>
+          </center>
           <Typography component="h1" variant="h6" fontFamily={"serif"} color={'grey'} marginTop={1}>
             YOUR QUEUE NUMBER
           </Typography>

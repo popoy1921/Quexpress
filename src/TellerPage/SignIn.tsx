@@ -18,16 +18,88 @@ const Logo = require('../Photos/coollogo_com-178391066.png');
 
 if(localStorage.getItem('TransactionCodes') === null) {
   localStorage.setItem('TransactionCodes', JSON.stringify({
+    BPLO1 : "BPLO1",
+    BPLO2 : "BPLO2",
+    BPLO3 : "BPLO3",
+    BUSINESSPERMITINQUIRY : "BPI",
+    NEWAPPLICANT : "BPN",
+    RENEWAL : "BPR",
+    CLOSINGBUSINESS : "BPC",
+    BUSINESSPERMITCLAIM : "BPT",
     SANITARY : "BPS",
-    BUILDINGPERMIT : "BPB",
+    SANITARYINQUIRY : "BSI",
+    SANITARYREQUIREMENTS : "BSR",
+    SANITARYPAYMENT : "BSP",
+    SANITARYCLAIM : "BST",
+    BUILDINGPERMIT: "BPB",
+    BUILDINGPERMITINQUIRY : "BBI",
+    BUILDINGPERMITREQUIREMENTS : "BBR",
+    BUILDINGPERMITPAYMENT : "BBP",
+    BUILDINGPERMITCLAIM : "BBT",
     ZONING: "BPZ",
+    ZONINGINQUIRY  : "BZI",
+    ZONINGREQUIREMENTS  : "BZR",
+    ZONINGPAYMENT  : "BZP",
+    ZONINGCLAIM  : "BZT",
     FIRESAFETYINSPECTIONCERTIFICATE : "BPF",
-    BIRTHCERTIFICATE : "LCB",
-    DEATHCERTIFICATE : "LCD",
-    MARRIAGECERTIFICATE : "LCM",
+    FIRESAFETYINSPECTIONCERTIFICATEINQUIRY : "BFI",
+    FIRESAFETYINSPECTIONCERTIFICATEREQUIREMENTS : "BFR",
+    FIRESAFETYINSPECTIONCERTIFICATEPAYMENT : "BFP",
+    FIRESAFETYINSPECTIONCERTIFICATECLAIM : "BFT",
+    LCRCLAIM : "LCRT",
+    BIRTHCERTIFICATE: "LBC",
+    BIRTHCERTIFICATEINQUIRY : "LBI",
+    BIRTHCERTIFICATEREQUIREMENTS : "LBR",
+    BIRTHCERTIFICATECLAIM : "LBT",
+    DEATHCERTIFICATE: "LDC",
+    DEATHCERTIFICATEINQUIRY : "LDI",
+    DEATHCERTIFICATEREQUIREMENTS : "LDR",
+    DEATHCERTIFICATECLAIM : "LDT",
+    MARRIAGECERTIFICATE: "LMC",
+    MARRIAGECERTIFICATEINQUIRY : "LMI",
+    MARRIAGECERTIFICATEREQUIREMENTS : "LMR",
+    MARRIAGECERTIFICATECLAIM : "LMT",
+    CORRECTION: "LCC",
+    CORRECTIONBIRTHCERTIFICATE  : "LCB",
+    CORRECTIONDEATHCERTIFICATE  : "LCD",
+    CORRECTIONMARRIAGECERTIFICATE  : "LCM",
+    CORRECTIONCLAIM  : "LCT",
+    DTI: "DTM",
+    DTIINQUIRY : "DTI",
+    DTIREQUIREMENTS : "DTR",
+    DTIPAYMENT : "DTP",
+    DTICLAIM : "DTT",
+    MAYORCLEARANCEINQUIRY  : "MYI",
+    MAYORCLEARANCEREQUIREMENTS  : "MYR",
+    MAYORCLEARANCEPAYMENT  : "MYP",
+    MAYORCLEARANCECLAIM  : "MYT",
+    WORKINGPERMITINQUIRY : "WPI",
+    WORKINGPERMITREQUIREMENTS : "WPR",
+    WORKINGPERMITPAYMENT : "WPP",
+    WORKINGPERMITCLAIM : "WPT",
+    PERMITTOOPERATEINQUIRY : "POI",
+    PERMITTOOPERATEREQUIREMENTS : "POR",
+    PERMITTOOPERATEPAYMENT : "POP",
+    PERMITTOOPERATECLAIM : "POT",
+    BUSINESSPERMITPAYMENT : "BPP",
     CEDULA : "CDL",
+    RENTALPAYMENT: "RTP",
     REALPROPERTYTAX : "RPT",
-    CASHIER : "CSH"
+    BIRTHCERTIFICATEPAYMENT : "LBP",
+    DEATHCERTIFICATEPAYMENT : "LDP",
+    MARRIAGECERTIFICATEPAYMENT : "LMP",
+    CORRECTIONPAYMENT : "LCP",
+    VIOLATIONPAYMENT : "VLP",
+    OTHERSPAYMENT : "OTP",
+    CASHIER1 : "CSH1",
+    CASHIER2 : "CSH2",
+    CASHIER3 : "CSH3",
+    CASHIER4 : "CSH4",
+    CASHIER5 : "CSH5",
+    CASHIER6 : "CSH6",
+    CASHIER7 : "CSH7",
+    CASHIER8 : "CSH8",
+    CASHIER9 : "CSH9",
   }));
 }
 
@@ -68,86 +140,103 @@ const SignIn: React.FC = () => {
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [transaction, setTransaction] = React.useState('');
+  const [windowNumber, setWindowNumber] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
     localStorage.removeItem('UserEmail');
   }, []);
 
+  const handleChangeTransaction = (event: SelectChangeEvent) => {
+    setTransaction(event.target.value as string);
+  };
+
+  const handleChangeWindow = (event: SelectChangeEvent) => {
+    setWindowNumber(event.target.value as string); // Update window state
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-      const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/users/get/${email}`)
-      .then(async function (response) {
-        const isMatch = await comparePasswords(password, response.data.user_pass);
-        if (response.data.user_name === email) {
-          if (isMatch === false) {
-            alert('Invalid email or password');
-          } else {
-            if (response.data.access_id === 2) {
-              if(transaction !== '') {
-                if (
-                  transaction === 'SANITARY' || 
-                  transaction === 'BUILDINGPERMIT' || 
-                  transaction === 'ZONING' || 
-                  transaction === 'FIRESAFETYINSPECTIONCERTIFICATE' || 
-                  transaction === 'BIRTHCERTIFICATE' || 
-                  transaction === 'DEATHCERTIFICATE' || 
-                  transaction === 'MARRIAGECERTIFICATE' || 
-                  transaction === 'CEDULA' || 
-                  transaction === 'REALPROPERTYTAX' 
-                ) {
-                  alert('Welcone ' + response.data.user_first_name + ' with Transaction type ' +transaction);
-                  localStorage.setItem('UserFirstName', response.data.user_first_name);
-                  localStorage.setItem('UserEmail', response.data.user_name);
-                  localStorage.setItem('UserID', response.data.user_id);
-                  localStorage.setItem('TransactionAccess', transaction);
-                  localStorage.setItem('AccessId', response.data.access_id);
-                  navigate(`/Teller/` +  transaction);
-                } else {
-                  alert('Teller Account is not applicable to use this this type of transaction');
-                  navigate('/SignInAccount');
-                }  
-              }
-            } else if(response.data.access_id === 3) {
-              if(transaction !== '') {
-                if(transaction === 'CASHIER') {
-                  alert('Welcone ' + response.data.user_first_name + ' with Transaction type ' +transaction);
-                  localStorage.setItem('UserFirstName', response.data.user_first_name);
-                  localStorage.setItem('UserEmail', response.data.user_name);
-                  localStorage.setItem('UserID', response.data.user_id);
-                  localStorage.setItem('TransactionAccess', transaction);
-                  localStorage.setItem('AccessId', response.data.access_id);
-                  navigate(`/Teller/` +  transaction);
-                } else {
-                  alert('Cashier Account is not applicable to use this this type of transaction');
-                  navigate('/SignInAccount');
-                }
-              }
-            }
+    try {
+      const response = await axios.get(`${process.env.REACT_APP_OTHER_BACKEND_SERVER}/users/get/${email}`);
+      const user = response.data;
+  
+      const isMatch = await comparePasswords(password, user.user_pass);
+      if (!isMatch || user.user_name !== email) {
+        alert('Invalid email or password');
+        return;
+      }
+  
+      // Ensure a transaction is selected
+      if (transaction === '') {
+        alert('Please select a transaction');
+        return;
+      }
 
-            // reset nowserving counters
-            let transactionCodeString = localStorage.getItem('TransactionCodes') as string;
-            let transactionCodes : {[key: string]: string} = {};
-            if(transactionCodes !== null) {
-              transactionCodes = JSON.parse(transactionCodeString);
-              const currentDate = localStorage.getItem('tellerCurrentDate');
-              const dateToday = format(new Date(), "yyyy-MM-dd");
-              // reset counters
-              if (currentDate !== dateToday) {
-                localStorage.setItem('tellerCurrentDate', dateToday);
-                for (var transactionCodeKey in transactionCodes) {
-                  localStorage.setItem(transactionCodes[transactionCodeKey] + 'NowServing', '0');
-                }
-              }
-            }
-          }
+      if (transaction === 'CASHIER' && windowNumber === '') {
+        alert('Please select a window');
+        return;
+      }
+  
+      // Check for Teller role (access_id === 2)
+      if (user.access_id === 2) {
+        const allowedTellerTransactions = [
+          'BPLO1', 'BPLO2', 'BPLO3', 'SANITARY', 'BUILDINGPERMIT', 'ZONING', 'FIRESAFETYINSPECTIONCERTIFICATE',
+          'BIRTHCERTIFICATE', 'DEATHCERTIFICATE', 'MARRIAGECERTIFICATE','CORRECTION', 'LCRT',
+          'DTI', 'CEDULA', 'REALPROPERTYTAX'
+        ];
+  
+        if (allowedTellerTransactions.includes(transaction)) {
+          grantAccess(user, transaction);
+        } else {
+          alert('Teller account is not authorized for this transaction.');
+          navigate('/SignInAccount');
         }
-      })
-      .catch(function (error) {
-        setErrorMessage('Server Error');
-        alert(' ' + error);
-      });
-  }
+      }
+  
+      // Check for Cashier role (access_id === 3)
+      else if (user.access_id === 3) {
+        if (transaction === 'CASHIER') {
+          grantAccess(user, transaction+windowNumber);
+        } else {
+          alert('Cashier account is not authorized for this transaction.');
+          navigate('/SignInAccount');
+        }
+      } else {
+        alert('Invalid access level.');
+      }
+  
+      resetCountersIfNewDay();
+    } catch (error) {
+      setErrorMessage('Server Error');
+    }
+  };
+  
+  // Helper function to grant access
+  const grantAccess = (user: any, transaction: string) => {
+    alert(`Welcome ${user.user_first_name} with Transaction type ${transaction}`);
+    localStorage.setItem('UserFirstName', user.user_first_name);
+    localStorage.setItem('UserEmail', user.user_name);
+    localStorage.setItem('UserID', user.user_id);
+    localStorage.setItem('TransactionAccess', transaction);
+    localStorage.setItem('AccessId', user.access_id);
+    navigate(`/Teller/${transaction}`);
+  };
+  
+  // Reset counters if a new day
+  const resetCountersIfNewDay = () => {
+    const transactionCodes = JSON.parse(localStorage.getItem('TransactionCodes') as string);
+    const currentDate = localStorage.getItem('tellerCurrentDate');
+    const dateToday = format(new Date(), 'yyyy-MM-dd');
+  
+    if (currentDate !== dateToday) {
+      localStorage.setItem('tellerCurrentDate', dateToday);
+      for (let transactionCodeKey in transactionCodes) {
+        localStorage.setItem(`${transactionCodes[transactionCodeKey]}NowServing`, '0');
+      }
+    }
+  };
+  
   
   const handleChange = (event: SelectChangeEvent) => {
     setTransaction(event.target.value as string);
@@ -212,6 +301,9 @@ const SignIn: React.FC = () => {
                 label="Transaction"
                 onChange={handleChange}
               >
+                <MenuItem value={'BPLO1'}>BPLO RECEIVING</MenuItem>
+                <MenuItem value={'BPLO2'}>CLEARANCE/ WORK PERMIT</MenuItem>
+                <MenuItem value={'BPLO3'}>BPLO CLAIM</MenuItem>
                 <MenuItem value={'SANITARY'}>SANITARY</MenuItem>
                 <MenuItem value={'BUILDINGPERMIT'}>BUILDING PERMIT</MenuItem>
                 <MenuItem value={'ZONING'}>ZONING</MenuItem>
@@ -219,11 +311,37 @@ const SignIn: React.FC = () => {
                 <MenuItem value={'BIRTHCERTIFICATE'}>BIRTH CERTIFICATE</MenuItem>
                 <MenuItem value={'DEATHCERTIFICATE'}>DEATH CERTIFICATE</MenuItem>
                 <MenuItem value={'MARRIAGECERTIFICATE'}>MARRIAGE CERTIFICATE</MenuItem>
-                <MenuItem value={'CEDULA'}>CEDULA</MenuItem>
-                <MenuItem value={'REALPROPERTYTAX'}>REAL PROPERTY TAX</MenuItem>
+                <MenuItem value={'CORRECTION'}>CORRECTION</MenuItem>
+                <MenuItem value={'LCRCLAIM'}>LCR TO CLAIM</MenuItem>
+                <MenuItem value={'DTI'}>DTI</MenuItem>
                 <MenuItem value={'CASHIER'}>CASHIER</MenuItem>
               </Select>
             </FormControl>
+
+            {/* Conditionally show the window selection when CASHIER is selected */}
+            {transaction === 'CASHIER' && (
+              <FormControl fullWidth margin='normal'>
+                <InputLabel id="Window">Window Number</InputLabel>
+                <Select
+                  required
+                  labelId="Window"
+                  id="Window"
+                  value={windowNumber}
+                  label="Window"
+                  onChange={handleChangeWindow}
+                >
+                  <MenuItem value={'1'}>CASHIER WINDOW 1</MenuItem>
+                  <MenuItem value={'2'}>CASHIER WINDOW 2</MenuItem>
+                  <MenuItem value={'3'}>CASHIER WINDOW 3</MenuItem>
+                  <MenuItem value={'4'}>CASHIER WINDOW 4</MenuItem>
+                  <MenuItem value={'5'}>CASHIER WINDOW 5</MenuItem>
+                  <MenuItem value={'6'}>CASHIER WINDOW 6</MenuItem>
+                  <MenuItem value={'7'}>CASHIER WINDOW 7</MenuItem>
+                  <MenuItem value={'8'}>CASHIER WINDOW 8</MenuItem>
+                </Select>
+              </FormControl>
+            )}
+
             <Button
               type="submit"
               fullWidth

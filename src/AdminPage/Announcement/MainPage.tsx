@@ -19,6 +19,7 @@ import { useNavigate } from 'react-router-dom';
 import Announcement from './Announcement';
 
 const Logo = require('../../Photos/coollogo_com-178391066.png');
+const mLogo = require('../../Photos/lingayen-seal.png');
 
 const userInfo = localStorage.getItem('User');
 const Username = localStorage.getItem('Username');
@@ -194,6 +195,13 @@ export default function Dashboard() {
               </Grid>
             </Grid>
             <Copyright sx={{ mt: 1 }} />
+            <div className="logo-container">
+              <img 
+                src={mLogo} 
+                width={100} 
+                alt="" 
+              />
+            </div>
           </Container>
         </Box>
       </Box>

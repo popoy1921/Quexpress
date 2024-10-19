@@ -39,7 +39,17 @@ const CancelButton: React.FC<ButtonProps> = ({ details, destination, children })
     fullWidth
     size='large'
     variant="contained"
-    sx={{ mt: 1, mb: 1}}
+    sx={{ 
+      mt: 1,
+      mb: 1,
+      borderRadius: '20px',
+      fontFamily:'serif',
+      transition: 'background-color 0.3s, transform 0.3s',
+      '&:hover': {
+        backgroundColor: '#228B22',
+        transform: 'scale(1.05)',
+      },
+    }}
     onClick={handleClick}>
         {children}
     </Button>

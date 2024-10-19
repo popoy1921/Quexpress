@@ -29,7 +29,7 @@ export default function Served() {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `${process.env.REACT_APP_OTHER_BACKEND_SERVER}/transaction_log/get/today/done`
+          `${process.env.REACT_APP_OTHER_BACKEND_SERVER}/transaction_log/admin/served`
         );
         setNumberOfServed(response.data.length);
         setIsVisible(true); // Show animation after data is fetched

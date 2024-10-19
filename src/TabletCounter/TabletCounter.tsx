@@ -12,6 +12,7 @@ import { useMediaQuery } from 'react-responsive';
 import { useNavigate } from 'react-router-dom';
 
 const Logo = require('../Photos/coollogo_com-178391066.png');
+const mLogo = require('../Photos/lingayen-seal.png');
 const BackgroundMobile = require('../Photos/BackgroundMobile.jpg');
 const BackgroundTablet = require('../Photos/BackgroundTablet.jpg');
 const BackgroundDesktop = require('../Photos/BackgroundDesktop.jpg');
@@ -112,8 +113,8 @@ export default function SignIn() {
             width: isPortrait ? '100%' : 'auto',
           }}
         >
-          <img src={Logo} width={isMobile ? 300 : isPortrait ? 400 : isDesktop ? 600 : 600} alt="" />
-          <Typography component="h1" variant={isMobile ? "h5" : isTablet ? "h4" : "h3"} color={'black'} marginTop={1}>
+          <img src={Logo} width={isMobile ? 200 : isPortrait ? 300 : isDesktop ? 500 : 500} alt="" />
+          <Typography component="h1" variant={isMobile ? "h5" : isTablet ? "h4" : "h4"} color={'black'} marginTop={1}>
             Welcome {localStorage.getItem('UserFirstName')} {localStorage.getItem('UserLastName')}
           </Typography>
           <Typography component="h1" variant={isMobile ? "h6" : isTablet ? "h5" : "h5"} color={'grey'} marginTop={1}>
@@ -122,42 +123,42 @@ export default function SignIn() {
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 2 }}>
             <Grid container spacing={1}>
               <Grid item xs={4}>
-                <CustomButton details={'SANITARY'} destination='/CounterConfirmation'>
-                SANITARY
+                <CustomButton details={'BUSINESS PERMIT'} destination='/CounterBusinessPermit'>
+                BUSINESS PERMIT
                 </CustomButton>
-                <CustomButton details={'BUILDING PERMIT'} destination='/CounterConfirmation'>
-                BUILDING PERMIT
+                <CustomButton details={'LOCAL CIVIL REGISTRY'} destination='/CounterLocalCivilRegistry'>
+                LOCAL CIVIL REGISTRY
                 </CustomButton>
-                <CustomButton details={'ZONING'} destination='/CounterConfirmation'>
-                ZONING
-                </CustomButton>
-              </Grid>
-
-              <Grid item xs={4}>
-                <CustomButton details={'BIRTH CERTIFICATE'} destination='/CounterConfirmation'>
-                BIRTH CERTIFICATE
-                </CustomButton>
-                <CustomButton details={'DEATH CERTIFICATE'} destination='/CounterConfirmation'>
-                DEATH CERTIFICATE
-                </CustomButton>
-                <CustomButton details={'MARRIAGE CERTIFICATE'} destination='/CounterConfirmation'>
-                MARRIAGE CERTIFICATE
+                <CustomButton details={'WORKING PERMIT'} destination='/CounterBusinessPermitSub'>
+                WORKING PERMIT
                 </CustomButton>
               </Grid>
 
               <Grid item xs={4}>
+                <CustomButton details={'DTI'} destination='/CounterBusinessPermitSub'>
+                DTI REGISTRATION
+                </CustomButton>
                 <CustomButton details={'CEDULA'} destination='/CounterConfirmation'>
                 CEDULA
                 </CustomButton>
-                <CustomButton details={'REAL PROPERTY TAX'} destination='/CounterConfirmation'>
-                REAL PROPERTY TAX
-                </CustomButton>
-                <CustomButton details={'FIRE SAFETY INSPECTION CERTIFICATE'} destination='/CounterConfirmation'>
-                FIRE SAFETY CERTIFICATE
+                <CustomButton details={'MAYOR CLEARANCE'} destination='/CounterBusinessPermitSub'>
+                MAYOR'S CLEARANCE
                 </CustomButton>
               </Grid>
-              <Grid item xs={2}/>
-              <Grid item xs={8}>
+
+              <Grid item xs={4}>
+                <CustomButton details={'ENDORSING OFFICES'} destination='/CounterEndorsingOffices'>
+                ENDORSING OFFICES
+                </CustomButton>
+                <CustomButton details={'PAYMENT'} destination='/CounterPayment'>
+                PAYMENT
+                </CustomButton>
+                <CustomButton details={'PERMIT TO OPERATE'} destination='/CounterBusinessPermitSub'>
+                PERMIT TO OPERATE
+                </CustomButton>
+              </Grid>
+              <Grid item xs={3}/>
+              <Grid item xs={6}>
                 
                 <CancelButton details={'BACK'} destination='/SignInCustomer'>
                     lOGOUT
@@ -166,7 +167,14 @@ export default function SignIn() {
             </Grid> 
           </Box>
         </Paper>
-        <Copyright sx={{ mt: 1 }} />
+        <Copyright sx={{ mt: 1 }} />   
+        <div className="logo-container">
+          <img 
+            src={mLogo} 
+            width={isMobile ? 100 : isPortrait ? 200 : isDesktop ? 100 : 100} 
+            alt="" 
+          />
+        </div>
       </Container>
     </ThemeProvider>
   );

@@ -7,11 +7,12 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Checkbox, FormControlLabel, Paper } from '@mui/material';
+import { Checkbox, CircularProgress, FormControlLabel, Paper } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import UniqueNumber from '../UniqueNumber';
 import { useMediaQuery } from 'react-responsive';
+import OTPInput from './OTPInput';
 
 const Logo = require('../Photos/coollogo_com-178391066.png');
 
@@ -88,6 +89,41 @@ export default function SignUpCustomer() {
   const isPortrait = useMediaQuery({ query: '(orientation: portrait)' });
 
   const [termsAccepted, setTermsAccepted] = React.useState(false);
+  const [otp, setOtp] = React.useState('');
+  const [otpSent, setOtpSent] = React.useState(false);
+  const [otpVerified, setOtpVerified] = React.useState(false); // new state to track OTP verification
+  const [isSendingOtp, setIsSendingOtp] = React.useState(false); // loading state for sending OTP
+  const [isVerifyingOtp, setIsVerifyingOtp] = React.useState(false); // loading state for verifying OTP
+
+  const handleOTPSend = async () => {
+    setIsSendingOtp(true);
+    const mobileNumber = (document.getElementById('mobileNumber') as HTMLInputElement)?.value;
+  
+    try {
+      await axios.post(process.env.REACT_APP_OTHER_BACKEND_SERVER + '/send-otp', { mobileNumber });
+      setOtpSent(true); // OTP is sent
+    } catch (error) {
+      console.error('Error sending OTP:', error);
+    } finally {
+      setIsSendingOtp(false); // stop loading spinner
+    }
+  };
+  
+  const handleOTPChange = (otp: string) => setOtp(otp);
+
+  const handleOTPSubmit = async () => {
+    setIsVerifyingOtp(true);
+    const mobileNumber = (document.getElementById('mobileNumber') as HTMLInputElement)?.value;
+  
+    try {
+      await axios.post(process.env.REACT_APP_OTHER_BACKEND_SERVER + '/verify-otp', { mobileNumber, otp });
+      setOtpVerified(true); // OTP is verified
+    } catch (error) {
+      console.error('Error verifying OTP:', error);
+    } finally {
+      setIsVerifyingOtp(false);
+    }
+  };
 
   const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTermsAccepted(event.target.checked);
@@ -95,6 +131,11 @@ export default function SignUpCustomer() {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (!otpVerified) {
+    alert('Please verify the OTP first');
+    return;
+    }
+    
     const data = new FormData(event.currentTarget);
 
     const firstName = data.get('firstName');
@@ -224,13 +265,40 @@ export default function SignUpCustomer() {
                 />
               </Grid>
             </Grid>
+            {!otpSent ? (
+              <Button
+                fullWidth
+                variant="contained"
+                onClick={handleOTPSend}
+                disabled={isSendingOtp}
+                sx={{ mt: 3, mb: 2 }}
+              >
+                {isSendingOtp ? <CircularProgress size={24} /> : 'Send OTP'}
+              </Button>
+            ) : (
+              <>
+                <Typography variant="h6" fontFamily={"serif"} color={'grey'}>Enter OTP</Typography>
+                <OTPInput length={6} onChange={handleOTPChange} />
+                <Button
+                  fullWidth
+                  variant="contained"
+                  onClick={handleOTPSubmit}
+                  disabled={isVerifyingOtp}
+                  sx={{ mt: 3, mb: 2 }}
+                >
+                  {isVerifyingOtp ? <CircularProgress size={24} /> : 'Verify OTP'}
+                </Button>
+              </>
+            )}
+
             <Button
               type="submit"
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
+              disabled={!otpVerified} // Disable until OTP is verified
             >
-                Sign Up
+              Sign Up
             </Button>
           </Box>
         </Paper>

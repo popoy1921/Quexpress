@@ -29,7 +29,7 @@ export default function Cancelled() {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `${process.env.REACT_APP_OTHER_BACKEND_SERVER}/transaction_log/get/today/cancelled`
+          `${process.env.REACT_APP_OTHER_BACKEND_SERVER}/transaction_log/admin/cancelled`
         );
         setNumberOfCancelled(response.data.length);
         setIsVisible(true); // Show animation when data is fetched

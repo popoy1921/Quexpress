@@ -129,36 +129,31 @@ export default function SignIn() {
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 2 }}>
             <Grid container spacing={1}>
               <Grid item xs={4}>
-                <CustomButton details={'BUSINESS PERMIT INQUIRY'} destination='/CounterConfirmation'>
+                <CustomButton details={transactionType + ' INQUIRY'} destination='/CounterConfirmation'>
                     INQUIRY
                 </CustomButton>
               </Grid>
               <Grid item xs={4}>
-                <CustomButton details={'BUSINESS PERMIT NEW APPLICANT'} destination='/CounterConfirmation'>
-                    NEW APPLICATION
+                <CustomButton details={transactionType + ' REQUIREMENTS'} destination='/CounterConfirmation'>
+                    PASS REQUIREMENTS
                 </CustomButton>
               </Grid>
               <Grid item xs={4}>
-                <CustomButton details={'BUSINESS PERMIT RENEWAL'} destination='/CounterConfirmation'>
-                    RENEWAL
+                <CustomButton details={transactionType + ' PAYMENT'} destination='/CounterConfirmation'>
+                    PAYMENT
                 </CustomButton>
               </Grid>
-              <Grid item xs={2}/>
+              <Grid item xs={4}/>
               <Grid item xs={4}>
-                <CustomButton details={'BUSINESS PERMIT CLOSING BUSINESS'} destination='/CounterConfirmation'>
-                    BISINESS CLOSURE
-                </CustomButton>
-              </Grid>
-              <Grid item xs={4}>
-                <CustomButton details={'BUSINESS PERMIT CLAIM'} destination='/CounterConfirmation'>
+                <CustomButton details={transactionType + ' CLAIM'} destination='/CounterConfirmation'>
                     CLAIM
                 </CustomButton>
               </Grid>
-              <Grid item xs={2}/>
+              <Grid item xs={4}/>
               
               <Grid item xs={3}/>
               <Grid item xs={6} mt={10} >
-                <CancelButton details='' destination='/CounterTablet'>
+                <CancelButton details='' destination='/CounterEndorsingOffices'>
                     BACK
                 </CancelButton>
               </Grid>

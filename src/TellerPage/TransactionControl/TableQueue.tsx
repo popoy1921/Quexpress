@@ -21,7 +21,7 @@ export default function BasicTable() {
       let transactionCodes: { [key: string]: string } = {};
       transactionCodes = JSON.parse(transactionCodeString);
       let transactionCode = transactionCodes[transaction ?? ''];
-
+      
       try {
         const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/${transactionCode}/toQueue`);
         setQueueNumbers(response.data);
@@ -59,6 +59,8 @@ export default function BasicTable() {
                     <TableRow>
                       <TableCell>Queue Number</TableCell>
                       <TableCell>Customer Account Number</TableCell>
+                      <TableCell>Transaction</TableCell>
+                      <TableCell>Customer Name</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -66,12 +68,14 @@ export default function BasicTable() {
                       <TableRow key={index}>
                         <TableCell>
                           {localStorage.getItem('AccessId') === '3' 
-                            ? element.transaction_ref 
+                            ? (element.transaction_ref || element.transactions_queue)
                             : localStorage.getItem('AccessId') === '2'
                             ? element.transactions_queue
                             : null }
                         </TableCell>
                         <TableCell>{element.customer_account_id}</TableCell>
+                        <TableCell>{element.transaction_desc} {element.sub_transaction_desc}</TableCell>
+                        <TableCell>{element.customer_first_name} {element.customer_last_name}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

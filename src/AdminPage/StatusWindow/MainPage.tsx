@@ -19,6 +19,7 @@ import StatusTable from './TableStatus'
 import { useNavigate } from 'react-router-dom';
 
 const Logo = require('../../Photos/coollogo_com-178391066.png');
+const mLogo = require('../../Photos/lingayen-seal.png');
 
 function Copyright(props: any) {
   return (
@@ -180,6 +181,13 @@ export default function Dashboard() {
               </Grid>
             </Grid>
             <Copyright sx={{ pt: 4 }} />
+            <div className="logo-container">
+              <img 
+                src={mLogo} 
+                width={100} 
+                alt="" 
+              />
+            </div>
           </Container>
         </Box>
       </Box>

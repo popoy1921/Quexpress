@@ -9,8 +9,10 @@ import { Grid, Paper } from '@mui/material';
 import CustomButton from '../CommonElements/CustomButton';
 import CancelButton from '../CommonElements/CancelButton';
 import { useNavigate } from 'react-router-dom';
+import { useMediaQuery } from 'react-responsive';
 
 const Logo = require('../Photos/coollogo_com-178391066.png');
+const mLogo = require('../Photos/lingayen-seal.png');
 const BackgroundMobile = require('../Photos/BackgroundMobile.jpg');
 const BackgroundTablet = require('../Photos/BackgroundTablet.jpg');
 const BackgroundDesktop = require('../Photos/BackgroundDesktop.jpg');
@@ -21,9 +23,7 @@ function Copyright(props: any) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" fontFamily={"serif"} {...props}>
       {'Copyright © '}
-      <Link color="inherit" href="http://localhost:3000/">
         QuExpress
-      </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
     </Typography>
@@ -70,6 +70,9 @@ const defaultTheme = createTheme({
         }
       }
     }
+  },
+  palette: {
+    primary: {main: '#228B22'},
   }
 });
 
@@ -91,48 +94,60 @@ export default function SignIn() {
     });
   };
 
+  const isMobile = useMediaQuery({ query: '(max-width: 600px)' });
+  const isTablet = useMediaQuery({ query: '(min-width: 601px) and (max-width: 1024px)' });
+  const isDesktop = useMediaQuery({ query: '(min-width: 1025px)' });
+  const isPortrait = useMediaQuery({ query: '(orientation: portrait)' });
+
   return (
     <ThemeProvider theme={defaultTheme}>
-      <Container component="main" maxWidth="lg">
+      <Container component="main" maxWidth={isMobile ? "xs" : isTablet ? "md" : isDesktop ? "lg" : "lg"}>
         <CssBaseline />
         <Paper
           elevation={24}
           sx={{
-            marginTop: 4,
+            marginTop: 1,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            p: 5,
+            p: isMobile ? 2 : isTablet ? 4 : 6,
             opacity:0.95,
+            width: isPortrait ? '100%' : 'auto',
           }}
         >
-          <img src={Logo} width={600} alt="" />
-          <Typography component="h1" variant="h4" fontFamily={"serif"} marginTop={1}>
+          <img src={Logo} width={isMobile ? 200 : isPortrait ? 300 : isDesktop ? 500 : 500} alt="" />
+          <Typography component="h1" variant={isMobile ? "h5" : isTablet ? "h4" : "h4"} fontFamily={"serif"} marginTop={1}>
             {transactionType}
           </Typography>
-          <Typography component="h1" variant="h5" color={'grey'} marginTop={1}>
+          <Typography component="h1" variant={isMobile ? "h6" : isTablet ? "h5" : "h5"} color={'grey'} marginTop={1}>
             PLEASE CHOOSE TRANSACTION
           </Typography>
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 2 }}>
             <Grid container spacing={1}>
-              <Grid item xs={6}>
-                <CustomButton details={'BIRTH CERTIFICATE'} destination='/CounterConfirmation'>
+              <Grid item xs={4}>
+                <CustomButton details={'BIRTH CERTIFICATE'} destination='/CounterLocalCivilRegistrySub'>
                     BIRTH CERTIFICATE
                 </CustomButton>
               </Grid>
-              <Grid item xs={6}>
-                <CustomButton details={'DEATH CERTIFICATE'} destination='/CounterConfirmation'>
+              <Grid item xs={4}>
+                <CustomButton details={'DEATH CERTIFICATE'} destination='/CounterLocalCivilRegistrySub'>
                     DEATH CERTIFICATE
                 </CustomButton>
               </Grid>
-              <Grid item xs={3.01} />
-              <Grid item xs={6}>
-                <CustomButton details={'MARRIAGE CERTIFICATE'} destination='/CounterConfirmation'>
+              <Grid item xs={4}>
+                <CustomButton details={'MARRIAGE CERTIFICATE'} destination='/CounterLocalCivilRegistrySub'>
                     MARRIAGE CERTIFICATE
                 </CustomButton>
               </Grid>
+              <Grid item xs={4} />
+              <Grid item xs={4}>
+                <CustomButton details={'CORRECTION'} destination='/CounterLocalCivilRegistryCorrection'>
+                    CORRECTION
+                </CustomButton>
+              </Grid>
+              <Grid item xs={4} />
               <Grid item xs={3.01} />
-              <Grid item xs={6}>
+              <Grid item xs={6} mt={10} >
                 <CancelButton details='' destination='/CounterTablet'>
                     BACK
                 </CancelButton>
@@ -140,7 +155,14 @@ export default function SignIn() {
             </Grid>
           </Box>
         </Paper>
-        <Copyright sx={{ mt: 8, mb: 4 }} />
+        <Copyright sx={{ mt: 1 }} />
+        <div className="logo-container">
+          <img 
+            src={mLogo} 
+            width={isMobile ? 100 : isPortrait ? 200 : isDesktop ? 100 : 100} 
+            alt="" 
+          />
+        </div>
       </Container>
     </ThemeProvider>
   );

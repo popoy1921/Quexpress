@@ -1,6 +1,5 @@
 import * as React from 'react';
 import CssBaseline from '@mui/material/CssBaseline';
-import Link from '@mui/material/Link';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
@@ -13,6 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { useMediaQuery } from 'react-responsive';
 
 const Logo = require('../Photos/coollogo_com-178391066.png');
+const mLogo = require('../Photos/lingayen-seal.png');
 const { formattedDate, formattedTime } = returnDateTime();
 
 const transactionType = localStorage.getItem('TransactionType');
@@ -139,7 +139,7 @@ export default function ConfirmQueue() {
           customerId           : customerId,
           customerAccountId    : accountId,
           queueNumber          : localStorage.getItem('QueueNumber'),
-          windowId             : response2.data.transaction_id,
+          windowId             : null,
           staffId              : null,
           date                 : formattedDate,
           startTime            : null,
@@ -205,13 +205,15 @@ export default function ConfirmQueue() {
             width: isPortrait ? '100%' : 'auto',
           }}
         >
-          <img src={Logo} width={isMobile ? 500 : isPortrait ? 500 : isDesktop ? 500 : 500} alt="" />
-          <Typography component="h1" variant="h6" fontFamily={"serif"} color={'grey'} marginTop={4}>
+          <img src={Logo} width={isMobile ? 200 : isPortrait ? 300 : isDesktop ? 500 : 500} alt="" />
+          <Typography component="h1" variant="h6" fontFamily={"serif"} color={'grey'} marginTop={1}>
             YOUR TRANSACTION
           </Typography>
+          <center>
           <Typography component="h1" variant="h5" fontFamily={"serif"} marginTop={1}>
             {transactionType}
           </Typography>
+          </center>
           <Typography component="h1" variant="h3" fontFamily={"serif"} marginTop={1} id="QueueNumber">
 
           </Typography>
@@ -245,6 +247,13 @@ export default function ConfirmQueue() {
           </Box>
         </Paper>
         <Copyright sx={{ mt: 1 }} />
+        <div className="logo-container">
+          <img 
+            src={mLogo} 
+            width={isMobile ? 100 : isPortrait ? 200 : isDesktop ? 100 : 100} 
+            alt="" 
+          />
+        </div>
       </Container>
     </ThemeProvider>
   );

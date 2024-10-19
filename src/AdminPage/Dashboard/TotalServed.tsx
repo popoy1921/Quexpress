@@ -29,7 +29,7 @@ export default function TotalServed() {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `${process.env.REACT_APP_OTHER_BACKEND_SERVER}/transaction_log/get/all/alldone`
+          `${process.env.REACT_APP_OTHER_BACKEND_SERVER}/transaction_log/admin/total`
         );
         setNumberOfServed(response.data.length);
         setIsVisible(true); // Show animation once data is fetched

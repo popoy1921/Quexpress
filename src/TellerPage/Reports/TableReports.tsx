@@ -5,6 +5,7 @@ import "react-data-table-component-extensions/dist/index.css";
 import axios from 'axios';
 import { Alert, CircularProgress, Container, Typography } from '@mui/material';
 import "../../index.css";
+import { format } from 'date-fns';
 
 const App = () => {
   const [tableData, setData] = useState([]);
@@ -15,8 +16,12 @@ const App = () => {
   interface Row {
     transactions_queue :  string,
     transaction_ref :  string,
+    customer_first_name : string,
+    customer_last_name : string,
     customer_account_id :  string,
     window_id :  string,
+    transaction_desc : string,
+    sub_transaction_desc : string,
     staff_id :  string,
     transaction_datetime :  string,
     transaction_starttime :  string,
@@ -53,9 +58,10 @@ const App = () => {
       cellExport: (row: Row) => accessid === '2' ? row.transactions_queue : row.transaction_ref,
     },
     {name : 'Customer Account ID'   , sortable: true, selector : (row : Row)  => row.customer_account_id, cellExport: (row : Row) => row.customer_account_id},
-    {name : 'Window ID'             , sortable: true, selector : (row : Row)  => row.window_id, cellExport: (row : Row) => row.window_id},
+    {name : 'Customer Name'         , sortable: true, selector : (row : Row)  => row.customer_first_name +' '+ row.customer_last_name, cellExport: (row : Row) => row.customer_first_name + row.customer_last_name},
+    {name : 'Transaction'           , sortable: true, selector : (row : Row)  => row.transaction_desc +' '+ row.sub_transaction_desc, cellExport: (row : Row) => row.transaction_desc +' '+ row.sub_transaction_desc},
     {name : 'Staff ID'              , sortable: true, selector : (row : Row)  => row.staff_id, cellExport: (row : Row) => row.staff_id},
-    {name : 'Date'                  , sortable: true, selector : (row : Row)  => row.transaction_datetime, cellExport: (row : Row) => row.transaction_datetime},
+    {name : 'Date'                  , sortable: true, selector : (row : Row)  => format(new Date(row.transaction_datetime), 'MMMM d, yyyy'), cellExport: (row : Row) => format(new Date(row.transaction_datetime), 'MMMM d, yyyy')},
     {name : 'Start Time'            , sortable: true, selector : (row : Row)  => row.transaction_starttime, cellExport: (row : Row) => row.transaction_starttime},
     {name : 'End Time'              , sortable: true, selector : (row : Row)  => row.transaction_endtime, cellExport: (row : Row) => row.transaction_endtime},
     {name : 'Transaction Status'    , sortable: true, selector : (row : Row)  => row.transaction_status, cellExport: (row : Row) => row.transaction_status},

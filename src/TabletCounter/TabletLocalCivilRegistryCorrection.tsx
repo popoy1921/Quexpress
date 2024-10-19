@@ -1,5 +1,4 @@
 import * as React from 'react';
-import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import Link from '@mui/material/Link';
 import Box from '@mui/material/Box';
@@ -9,8 +8,8 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Grid, Paper } from '@mui/material';
 import CustomButton from '../CommonElements/CustomButton';
 import CancelButton from '../CommonElements/CancelButton';
-import { useMediaQuery } from 'react-responsive';
 import { useNavigate } from 'react-router-dom';
+import { useMediaQuery } from 'react-responsive';
 
 const Logo = require('../Photos/coollogo_com-178391066.png');
 const mLogo = require('../Photos/lingayen-seal.png');
@@ -18,16 +17,13 @@ const BackgroundMobile = require('../Photos/BackgroundMobile.jpg');
 const BackgroundTablet = require('../Photos/BackgroundTablet.jpg');
 const BackgroundDesktop = require('../Photos/BackgroundDesktop.jpg');
 
-
 const transactionType = localStorage.getItem('TransactionType');
 
 function Copyright(props: any) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" fontFamily={"serif"} {...props}>
       {'Copyright © '}
-      <Link color="inherit" href="/">
         QuExpress
-      </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
     </Typography>
@@ -129,41 +125,34 @@ export default function SignIn() {
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 2 }}>
             <Grid container spacing={1}>
               <Grid item xs={4}>
-                <CustomButton details={'BUSINESS PERMIT INQUIRY'} destination='/CounterConfirmation'>
-                    INQUIRY
+                <CustomButton details={transactionType + ' BIRTH CERTIFICATE'} destination='/CounterConfirmation'>
+                    BIRTH CERTIFICATE
                 </CustomButton>
               </Grid>
               <Grid item xs={4}>
-                <CustomButton details={'BUSINESS PERMIT NEW APPLICANT'} destination='/CounterConfirmation'>
-                    NEW APPLICATION
+                <CustomButton details={transactionType + ' DEATH CERTIFICATE'} destination='/CounterConfirmation'>
+                    DEATH CERTIFICATE
                 </CustomButton>
               </Grid>
               <Grid item xs={4}>
-                <CustomButton details={'BUSINESS PERMIT RENEWAL'} destination='/CounterConfirmation'>
-                    RENEWAL
+                <CustomButton details={transactionType + ' MARRIAGE CERTIFICATE'} destination='/CounterConfirmation'>
+                    MARRIAGE CERTIFICATE
                 </CustomButton>
               </Grid>
-              <Grid item xs={2}/>
+              <Grid item xs={4} />
               <Grid item xs={4}>
-                <CustomButton details={'BUSINESS PERMIT CLOSING BUSINESS'} destination='/CounterConfirmation'>
-                    BISINESS CLOSURE
+                <CustomButton details={transactionType + ' CLAIM'} destination='/CounterConfirmation'>
+                    TO CLAIM
                 </CustomButton>
               </Grid>
-              <Grid item xs={4}>
-                <CustomButton details={'BUSINESS PERMIT CLAIM'} destination='/CounterConfirmation'>
-                    CLAIM
-                </CustomButton>
-              </Grid>
-              <Grid item xs={2}/>
-              
-              <Grid item xs={3}/>
+              <Grid item xs={4} />
+              <Grid item xs={3.01} />
               <Grid item xs={6} mt={10} >
                 <CancelButton details='' destination='/CounterTablet'>
                     BACK
                 </CancelButton>
               </Grid>
             </Grid>
-               
           </Box>
         </Paper>
         <Copyright sx={{ mt: 1 }} />

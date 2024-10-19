@@ -129,32 +129,27 @@ export default function SignIn() {
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 2 }}>
             <Grid container spacing={1}>
               <Grid item xs={4}>
-                <CustomButton details={'BUSINESS PERMIT INQUIRY'} destination='/CounterConfirmation'>
-                    INQUIRY
+                <CustomButton details={'SANITARY'} destination='/CounterBusinessPermitSub'>
+                    SANITARY PERMIT
                 </CustomButton>
               </Grid>
               <Grid item xs={4}>
-                <CustomButton details={'BUSINESS PERMIT NEW APPLICANT'} destination='/CounterConfirmation'>
-                    NEW APPLICATION
+                <CustomButton details={'ZONING'} destination='/CounterBusinessPermitSub'>
+                    ZONING PERMIT
                 </CustomButton>
               </Grid>
               <Grid item xs={4}>
-                <CustomButton details={'BUSINESS PERMIT RENEWAL'} destination='/CounterConfirmation'>
-                    RENEWAL
+                <CustomButton details={'BUILDING PEPMIT'} destination='/CounterBusinessPermitSub'>
+                    BUILDING PERMIT
                 </CustomButton>
               </Grid>
-              <Grid item xs={2}/>
+              <Grid item xs={4}/>
               <Grid item xs={4}>
-                <CustomButton details={'BUSINESS PERMIT CLOSING BUSINESS'} destination='/CounterConfirmation'>
-                    BISINESS CLOSURE
+                <CustomButton details={'FIRE SAFETY INSPECTION CERTIFICATE'} destination='/CounterBusinessPermitSub'>
+                    FIRE SAFETY INSPECTION CERTIFICATE
                 </CustomButton>
               </Grid>
-              <Grid item xs={4}>
-                <CustomButton details={'BUSINESS PERMIT CLAIM'} destination='/CounterConfirmation'>
-                    CLAIM
-                </CustomButton>
-              </Grid>
-              <Grid item xs={2}/>
+              <Grid item xs={4}/>
               
               <Grid item xs={3}/>
               <Grid item xs={6} mt={10} >

@@ -18,10 +18,16 @@ import AdminAnnouncement from './AdminPage/Announcement/MainPage'
 import UploadPage from './AdminPage/AdsDisplay/UploadPage'
 import TabletCounter from './TabletCounter/TabletCounter'
 import TabletBusinessPermit from './TabletCounter/TabletBusinessPermit'
+import TabletEndorsingOffices from './TabletCounter/TabletEndorsingOffices'
+import TabletBusinessPermitSub from './TabletCounter/TabletBusinessPermitSub'
 import TabletLocalCivilRegistry from './TabletCounter/TabletLocalCivilRegistry'
+import TabletLocalCivilRegistrySub from './TabletCounter/TabletLocalCivilRegistrySub'
+import TabletLocalCivilRegistryCorrection from './TabletCounter/TabletLocalCivilRegistryCorrection'
+import TabletPayment from './TabletCounter/TabletPayment'
 import TabletConfirmation from './TabletCounter/TabletConfirmation'
 import TabletPrint from './TabletCounter/CounterPrint'
-import DisplayMonitor from './DisplayMonitor/DisplayNumber'
+import DisplayMonitor1 from './DisplayMonitor/DisplayMonitor1'
+import DisplayMonitor2 from './DisplayMonitor/DisplayMonitor2';
 import TellerControl from './TellerPage/TransactionControl/MainPage'
 import TellerReports from './TellerPage/Reports/MainPage'
 import { FileProvider } from './AdminPage/AdsDisplay/FileContext';
@@ -54,10 +60,16 @@ const App: React.FC = () => {
           <Route path="/Counter" element={<TabletCounter/>} />
           <Route path="/CounterTablet" element={<TabletCounter/>} />
           <Route path="/CounterBusinessPermit" element={<TabletBusinessPermit/>} />
+          <Route path="/CounterBusinessPermitSub" element={<TabletBusinessPermitSub/>} />
+          <Route path="/CounterEndorsingOffices" element={<TabletEndorsingOffices/>} />
           <Route path="/CounterLocalCivilRegistry" element={<TabletLocalCivilRegistry/>} />
+          <Route path="/CounterLocalCivilRegistrySub" element={<TabletLocalCivilRegistrySub/>} />
+          <Route path="/CounterLocalCivilRegistryCorrection" element={<TabletLocalCivilRegistryCorrection/>} />
+          <Route path="/CounterPayment" element={<TabletPayment/>} />
           <Route path="/CounterConfirmation" element={<TabletConfirmation/>} />
           <Route path="/CounterPrint" element={<TabletPrint/>} />
-          <Route path="/DisplayMonitor" element={<DisplayMonitor/>}/>
+          <Route path="/DisplayMonitor1" element={<DisplayMonitor1/>}/>
+          <Route path="/DisplayMonitor2" element={<DisplayMonitor2/>}/>
           
         </Routes>
       </Router>

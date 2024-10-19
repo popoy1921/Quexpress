@@ -29,7 +29,7 @@ export default function Queued() {
     async function fetchData() {
       try {
         const response = await axios.get(
-          `${process.env.REACT_APP_OTHER_BACKEND_SERVER}/transaction_log/get/today/all`
+          `${process.env.REACT_APP_OTHER_BACKEND_SERVER}/transaction_log/admin/queued`
         );
         setNumberOfQueued(response.data.length);
         setIsVisible(true); // Trigger the fade-in animation
