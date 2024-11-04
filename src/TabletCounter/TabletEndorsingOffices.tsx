@@ -127,7 +127,7 @@ export default function SignIn() {
             PLEASE CHOOSE TRANSACTION
           </Typography>
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 2 }}>
-            <Grid container spacing={1}>
+            <Grid container spacing={2}>
               <Grid item xs={4}>
                 <CustomButton details={'SANITARY'} destination='/CounterBusinessPermitSub'>
                     SANITARY PERMIT
@@ -139,7 +139,7 @@ export default function SignIn() {
                 </CustomButton>
               </Grid>
               <Grid item xs={4}>
-                <CustomButton details={'BUILDING PEPMIT'} destination='/CounterBusinessPermitSub'>
+                <CustomButton details={'BUILDING PERMIT'} destination='/CounterBusinessPermitSub'>
                     BUILDING PERMIT
                 </CustomButton>
               </Grid>

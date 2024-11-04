@@ -856,6 +856,8 @@ app.get('/transactions/getBlink/:transactionCode', async (req, res) => {
   }
 });
 
+
+// Route for OTP
 const bodyParser = require('body-parser');
 const crypto = require('crypto');
 
@@ -865,7 +867,8 @@ const users = new Map();
 app.use(bodyParser.json());
 
 function generateOTP() {
-  return crypto.randomInt(100000, 999999).toString();
+  // return crypto.randomInt(100000, 999999).toString();
+  return '123456';
 }
 
 app.post('/send-otp', (req, res) => {
@@ -887,7 +890,6 @@ app.post('/send-otp', (req, res) => {
 // 2. Endpoint to verify OTP
 app.post('/verify-otp', (req, res) => {
   const { mobileNumber, otp } = req.body;
-
   if (!mobileNumber || !otp) {
     return res.status(400).json({ message: 'Mobile number and OTP are required.' });
   }

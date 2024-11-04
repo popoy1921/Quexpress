@@ -123,7 +123,7 @@ export default function SignIn() {
             PLEASE CHOOSE TRANSACTION
           </Typography>
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 2 }}>
-            <Grid container spacing={1}>
+            <Grid container spacing={2}>
               <Grid item xs={4}>
                 <CustomButton details={transactionType + ' BIRTH CERTIFICATE'} destination='/CounterConfirmation'>
                     BIRTH CERTIFICATE
@@ -148,7 +148,7 @@ export default function SignIn() {
               <Grid item xs={4} />
               <Grid item xs={3.01} />
               <Grid item xs={6} mt={10} >
-                <CancelButton details='' destination='/CounterTablet'>
+                <CancelButton details='LOCAL CIVIL REGISTRY' destination='/CounterLocalCivilRegistry'>
                     BACK
                 </CancelButton>
               </Grid>

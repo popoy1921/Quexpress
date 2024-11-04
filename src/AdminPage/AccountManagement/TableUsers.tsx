@@ -42,8 +42,10 @@ const App = () => {
       setAnchorEl(null);
       if (value === 'Teller') {
           navigate('/SignUpTeller');
-      } else {
+      } else if (value === 'Cashier') {
           navigate('/SignUpCashier');
+      } else {
+        
       }
   };
 

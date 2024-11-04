@@ -11,7 +11,7 @@ interface ButtonProps {
 const CancelButton: React.FC<ButtonProps> = ({ details, destination, children }) => {
   const handleClick = () => {
     navigateTo(destination, details);
-    localStorage.removeItem(details);
+    localStorage.setItem('TransactionType', details);
   };
 
   const navigateTo = (url: string, data: any) => {

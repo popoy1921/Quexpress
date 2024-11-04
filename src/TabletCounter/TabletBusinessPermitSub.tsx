@@ -127,7 +127,7 @@ export default function SignIn() {
             PLEASE CHOOSE TRANSACTION
           </Typography>
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 2 }}>
-            <Grid container spacing={1}>
+            <Grid container spacing={2}>
               <Grid item xs={4}>
                 <CustomButton details={transactionType + ' INQUIRY'} destination='/CounterConfirmation'>
                     INQUIRY
@@ -153,9 +153,20 @@ export default function SignIn() {
               
               <Grid item xs={3}/>
               <Grid item xs={6} mt={10} >
-                <CancelButton details='' destination='/CounterEndorsingOffices'>
-                    BACK
-                </CancelButton>
+              <CancelButton
+                details={
+                  ['SANITARY', 'ZONING', 'BUILDING PERMIT', 'FIRE SAFETY INSPECTION CERTIFICATE', null].includes(transactionType)
+                    ? 'ENDORSING OFFICES'
+                    : ''
+                }
+                destination={
+                  ['DTI', 'WORKING PERMIT', 'MAYOR CLEARANCE', 'PERMIT TO OPERATE', null].includes(transactionType)
+                    ? '/CounterTablet'
+                    : '/CounterEndorsingOffices'
+                }
+              >
+                BACK
+              </CancelButton>
               </Grid>
             </Grid>
                

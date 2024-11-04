@@ -22,9 +22,9 @@ if(localStorage.getItem('TransactionCodes') === null) {
     BPLO2 : "BPLO2",
     BPLO3 : "BPLO3",
     BUSINESSPERMITINQUIRY : "BPI",
-    NEWAPPLICANT : "BPN",
-    RENEWAL : "BPR",
-    CLOSINGBUSINESS : "BPC",
+    BUSINESSPERMITNEWAPPLICANT : "BPN",
+    BUSINESSPERMITRENEWAL : "BPR",
+    BUSINESSPERMITCLOSINGBUSINESS : "BPC",
     BUSINESSPERMITCLAIM : "BPT",
     SANITARY : "BPS",
     SANITARYINQUIRY : "BSI",
@@ -256,7 +256,7 @@ const SignIn: React.FC = () => {
         <Paper
           elevation={24}
           sx={{
-            marginTop: 8,
+            marginTop: '50%',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',

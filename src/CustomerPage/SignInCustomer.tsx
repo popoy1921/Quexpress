@@ -23,9 +23,9 @@ if(localStorage.getItem('TransactionCodes') === null) {
     BPLO2 : "BPLO2",
     BPLO3 : "BPLO3",
     BUSINESSPERMITINQUIRY : "BPI",
-    NEWAPPLICANT : "BPN",
-    RENEWAL : "BPR",
-    CLOSINGBUSINESS : "BPC",
+    BUSINESSPERMITNEWAPPLICANT : "BPN",
+    BUSINESSPERMITRENEWAL : "BPR",
+    BUSINESSPERMITCLOSINGBUSINESS : "BPC",
     BUSINESSPERMITCLAIM : "BPT",
     SANITARY : "BPS",
     SANITARYINQUIRY : "BSI",
@@ -65,6 +65,7 @@ if(localStorage.getItem('TransactionCodes') === null) {
     CORRECTIONDEATHCERTIFICATE  : "LCD",
     CORRECTIONMARRIAGECERTIFICATE  : "LCM",
     CORRECTIONCLAIM  : "LCT",
+    DTI: "DTM",
     DTIINQUIRY : "DTI",
     DTIREQUIREMENTS : "DTR",
     DTIPAYMENT : "DTP",
@@ -102,7 +103,6 @@ if(localStorage.getItem('TransactionCodes') === null) {
     CASHIER9 : "CSH9",
   }));
 }
-
 
 function Copyright(props: any) {
   return (
@@ -210,7 +210,7 @@ const SignIn: React.FC = () => {
         <Paper
           elevation={24}
           sx={{
-            marginTop: 1,
+            marginTop: '25%',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',

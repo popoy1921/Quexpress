@@ -143,7 +143,7 @@ export default function SignUpCustomer() {
         <Paper 
           elevation={24}
           sx={{
-            marginTop: 1,
+            marginTop: '25%',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
