@@ -37,10 +37,10 @@
   }
 }
 
-@page{
+/* @page{
   size: 80mm 80mm;
   margin:0;
-}
+} */
 
 .WebContainer{
   width: 100%;
@@ -67,4 +67,20 @@
   right: 0;
   margin: 10px; /* Optional margin */
   z-index: 100; /* Ensure it's above other content */
+}
+
+@media print {
+  /* Hide all elements except the content to print */
+  body * {
+    visibility: hidden;
+  }
+  #printablediv1, #printablediv1 * {
+    visibility: visible;
+  }
+  #printablediv1 {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 56mm;
+  }
 }

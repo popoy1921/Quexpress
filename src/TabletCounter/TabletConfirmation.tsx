@@ -179,11 +179,14 @@ export default function ConfirmQueue() {
       printWindow.addEventListener('load', () => {
         setTimeout(() => {
           printWindow?.print();
-          printWindow.close();
-        }, 500); // Adjust the delay as needed
+          setTimeout(() => {
+            printWindow.close();
+          }, 1000);
+        }, 500); 
       }, true);
     }
   }
+  
   const isMobile = useMediaQuery({ query: '(max-width: 600px)' });
   const isTablet = useMediaQuery({ query: '(min-width: 601px) and (max-width: 1024px)' });
   const isDesktop = useMediaQuery({ query: '(min-width: 1025px)' });

@@ -630,7 +630,7 @@ app.get('/transaction_log/admin/queued', async (req, res) => {
     var queryParameters = [];
     var queryString = 'SELECT * FROM quexpress.tbl_quexpress_transaction_log'
     + ' WHERE (transaction_datetime >= CURRENT_DATE)'
-    + ' AND transaction_status IS NULL';
+    + ' AND (transaction_status IS NULL OR transaction_status IS NOT NULL)';
     const client = await pool.connect();
     const queryResult = await client.query(queryString, queryParameters);
     res.json(queryResult.rows);

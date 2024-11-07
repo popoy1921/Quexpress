@@ -426,7 +426,7 @@ export default function TransactionControl() {
             refQueueNumber: responseData.transactions_queue,
           };
           createLog(transactionData);
-        } else if(transactionRef.startsWith('LC')){
+        } else if(transactionRef.startsWith('LC') || transactionRef.startsWith('LB') || transactionRef.startsWith('LD') || transactionRef.startsWith('LM')){
           const transactionData = {
             transactionId: responseData.transaction_id,
             customerId: responseData.customer_id,

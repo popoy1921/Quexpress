@@ -39,19 +39,16 @@ export default function CounterPrint() {
           }}
         >
           <center>
-          <Typography component="h1" variant="h5" fontFamily={"serif"} marginTop={1}>
+          <Typography component="h1" variant="h6" fontFamily={"serif"} marginTop={1}>
             {transactionType}
           </Typography>
-          </center>
-          <Typography component="h1" variant="h6" fontFamily={"serif"} color={'grey'} marginTop={1}>
-            YOUR QUEUE NUMBER
-          </Typography>
-          <Typography component="h1" variant="h3" fontFamily={"serif"} marginTop={1}>
+          <Typography component="h1" variant="h4" fontFamily={"serif"} marginTop={1}>
             {queueNumber}
           </Typography>
           <Typography component="h1" variant="h6" fontFamily={"serif"} marginTop={1}>
             {formattedDate}
           </Typography>
+          </center>
         </Paper>
       </Container>
     </ThemeProvider>
