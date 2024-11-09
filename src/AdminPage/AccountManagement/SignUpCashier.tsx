@@ -7,8 +7,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Paper } from '@mui/material';
-import Link from '@mui/material/Link';
+import { FormControl, InputLabel, MenuItem, Paper, Select, SelectChangeEvent } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import bcrypt from 'bcryptjs';
@@ -51,7 +50,12 @@ const defaultTheme = createTheme({
 export default function SignUp() {
 
   const navigate = useNavigate();
+  const [userRole, setUserRole] = React.useState('');
 
+  const handleRoleChange = (event: SelectChangeEvent<string>) => {
+    setUserRole(event.target.value);
+  };
+  
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -104,7 +108,8 @@ export default function SignUp() {
       lastName  : lastName,
       email     : email,
       password  : hashedPassword,
-      access    : access
+      access    : access,
+      userRole  : userRole,
     }
 
     registerUser(userDetails);
@@ -185,6 +190,27 @@ export default function SignUp() {
                   type="password"
                   id="password"
                 />
+              </Grid>
+              <Grid item xs={12}>
+                <FormControl fullWidth required>
+                  <InputLabel id="userRole-label">User Role</InputLabel>
+                  <Select
+                    labelId="userRole-label"
+                    id="userRole"
+                    value={userRole}
+                    label="User Role"
+                    onChange={handleRoleChange}
+                  >
+                    <MenuItem value="14">Cashier1</MenuItem>
+                    <MenuItem value="15">Cashier2</MenuItem>
+                    <MenuItem value="16">Cashier3</MenuItem>
+                    <MenuItem value="17">Cashier4</MenuItem>
+                    <MenuItem value="18">Cashier5</MenuItem>
+                    <MenuItem value="19">Cashier6</MenuItem>
+                    <MenuItem value="20">Cashier7</MenuItem>
+                    <MenuItem value="21">Cashier8</MenuItem>
+                  </Select>
+                </FormControl>
               </Grid>
             </Grid>
             <Button

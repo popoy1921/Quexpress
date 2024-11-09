@@ -7,7 +7,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Paper } from '@mui/material';
+import { FormControl, InputLabel, MenuItem, Paper, Select, SelectChangeEvent } from '@mui/material';
 import Link from '@mui/material/Link';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -51,6 +51,11 @@ const defaultTheme = createTheme({
 export default function SignUp() {
 
   const navigate = useNavigate();
+  const [userRole, setUserRole] = React.useState('');
+
+  const handleRoleChange = (event: SelectChangeEvent<string>) => {
+    setUserRole(event.target.value);
+  };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -104,7 +109,8 @@ export default function SignUp() {
       lastName  : lastName,
       email     : email,
       password  : hashedPassword,
-      access    : access
+      access    : access,
+      userRole  : userRole,
     }
 
     registerUser(userDetails);
@@ -185,6 +191,32 @@ export default function SignUp() {
                   type="password"
                   id="password"
                 />
+              </Grid>
+              <Grid item xs={12}>
+                <FormControl fullWidth required>
+                  <InputLabel id="userRole-label">User Role</InputLabel>
+                  <Select
+                    labelId="userRole-label"
+                    id="userRole"
+                    value={userRole}
+                    label="User Role"
+                    onChange={handleRoleChange}
+                  >
+                    <MenuItem value="1">BPLO RECEIVING</MenuItem>
+                    <MenuItem value="2">CLEARANCE/ WORK PERMIT</MenuItem>
+                    <MenuItem value="3">BPLO CLAIM</MenuItem>
+                    <MenuItem value="4">SANITARY</MenuItem>
+                    <MenuItem value="5">BUILDING PERMIT</MenuItem>
+                    <MenuItem value="6">ZONING</MenuItem>
+                    <MenuItem value="7">FIRE SAFETY INSPECTION CERTIFICATE</MenuItem>
+                    <MenuItem value="8">BIRTH CERTIFICATE</MenuItem>
+                    <MenuItem value="9">DEATH CERTIFICATE</MenuItem>
+                    <MenuItem value="10">MARRIAGE CERTIFICATE</MenuItem>
+                    <MenuItem value="11">CORRECTION</MenuItem>
+                    <MenuItem value="12">LCR TO CLAIM</MenuItem>
+                    <MenuItem value="13">DTI REGISTRATION</MenuItem>
+                  </Select>
+                </FormControl>
               </Grid>
             </Grid>
             <Button

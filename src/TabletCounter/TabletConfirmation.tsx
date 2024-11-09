@@ -10,6 +10,7 @@ import { format, formatDate } from 'date-fns';
 import returnDateTime from '../TimeStamp';
 import { useNavigate } from 'react-router-dom';
 import { useMediaQuery } from 'react-responsive';
+import html2canvas from 'html2canvas';
 
 const Logo = require('../Photos/coollogo_com-178391066.png');
 const mLogo = require('../Photos/lingayen-seal.png');
@@ -85,7 +86,6 @@ const defaultTheme = createTheme({
   }
 });
 
-
 export default function ConfirmQueue() {
   const navigate = useNavigate();
   getQueueNumber();
@@ -118,6 +118,19 @@ export default function ConfirmQueue() {
     })
   }
 
+  const captureAndSave = async () => {
+    const element = document.getElementById('printablediv');
+    if (element) {
+      const canvas = await html2canvas(element);
+      const dataUrl = canvas.toDataURL('image/png');
+  
+      const link = document.createElement('a');
+      link.href = dataUrl;
+      link.download = 'transaction_receipt.png';
+      link.click();
+    }
+  };  
+
   const yesButton = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -146,8 +159,7 @@ export default function ConfirmQueue() {
           endTime              : null,
         }
         createLog(transactionData);
-        
-        printExternal();
+        captureAndSave();
         navigate("/SignInCustomer");
       })
       .catch(function (error) {
@@ -173,19 +185,6 @@ export default function ConfirmQueue() {
     });
   }
 
-  function printExternal(): void {
-    const printWindow = window.open("/CounterPrint", 'print');
-    if (printWindow) {
-      printWindow.addEventListener('load', () => {
-        setTimeout(() => {
-          printWindow?.print();
-          setTimeout(() => {
-            printWindow.close();
-          }, 1000);
-        }, 500); 
-      }, true);
-    }
-  }
   
   const isMobile = useMediaQuery({ query: '(max-width: 600px)' });
   const isTablet = useMediaQuery({ query: '(min-width: 601px) and (max-width: 1024px)' });
@@ -212,14 +211,19 @@ export default function ConfirmQueue() {
           <Typography component="h1" variant="h6" fontFamily={"serif"} color={'grey'} marginTop={1}>
             YOUR TRANSACTION
           </Typography>
+          <div id="printablediv">
           <center>
           <Typography component="h1" variant="h5" fontFamily={"serif"} marginTop={1}>
             {transactionType}
           </Typography>
-          </center>
           <Typography component="h1" variant="h3" fontFamily={"serif"} marginTop={1} id="QueueNumber">
 
           </Typography>
+          <Typography component="h1" variant="h6" fontFamily={"serif"} marginTop={1}>
+            {formattedDate}
+          </Typography>
+          </center>
+          </div>
           <Box component="form" noValidate sx={{ mt: 2, mb: 2 }}>
             <Grid container spacing={2}>
               <Grid item xs={6}>

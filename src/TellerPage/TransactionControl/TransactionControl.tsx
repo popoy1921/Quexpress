@@ -10,7 +10,6 @@ import NextIcon from '@mui/icons-material/ArrowForward'; // Next button icon
 import CallIcon from '@mui/icons-material/Call'; // Call button icon
 import CancelIcon from '@mui/icons-material/Cancel'; // Cancel button icon
 import CashierIcon from '@mui/icons-material/AttachMoney'; // Pass to cashier button icon
-import { AltRouteRounded } from '@mui/icons-material';
 
 const { formattedDate } = returnDateTime();
 const transactionAccess = localStorage.getItem('TransactionAccess');
@@ -176,7 +175,7 @@ export default function TransactionControl() {
             case 'LCRT':
               windowData.windowId = 12;
               break;
-            case 'DTM':
+            case 'DTIM':
               windowData.windowId = 13;
               break;
             case 'CSH1':
@@ -318,7 +317,7 @@ export default function TransactionControl() {
             case 'LCRT':
               windowData.windowId = 12;
               break;
-            case 'DTM':
+            case 'DTIM':
               windowData.windowId = 13;
               break;
             case 'CSH1':
@@ -412,7 +411,7 @@ export default function TransactionControl() {
         localStorage.setItem('CASHIER' + '#', transactionCodeCounter);
 
         var responseData = response.data;
-        if(transactionRef.startsWith('BP') || transactionRef.startsWith('MY') || transactionRef.startsWith('WR') || transactionRef.startsWith('BS') || transactionRef.startsWith('BB') || transactionRef.startsWith('BZ') || transactionRef.startsWith('BF') || transactionRef.startsWith('BC')){
+        if(transactionRef.startsWith('BP') || transactionRef.startsWith('MY') || transactionRef.startsWith('WP') || transactionRef.startsWith('BS') || transactionRef.startsWith('BB') || transactionRef.startsWith('BZ') || transactionRef.startsWith('BF') || transactionRef.startsWith('BC') || transactionRef.startsWith('PO')){
           const transactionData = {
             transactionId: responseData.transaction_id,
             customerId: responseData.customer_id,

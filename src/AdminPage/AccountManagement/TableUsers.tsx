@@ -18,6 +18,7 @@ interface Row {
   access_id: number;
   user_first_name: string;
   user_last_name: string;
+  window_desc: string;
 }
 
 const App = () => {
@@ -92,6 +93,7 @@ const App = () => {
       { name: 'Access ID', sortable: true, selector: (row: Row) => row.access_id },
       { name: 'First Name', sortable: true, selector: (row: Row) => row.user_first_name },
       { name: 'Last Name', sortable: true, selector: (row: Row) => row.user_last_name },
+      { name: 'Window Transaction', sortable: true, selector: (row: Row) => row.window_desc },
       {
           name: 'Actions',
           cell: (row: Row) => (

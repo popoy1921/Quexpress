@@ -59,9 +59,10 @@ app.post('/users/create', async (req, res) => {
   const access    = userDetails.access;
   const email     = userDetails.email;
   const password  = userDetails.password;
+  const userRole  = userDetails.userRole;
   try {
     const client = await pool.connect();
-    const result = await client.query('INSERT INTO quexpress.tbl_quexpress_users (user_name, user_pass, access_id, user_first_name, user_last_name) VALUES ($1, $2, $3, $4, $5) RETURNING *', [email , password, access, firstName, lastName]);
+    const result = await client.query('INSERT INTO quexpress.tbl_quexpress_users (user_name, user_pass, access_id, user_first_name, user_last_name, window_id) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *', [email , password, access, firstName, lastName, userRole]);
     res.json(result.rows[0]);
     client.release();
   } catch (err) {
@@ -74,13 +75,15 @@ app.get('/users/get/:email', async (req, res) => {
   const userName = req.params.email;
   try {
     var queryParameters = [];
-    var queryString = 'SELECT * FROM quexpress.tbl_quexpress_users';
+    var queryString = 'SELECT a.user_id, a.user_name, a.access_id, a.user_first_name, a.user_last_name,'
+    + ' a.window_id, a.user_pass, b.window_id AS b_window_id, b.window_desc FROM quexpress.tbl_quexpress_users AS a'
+    + ' LEFT JOIN quexpress.tbl_quexpress_window AS b ON b.window_id = a.window_id'
     var result;
     if(userName !== 'all') {
-      queryString += ' WHERE user_name = $1'
+      queryString += ' WHERE user_name = $1 ORDER BY a.user_id ASC'
       queryParameters.push(userName);
     } else {
-      queryString += ' WHERE (access_id = 2 or access_id = 3) and (removed = 0 or (removed is null))';
+      queryString += ' WHERE (access_id = 2 or access_id = 3) and (removed = 0 or (removed is null)) ORDER BY a.user_id ASC';
     }
     const client = await pool.connect();
     const queryResult = await client.query(queryString, queryParameters);
@@ -118,7 +121,8 @@ app.put('/users/update/:userId', async (req, res) => {
   const lastName  = userDetails.lastName;
   const email     = userDetails.email;
   const password  = userDetails.password ?? '';
-  const removed  = userDetails.removed ?? '0';
+  const removed   = userDetails.removed ?? '0';
+  const userRole  = userDetails.userRole;
   
   var transactionLogDetails = [
     email,
@@ -126,12 +130,13 @@ app.put('/users/update/:userId', async (req, res) => {
     lastName,
     removed,
     userId,
-    password
+    password,
+    userRole,
   ];
   try {
     var queryString = 'UPDATE quexpress.tbl_quexpress_users'
       + ' SET user_name = $1, user_first_name = $2'
-      + ' ,user_last_name = $3, removed = $4, user_pass = $6'
+      + ' ,user_last_name = $3, removed = $4, user_pass = $6, window_id = $7'
       + ' where user_id = $5'
       + ' RETURNING *';
     const client = await pool.connect();
@@ -251,9 +256,9 @@ app.get('/transaction_log/get/:transactionCode', async (req, res) => {
       + ' OR transactions_queue LIKE \'BPC%\' OR transactions_queue LIKE \'POI%\' OR transactions_queue LIKE \'POR%\')';
     } else if (transactionCode === 'BPLO2%') {
       var queryString = baseQuery + ' AND (transactions_queue LIKE \'MYI%\' OR transactions_queue LIKE \'MYR%\''
-      + ' OR transactions_queue LIKE \'WRI%\' OR transactions_queue LIKE \'WRR%\')';
+      + ' OR transactions_queue LIKE \'WPI%\' OR transactions_queue LIKE \'WPR%\')';
     } else if (transactionCode === 'BPLO3%') {
-      var queryString = baseQuery + ' AND (transactions_queue LIKE \'MYT%\' OR transactions_queue LIKE \'WRT%\' OR transactions_queue LIKE \'BPT%\' OR transactions_queue LIKE \'BST%\''
+      var queryString = baseQuery + ' AND (transactions_queue LIKE \'MYT%\' OR transactions_queue LIKE \'WPT%\' OR transactions_queue LIKE \'BPT%\' OR transactions_queue LIKE \'BST%\''
       + ' OR transactions_queue LIKE \'BBT%\' OR transactions_queue LIKE \'BZT%\' OR transactions_queue LIKE \'BFT%\' OR transactions_queue LIKE \'POT%\')';
     } else if (transactionCode === 'BPS%') {
       var queryString = baseQuery + ' AND (transactions_queue LIKE \'BSI%\' OR transactions_queue LIKE \'BSR%\')';
@@ -273,8 +278,8 @@ app.get('/transaction_log/get/:transactionCode', async (req, res) => {
       var queryString = baseQuery + ' AND (transactions_queue LIKE \'LCB%\' OR transactions_queue LIKE \'LCD%\' OR transactions_queue LIKE \'LCM%\')';
     } else if (transactionCode === 'LCRT%') {
       var queryString = baseQuery + ' AND (transactions_queue LIKE \'LBT%\' OR transactions_queue LIKE \'LDT%\' OR transactions_queue LIKE \'LMT%\' OR transactions_queue LIKE \'LCT%\')';
-    } else if (transactionCode === 'DTM%') {
-      var queryString = baseQuery + ' AND (transactions_queue LIKE \'DTI%\' OR transactions_queue LIKE \'DTR%\' OR transactions_queue LIKE \'DTP%\ OR transactions_queue LIKE \'DTT%\')';
+    } else if (transactionCode === 'DTIM%') {
+      var queryString = baseQuery + ' AND (transactions_queue LIKE \'DTI%\' OR transactions_queue LIKE \'DTR%\' OR transactions_queue LIKE \'DTP%\' OR transactions_queue LIKE \'DTT%\')';
     } else {
       var queryString = baseQuery + ' AND transactions_queue LIKE $1';
 
@@ -305,11 +310,11 @@ app.get('/transaction_log/CSH/:transactionCode', async (req, res) => {
 
     // Determine query based on transactionCode, making sure all parentheses match
     if (transactionCode === 'CSH1') {
-      queryString = baseQuery + ' AND (transaction_ref LIKE \'BP%\' OR transaction_ref LIKE \'MY%\' OR transaction_ref LIKE \'WR%\''
-      + ' OR transaction_ref LIKE \'BS%\' OR transaction_ref LIKE \'BB%\' OR transaction_ref LIKE \'BZ%\' OR transaction_ref LIKE \'BF%\''
+      queryString = baseQuery + ' AND (transaction_ref LIKE \'BP%\' OR transaction_ref LIKE \'MY%\' OR transaction_ref LIKE \'WP%\''
+      + ' OR transaction_ref LIKE \'BS%\' OR transaction_ref LIKE \'BB%\' OR transaction_ref LIKE \'BZ%\' OR transaction_ref LIKE \'BF%\' OR transaction_ref LIKE \'PO%\''
       + ' OR transactions_queue LIKE \'BPP%\' OR transactions_queue LIKE \'POP%\') AND window_id = 14';
     } else if (transactionCode === 'CSH2') {
-      queryString = baseQuery + ' AND (transaction_ref LIKE \'BP%\' OR transaction_ref LIKE \'MY%\' OR transaction_ref LIKE \'WR%\''
+      queryString = baseQuery + ' AND (transaction_ref LIKE \'BP%\' OR transaction_ref LIKE \'MY%\' OR transaction_ref LIKE \'WP%\''
       + ' OR transaction_ref LIKE \'BS%\' OR transaction_ref LIKE \'BB%\' OR transaction_ref LIKE \'BZ%\' OR transaction_ref LIKE \'BF%\''
       + ' OR transactions_queue LIKE \'BPP%\' OR transactions_queue LIKE \'POP%\') AND window_id = 15';
     } else if (transactionCode === 'CSH3') {
@@ -379,7 +384,7 @@ app.get('/transaction_log/get/:transactionCode/:transactionStatus', async (req, 
       }
 
     } else if (transactionCode === 'BPLO3') {
-      var queryString = baseQuery + ' where (transactions_queue LIKE \'MYT%\' OR transactions_queue LIKE \'WRT%\' OR transactions_queue LIKE \'BPT%\' OR transactions_queue LIKE \'BST%\''
+      var queryString = baseQuery + ' where (transactions_queue LIKE \'MYT%\' OR transactions_queue LIKE \'WPT%\' OR transactions_queue LIKE \'BPT%\' OR transactions_queue LIKE \'BST%\''
       + ' OR transactions_queue LIKE \'BBT%\' OR transactions_queue LIKE \'BZT%\' OR transactions_queue LIKE \'BFT%\' OR transactions_queue LIKE \'POT%\')'
       + ' and (transaction_datetime >= CURRENT_DATE';
 
@@ -389,8 +394,8 @@ app.get('/transaction_log/get/:transactionCode/:transactionStatus', async (req, 
         queryString += ' or transaction_datetime <= CURRENT_DATE) and (transaction_status IS NOT NULL)';
       }
 
-    } else if (transactionCode === 'DTM') {
-      var queryString = baseQuery + ' where (transactions_queue LIKE \'DTI%\' OR transactions_queue LIKE \'DTR%\' OR transactions_queue LIKE \'DTP%\ OR transactions_queue LIKE \'DTT%\')'
+    } else if (transactionCode === 'DTIM') {
+      var queryString = baseQuery + ' where (transactions_queue LIKE \'DTI%\' OR transactions_queue LIKE \'DTR%\' OR transactions_queue LIKE \'DTP%\' OR transactions_queue LIKE \'DTT%\')'
       + ' and (transaction_datetime >= CURRENT_DATE';
 
       if (transactionStatus === 'toQueue') {
@@ -490,8 +495,8 @@ app.get('/transaction_log/get/:transactionCode/:transactionStatus', async (req, 
       }
 
     } else if (transactionCode === 'CSH1' || transactionCode === "CSH2") {
-      var queryString = baseQuery + ' WHERE (transaction_ref LIKE \'BP%\' OR transaction_ref LIKE \'MY%\' OR transaction_ref LIKE \'WR%\' OR transaction_ref LIKE \'BP%\''
-      + ' OR transaction_ref LIKE \'BS%\' OR transaction_ref LIKE \'BB%\' OR transaction_ref LIKE \'BZ%\' OR transaction_ref LIKE \'BF%\''
+      var queryString = baseQuery + ' WHERE (transaction_ref LIKE \'BP%\' OR transaction_ref LIKE \'MY%\' OR transaction_ref LIKE \'WP%\' OR transaction_ref LIKE \'BP%\''
+      + ' OR transaction_ref LIKE \'BS%\' OR transaction_ref LIKE \'BB%\' OR transaction_ref LIKE \'BZ%\' OR transaction_ref LIKE \'BF%\' OR transaction_ref LIKE \'PO%\''
       + ' OR transactions_queue LIKE \'BPP%\' OR transactions_queue LIKE \'POP%\')'
       + ' and (transaction_datetime >= CURRENT_DATE';
       

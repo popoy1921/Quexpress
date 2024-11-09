@@ -158,10 +158,10 @@ export default function DisplayMonitor1() {
   useTransactionData('BPZ');
   useTransactionData('BPF');
   useTransactionData('DTI');
-  useTransactionData('LBI');
-  useTransactionData('LDI');
-  useTransactionData('LMI');
-  useTransactionData('LCI');
+  useTransactionData('LBC');
+  useTransactionData('LDC');
+  useTransactionData('LMC');
+  useTransactionData('LCC');
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -245,7 +245,7 @@ export default function DisplayMonitor1() {
 
         {/* Render transaction windows in two columns */}
         <Grid container item xs={12} sm={6}>
-          {['BPLO1', 'BPLO2', 'BPS', 'BPB', 'BPZ', 'BPF', 'DTI', 'LBI', 'LDI', 'LMI', 'LCI',
+          {['BPLO1', 'BPLO2', 'BPS', 'BPB', 'BPZ', 'BPF', 'DTI', 'LBC', 'LDC', 'LMC', 'LCC',
             ].map((transactionCode, index) => (
             <Grid item xs={12} sm={6} key={transactionCode}>
               <Paper
