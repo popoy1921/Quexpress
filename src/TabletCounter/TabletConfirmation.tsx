@@ -118,18 +118,29 @@ export default function ConfirmQueue() {
     })
   }
 
-  const captureAndSave = async () => {
+  const captureContent = async () => {
     const element = document.getElementById('printablediv');
     if (element) {
-      const canvas = await html2canvas(element);
-      const dataUrl = canvas.toDataURL('image/png');
-  
-      const link = document.createElement('a');
-      link.href = dataUrl;
-      link.download = 'transaction_receipt.png';
-      link.click();
+        const canvas = await html2canvas(element);
+        return canvas.toDataURL('image/png'); // Base64 format
     }
-  };  
+    return null;
+  };
+
+  const printReceipt = async () => {
+    const dataUrl = await captureContent();
+    if (dataUrl) {
+        // Send captured image to backend for printing
+        const printData = { imageData: dataUrl };
+        await axios.post(process.env.REACT_APP_OTHER_BACKEND_SERVER + '/print-receipt', printData)
+          .then(response => {
+            console.log('Receipt sent for printing');
+          })
+          .catch(error => {
+            console.error('Error sending print request:', error);
+          });
+    }
+  };
 
   const yesButton = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -159,7 +170,7 @@ export default function ConfirmQueue() {
           endTime              : null,
         }
         createLog(transactionData);
-        captureAndSave();
+        printReceipt();
         navigate("/SignInCustomer");
       })
       .catch(function (error) {

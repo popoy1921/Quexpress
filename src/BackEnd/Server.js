@@ -914,7 +914,49 @@ app.post('/verify-otp', (req, res) => {
   return res.json({ message: 'OTP verified successfully!' });
 });
 
+// printer
+
+const WebSocket = require('ws');
+
+const wss = new WebSocket.Server({ noServer: true });
+
+wss.on('connection', (ws) => {
+  console.log('Mobile app connected to WebSocket');
+  
+  // Send acknowledgment of connection
+  ws.send(JSON.stringify({ message: 'Connected to print server' }));
+
+  // Listen for messages from mobile app (optional)
+  ws.on('message', (message) => {
+      console.log('Message from mobile app:', message);
+  });
+
+  ws.on('close', () => {
+      console.log('Mobile app disconnected');
+  });
+});
+
+app.post('/print-receipt', (req, res) => {
+  const { imageData } = req.body;
+
+  // Send the print command to all connected WebSocket clients (mobile apps)
+  wss.clients.forEach((client) => {
+      if (client.readyState === WebSocket.OPEN) {
+          client.send(JSON.stringify({ imageData,}));
+      }
+  });
+
+  // Respond to the React app to confirm receipt
+  res.status(200).json({ success: true, message: 'Print command sent to mobile app.' });
+});
+
 // Start server
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+const server = app.listen(PORT, () => {
+  console.log(`Server listening on http://localhost:${PORT}`);
+});
+
+server.on('upgrade', (request, socket, head) => {
+  wss.handleUpgrade(request, socket, head, (ws) => {
+      wss.emit('connection', ws, request);
+  });
 });
