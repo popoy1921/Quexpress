@@ -312,11 +312,13 @@ app.get('/transaction_log/CSH/:transactionCode', async (req, res) => {
     if (transactionCode === 'CSH1') {
       queryString = baseQuery + ' AND (transaction_ref LIKE \'BP%\' OR transaction_ref LIKE \'MY%\' OR transaction_ref LIKE \'WP%\''
       + ' OR transaction_ref LIKE \'BS%\' OR transaction_ref LIKE \'BB%\' OR transaction_ref LIKE \'BZ%\' OR transaction_ref LIKE \'BF%\' OR transaction_ref LIKE \'PO%\''
-      + ' OR transactions_queue LIKE \'BPP%\' OR transactions_queue LIKE \'POP%\') AND window_id = 14';
+      + ' OR transactions_queue LIKE \'BPP%\' OR transactions_queue LIKE \'POP%\' OR transactions_queue LIKE \'MYP%\' OR transactions_queue LIKE \'WPP%\''
+      + ' OR transactions_queue LIKE \'BSP%\' OR transactions_queue LIKE \'BBP%\' OR transactions_queue LIKE \'BZP%\' OR transactions_queue LIKE \'BFP%\') AND window_id = 14';
     } else if (transactionCode === 'CSH2') {
       queryString = baseQuery + ' AND (transaction_ref LIKE \'BP%\' OR transaction_ref LIKE \'MY%\' OR transaction_ref LIKE \'WP%\''
       + ' OR transaction_ref LIKE \'BS%\' OR transaction_ref LIKE \'BB%\' OR transaction_ref LIKE \'BZ%\' OR transaction_ref LIKE \'BF%\''
-      + ' OR transactions_queue LIKE \'BPP%\' OR transactions_queue LIKE \'POP%\') AND window_id = 15';
+      + ' OR transactions_queue LIKE \'BPP%\' OR transactions_queue LIKE \'POP%\' OR transactions_queue LIKE \'MYP%\' OR transactions_queue LIKE \'WPP%\''
+      + ' OR transactions_queue LIKE \'BSP%\' OR transactions_queue LIKE \'BBP%\' OR transactions_queue LIKE \'BZP%\' OR transactions_queue LIKE \'BFP%\') AND window_id = 15';
     } else if (transactionCode === 'CSH3') {
       queryString = baseQuery + ' AND (transactions_queue LIKE \'RPT%\') AND window_id = 16';
     } else if (transactionCode === 'CSH4') {

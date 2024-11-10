@@ -175,7 +175,6 @@ export default function ConfirmQueue() {
           ${document.querySelector('#QueueNumber')?.textContent}\n
           ${document.querySelector('#FormattedDate')?.textContent}
         `;
-        console.log(toPrint);
 
         sendPrintRequest(toPrint);
         navigate("/SignInCustomer");

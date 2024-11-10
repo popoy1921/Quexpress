@@ -157,7 +157,7 @@ export default function DisplayMonitor1() {
   useTransactionData('BPB');
   useTransactionData('BPZ');
   useTransactionData('BPF');
-  useTransactionData('DTI');
+  useTransactionData('DTIM');
   useTransactionData('LBC');
   useTransactionData('LDC');
   useTransactionData('LMC');
@@ -245,7 +245,7 @@ export default function DisplayMonitor1() {
 
         {/* Render transaction windows in two columns */}
         <Grid container item xs={12} sm={6}>
-          {['BPLO1', 'BPLO2', 'BPS', 'BPB', 'BPZ', 'BPF', 'DTI', 'LBC', 'LDC', 'LMC', 'LCC',
+          {['BPLO1', 'BPLO2', 'BPS', 'BPB', 'BPZ', 'BPF', 'DTIM', 'LBC', 'LDC', 'LMC', 'LCC',
             ].map((transactionCode, index) => (
             <Grid item xs={12} sm={6} key={transactionCode}>
               <Paper

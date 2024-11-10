@@ -10,6 +10,7 @@ import NextIcon from '@mui/icons-material/ArrowForward'; // Next button icon
 import CallIcon from '@mui/icons-material/Call'; // Call button icon
 import CancelIcon from '@mui/icons-material/Cancel'; // Cancel button icon
 import CashierIcon from '@mui/icons-material/AttachMoney'; // Pass to cashier button icon
+import DriveFileMoveIcon from '@mui/icons-material/DriveFileMove';
 
 const { formattedDate } = returnDateTime();
 const transactionAccess = localStorage.getItem('TransactionAccess');
@@ -446,6 +447,56 @@ export default function TransactionControl() {
       });
   }
 
+  function passToClaim(event: any) {
+    event.preventDefault();
+    let transactionRef = localStorage.getItem(transactionCode + 'NowServing') as string;
+    toClaim(transactionRef);
+    updateNumber('done');
+    if (document.getElementById('nowServing')?.innerText !== 'No Available Number') {
+      updateForMonitorBlink(transactionCode);
+    }
+  }
+
+  async function toClaim(transactionRef: string) {
+    await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/${transactionRef}`)
+      .then(async function (response) {
+
+        var responseData = response.data;
+        if(transactionRef.startsWith('BP') || transactionRef.startsWith('MY') || transactionRef.startsWith('WP') || transactionRef.startsWith('BS') || transactionRef.startsWith('BB') || transactionRef.startsWith('BZ') || transactionRef.startsWith('BF') || transactionRef.startsWith('BC') || transactionRef.startsWith('PO')){
+          const transactionData = {
+            transactionId: responseData.transaction_id,
+            customerId: responseData.customer_id,
+            customerAccountId: responseData.customer_account_id,
+            queueNumber: responseData.transactions_queue,
+            windowId: null,
+            staffId: null,
+            date: formattedDate,
+            startTime: null,
+            endTime: null,
+            refQueueNumber: responseData.transaction_ref,
+          };
+          createLog(transactionData);
+        } else if(transactionRef.startsWith('LC') || transactionRef.startsWith('LB') || transactionRef.startsWith('LD') || transactionRef.startsWith('LM')){
+          const transactionData = {
+            transactionId: responseData.transaction_id,
+            customerId: responseData.customer_id,
+            customerAccountId: responseData.customer_account_id,
+            queueNumber: responseData.transactions_queue,
+            windowId: null,
+            staffId: null,
+            date: formattedDate,
+            startTime: null,
+            endTime: null,
+            refQueueNumber: responseData.transaction_ref,
+          };
+        createLog(transactionData);
+        }
+      })
+      .catch(function (error) {
+        alert(' ' + error);
+      });
+  }
+
   function createLog(transactionData: Object) {
     axios.post(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/create`, transactionData)
       .then(response => { })
@@ -532,6 +583,21 @@ export default function TransactionControl() {
                         startIcon={<CashierIcon />}
                       >
                         PASS TO CASHIER
+                      </Button>
+                    </Grid>
+                  )}
+                  {/* Conditionally render the PASS TO CLAIM button based on transactionCode */}
+                  {(transactionCode === 'CSH1' || transactionCode === 'CSH2' || transactionCode === 'CSH7' || transactionCode === 'CSH8') && (
+                    <Grid item xs={6}>
+                      <Button
+                        fullWidth
+                        size="medium"
+                        variant="contained"
+                        sx={{ mt: 2, mb: 2, bgcolor: '#388e3c', '&:hover': { bgcolor: '#2e7d32' } }}
+                        onClick={passToClaim}
+                        startIcon={<DriveFileMoveIcon />}
+                      >
+                        PASS TO CLAIM
                       </Button>
                     </Grid>
                   )}
