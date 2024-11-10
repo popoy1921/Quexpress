@@ -916,47 +916,31 @@ app.post('/verify-otp', (req, res) => {
 
 // printer
 
-const WebSocket = require('ws');
+let printQueue = [];
 
-const wss = new WebSocket.Server({ noServer: true });
+app.post('/api/print', (req, res) => {
+  const { textToPrint } = req.body;
 
-wss.on('connection', (ws) => {
-  console.log('Mobile app connected to WebSocket');
-  
-  // Send acknowledgment of connection
-  ws.send(JSON.stringify({ message: 'Connected to print server' }));
+  if (!textToPrint) {
+    return res.status(400).json({ error: 'textToPrint is required' });
+  }
 
-  // Listen for messages from mobile app (optional)
-  ws.on('message', (message) => {
-      console.log('Message from mobile app:', message);
-  });
+  // Add the print job to the queue
+  printQueue.push({ textToPrint });
+  console.log('Added to print queue:', textToPrint);
 
-  ws.on('close', () => {
-      console.log('Mobile app disconnected');
-  });
+  res.status(200).json({ message: 'Print job added to queue' });
 });
 
-app.post('/print-receipt', (req, res) => {
-  const { imageData } = req.body;
+app.get('/api/print/next', (req, res) => {
+  if (printQueue.length === 0) {
+    return res.status(204).send(); // No Content
+  }
 
-  // Send the print command to all connected WebSocket clients (mobile apps)
-  wss.clients.forEach((client) => {
-      if (client.readyState === WebSocket.OPEN) {
-          client.send(JSON.stringify({ imageData,}));
-      }
-  });
-
-  // Respond to the React app to confirm receipt
-  res.status(200).json({ success: true, message: 'Print command sent to mobile app.' });
+  const nextJob = printQueue.shift(); // Get the next print job
+  res.status(200).json(nextJob);
 });
 
-// Start server
-const server = app.listen(PORT, () => {
-  console.log(`Server listening on http://localhost:${PORT}`);
-});
-
-server.on('upgrade', (request, socket, head) => {
-  wss.handleUpgrade(request, socket, head, (ws) => {
-      wss.emit('connection', ws, request);
-  });
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });

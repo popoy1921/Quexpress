@@ -10,7 +10,7 @@ import { format, formatDate } from 'date-fns';
 import returnDateTime from '../TimeStamp';
 import { useNavigate } from 'react-router-dom';
 import { useMediaQuery } from 'react-responsive';
-import html2canvas from 'html2canvas';
+import { useState } from 'react';
 
 const Logo = require('../Photos/coollogo_com-178391066.png');
 const mLogo = require('../Photos/lingayen-seal.png');
@@ -88,6 +88,8 @@ const defaultTheme = createTheme({
 
 export default function ConfirmQueue() {
   const navigate = useNavigate();
+  const [printPreview, setPrintPreview] = useState<string | null>(null);
+
   getQueueNumber();
   async function getQueueNumber() {
     const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transactions/get/${transactionType}`)
@@ -118,27 +120,24 @@ export default function ConfirmQueue() {
     })
   }
 
-  const captureContent = async () => {
-    const element = document.getElementById('printablediv');
-    if (element) {
-        const canvas = await html2canvas(element);
-        return canvas.toDataURL('image/png'); // Base64 format
-    }
-    return null;
-  };
-
-  const printReceipt = async () => {
-    const dataUrl = await captureContent();
-    if (dataUrl) {
-        // Send captured image to backend for printing
-        const printData = { imageData: dataUrl };
-        await axios.post(process.env.REACT_APP_OTHER_BACKEND_SERVER + '/print-receipt', printData)
-          .then(response => {
-            console.log('Receipt sent for printing');
-          })
-          .catch(error => {
-            console.error('Error sending print request:', error);
-          });
+  const sendPrintRequest = async (textToPrint: string) => {
+    try {
+      const response = await fetch(process.env.REACT_APP_OTHER_BACKEND_SERVER + '/api/print', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ textToPrint }),
+      });
+  
+      const data = await response.json();
+      if (response.ok) {
+        console.log('Print request sent:', data.message);
+      } else {
+        console.error('Error sending print request:', data.error);
+      }
+    } catch (error) {
+      console.error('Network error:', error);
     }
   };
 
@@ -170,7 +169,15 @@ export default function ConfirmQueue() {
           endTime              : null,
         }
         createLog(transactionData);
-        printReceipt();
+        
+        const toPrint = `
+          ${document.querySelector('#TransactionType')?.textContent}\n
+          ${document.querySelector('#QueueNumber')?.textContent}\n
+          ${document.querySelector('#FormattedDate')?.textContent}
+        `;
+        console.log(toPrint);
+
+        sendPrintRequest(toPrint);
         navigate("/SignInCustomer");
       })
       .catch(function (error) {
@@ -222,19 +229,17 @@ export default function ConfirmQueue() {
           <Typography component="h1" variant="h6" fontFamily={"serif"} color={'grey'} marginTop={1}>
             YOUR TRANSACTION
           </Typography>
-          <div id="printablediv">
           <center>
-          <Typography component="h1" variant="h5" fontFamily={"serif"} marginTop={1}>
+          <Typography component="h1" variant="h5" fontFamily={"serif"} marginTop={1} id="TransactionType">
             {transactionType}
           </Typography>
           <Typography component="h1" variant="h3" fontFamily={"serif"} marginTop={1} id="QueueNumber">
 
           </Typography>
-          <Typography component="h1" variant="h6" fontFamily={"serif"} marginTop={1}>
+          <Typography component="h1" variant="h6" fontFamily={"serif"} marginTop={1} id="FormattedDate">
             {formattedDate}
           </Typography>
           </center>
-          </div>
           <Box component="form" noValidate sx={{ mt: 2, mb: 2 }}>
             <Grid container spacing={2}>
               <Grid item xs={6}>

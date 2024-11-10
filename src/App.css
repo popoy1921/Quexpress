@@ -69,18 +69,9 @@
   z-index: 100; /* Ensure it's above other content */
 }
 
-@media print {
-  /* Hide all elements except the content to print */
-  body * {
-    visibility: hidden;
-  }
-  #printablediv1, #printablediv1 * {
-    visibility: visible;
-  }
-  #printablediv1 {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 56mm;
-  }
+#printablediv {
+  width: 180px; /* Roughly 48mm */
+  text-align: center;
+  padding: 5px;
+  font-size: 12px; /* Adjust as needed */
 }
