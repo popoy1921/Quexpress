@@ -103,6 +103,8 @@ const lookUpTableForTransactionCodes: MyObject  = {
   CASHIER7 : "CSH7",
   CASHIER8 : "CSH8",
   CASHIER9 : "CSH9",
+  BTC : "BTC",
+  LTC : "LTC",
 };
 
 function Copyright(props: any) {

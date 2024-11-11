@@ -87,7 +87,7 @@ export default function TransactionControl() {
         date: formattedDate,
         startTime: null,
         endTime: null,
-        refQueueNumber: null,
+        refQueueNumber: responseData.trasaction_ref,
       };
       createLog(transactionData);
     })
@@ -107,11 +107,22 @@ export default function TransactionControl() {
     
     if (!transactionData.transactionRef) {
       if (accessId === '2') {
-        transactionData.transactionQueue = transactionQueue;
+        if (transactionCode === 'BPLO3') {
+          if (transactionQueue) {
+            if (transactionQueue.startsWith('BPT') || transactionQueue.startsWith('BST') || transactionQueue.startsWith('BBT') || transactionQueue.startsWith('BZT') || transactionQueue.startsWith('BFT') || transactionQueue.startsWith('MYT') || transactionQueue.startsWith('WPT') || transactionQueue.startsWith('POT')) {
+              transactionData.transactionQueue = transactionQueue;
+            } else {
+              transactionData.transactionRef = transactionQueue;
+            }
+          }
+        } else {
+          transactionData.transactionQueue = transactionQueue;
+        }
       } else if (accessId === '3') {
         if (transactionCode === 'CSH1' || transactionCode === 'CSH2' || transactionCode === 'CSH7' || transactionCode === 'CSH8') {
           if (transactionQueue) {
-            if (transactionQueue.startsWith('BPP') || transactionQueue.startsWith('POP') || transactionQueue.startsWith('VLP') || transactionQueue.startsWith('OTP') || transactionQueue.startsWith('LBP') || transactionQueue.startsWith('LDP') || transactionQueue.startsWith('LMP') || transactionQueue.startsWith('LCP')) {
+            if (transactionQueue.startsWith('BPP') || transactionQueue.startsWith('POP') || transactionQueue.startsWith('VLP') || transactionQueue.startsWith('OTP') || transactionQueue.startsWith('LBP') || transactionQueue.startsWith('LDP') || transactionQueue.startsWith('LMP') || transactionQueue.startsWith('LCP')
+              || transactionQueue.startsWith('BSP') || transactionQueue.startsWith('BBP') || transactionQueue.startsWith('BZP') || transactionQueue.startsWith('BFP') || transactionQueue.startsWith('MYP') || transactionQueue.startsWith('WPP')) {
               transactionData.transactionQueue = transactionQueue;
             } else {
               transactionData.transactionRef = transactionQueue;
@@ -182,7 +193,7 @@ export default function TransactionControl() {
             case 'CSH1':
             windowData.windowId = 14;
             if (transactionQueue) {
-              if (transactionQueue.startsWith('BPP') || transactionQueue.startsWith('POP')) {
+              if (transactionQueue.startsWith('BPP') || transactionQueue.startsWith('POP') || transactionQueue.startsWith('BSP') || transactionQueue.startsWith('BBP') || transactionQueue.startsWith('BZP') || transactionQueue.startsWith('BFP') || transactionQueue.startsWith('MYP') || transactionQueue.startsWith('WPP')) {
                 windowData.windowId = 14;
               }
             }
@@ -190,7 +201,7 @@ export default function TransactionControl() {
           case 'CSH2':
             windowData.windowId = 15;
             if (transactionQueue) {
-              if (transactionQueue.startsWith('BPP') || transactionQueue.startsWith('POP')) {
+              if (transactionQueue.startsWith('BPP') || transactionQueue.startsWith('POP') || transactionQueue.startsWith('BSP') || transactionQueue.startsWith('BBP') || transactionQueue.startsWith('BZP') || transactionQueue.startsWith('BFP') || transactionQueue.startsWith('MYP') || transactionQueue.startsWith('WPP')) {
                 windowData.windowId = 15;
               }
             }
@@ -255,11 +266,21 @@ export default function TransactionControl() {
       };
   
       if (accessId === '2') {
-        transactionData.transactionQueue = queueNumber;
+        if (transactionCode === 'BPLO3') {
+          if (queueNumber) {
+            if (queueNumber.startsWith('BPT') || queueNumber.startsWith('BST') || queueNumber.startsWith('BBT') || queueNumber.startsWith('BZT') || queueNumber.startsWith('BFT') || queueNumber.startsWith('MYT') || queueNumber.startsWith('WPT') || queueNumber.startsWith('POT')) {
+              transactionData.transactionQueue = queueNumber;
+            } else {
+              transactionData.transactionRef = queueNumber;
+            }
+          }
+        } else {
+          transactionData.transactionQueue = queueNumber;
+        }
       } else if (accessId === '3') {
         if (transactionCode === 'CSH1' || transactionCode === 'CSH2' || transactionCode === 'CSH7' || transactionCode === 'CSH8') {
           if (queueNumber) {
-            if (queueNumber.startsWith('BPP') || queueNumber.startsWith('POP') || queueNumber.startsWith('VLP') || queueNumber.startsWith('OTP') || queueNumber.startsWith('LBP') || queueNumber.startsWith('LDP') || queueNumber.startsWith('LMP') || queueNumber.startsWith('LCP')) {
+            if (queueNumber.startsWith('BPP') || queueNumber.startsWith('POP') || queueNumber.startsWith('VLP') || queueNumber.startsWith('OTP') || queueNumber.startsWith('LBP') || queueNumber.startsWith('LDP') || queueNumber.startsWith('LMP') || queueNumber.startsWith('LCP')  || queueNumber.startsWith('MYP') || queueNumber.startsWith('WPP') || queueNumber.startsWith('BSP') || queueNumber.startsWith('BBP') || queueNumber.startsWith('BZP') || queueNumber.startsWith('BFP')) {
               transactionData.transactionQueue = queueNumber;
             } else {
               transactionData.transactionRef = queueNumber;
@@ -323,13 +344,13 @@ export default function TransactionControl() {
               break;
             case 'CSH1':
               windowData.windowId = 14;
-              if (queueNumber.startsWith('BPP') || queueNumber.startsWith('POP')) {
+              if (queueNumber.startsWith('BPP') || queueNumber.startsWith('POP') || queueNumber.startsWith('BSP') || queueNumber.startsWith('BBP') || queueNumber.startsWith('BZP') || queueNumber.startsWith('BFP') || queueNumber.startsWith('MYP') || queueNumber.startsWith('WPP')) {
                 windowData.windowId = 14;
               }
               break;
             case 'CSH2':
               windowData.windowId = 15;
-              if (queueNumber.startsWith('BPP') || queueNumber.startsWith('POP')) {
+              if (queueNumber.startsWith('BPP') || queueNumber.startsWith('POP') || queueNumber.startsWith('BSP') || queueNumber.startsWith('BBP') || queueNumber.startsWith('BZP') || queueNumber.startsWith('BFP') || queueNumber.startsWith('MYP') || queueNumber.startsWith('WPP')) {
                 windowData.windowId = 15;
               }
               break;
@@ -412,7 +433,7 @@ export default function TransactionControl() {
         localStorage.setItem('CASHIER' + '#', transactionCodeCounter);
 
         var responseData = response.data;
-        if(transactionRef.startsWith('BP') || transactionRef.startsWith('MY') || transactionRef.startsWith('WP') || transactionRef.startsWith('BS') || transactionRef.startsWith('BB') || transactionRef.startsWith('BZ') || transactionRef.startsWith('BF') || transactionRef.startsWith('BC') || transactionRef.startsWith('PO')){
+        if(transactionRef.startsWith('BP') || transactionRef.startsWith('MY') || transactionRef.startsWith('WP') || transactionRef.startsWith('BS') || transactionRef.startsWith('BB') || transactionRef.startsWith('BZ') || transactionRef.startsWith('BF') || transactionRef.startsWith('PO')){
           const transactionData = {
             transactionId: responseData.transaction_id,
             customerId: responseData.customer_id,
@@ -423,7 +444,7 @@ export default function TransactionControl() {
             date: formattedDate,
             startTime: null,
             endTime: null,
-            refQueueNumber: responseData.transactions_queue,
+            refQueueNumber: transactionRef,
           };
           createLog(transactionData);
         } else if(transactionRef.startsWith('LC') || transactionRef.startsWith('LB') || transactionRef.startsWith('LD') || transactionRef.startsWith('LM')){
@@ -437,7 +458,7 @@ export default function TransactionControl() {
             date: formattedDate,
             startTime: null,
             endTime: null,
-            refQueueNumber: responseData.transactions_queue,
+            refQueueNumber: transactionRef,
           };
         createLog(transactionData);
         }
@@ -460,20 +481,31 @@ export default function TransactionControl() {
   async function toClaim(transactionRef: string) {
     await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/${transactionRef}`)
       .then(async function (response) {
-
+        console.log(transactionRef);
+        const currentDate = localStorage.getItem('currentDate');
+        const dateToday = format(new Date(), "yyyy-MM-dd");
+        // reset counters
+        if (currentDate !== dateToday) {
+          localStorage.setItem('currentDate', dateToday);
+          localStorage.setItem('CLAIM' + '#', '0');
+        }
+        // get current counter
+        let transactionCodeCounter: any = (parseInt(localStorage.getItem('CLAIM' + '#') ?? '0') + 1).toString().padStart(5, '0');
+        localStorage.setItem('CLAIM' + '#', transactionCodeCounter);
+        
         var responseData = response.data;
-        if(transactionRef.startsWith('BP') || transactionRef.startsWith('MY') || transactionRef.startsWith('WP') || transactionRef.startsWith('BS') || transactionRef.startsWith('BB') || transactionRef.startsWith('BZ') || transactionRef.startsWith('BF') || transactionRef.startsWith('BC') || transactionRef.startsWith('PO')){
+        if(transactionRef.startsWith('BP') || transactionRef.startsWith('BS') || transactionRef.startsWith('BB') || transactionRef.startsWith('BZ') || transactionRef.startsWith('BF') || transactionRef.startsWith('BC') || transactionRef.startsWith('PO')){
           const transactionData = {
             transactionId: responseData.transaction_id,
             customerId: responseData.customer_id,
             customerAccountId: responseData.customer_account_id,
-            queueNumber: responseData.transactions_queue,
+            queueNumber: 'BTC' + transactionCodeCounter,
             windowId: null,
             staffId: null,
             date: formattedDate,
             startTime: null,
             endTime: null,
-            refQueueNumber: responseData.transaction_ref,
+            refQueueNumber: transactionRef,
           };
           createLog(transactionData);
         } else if(transactionRef.startsWith('LC') || transactionRef.startsWith('LB') || transactionRef.startsWith('LD') || transactionRef.startsWith('LM')){
@@ -481,13 +513,28 @@ export default function TransactionControl() {
             transactionId: responseData.transaction_id,
             customerId: responseData.customer_id,
             customerAccountId: responseData.customer_account_id,
-            queueNumber: responseData.transactions_queue,
+            queueNumber: 'LTC' + transactionCodeCounter,
             windowId: null,
             staffId: null,
             date: formattedDate,
             startTime: null,
             endTime: null,
-            refQueueNumber: responseData.transaction_ref,
+            refQueueNumber: transactionRef,
+          };
+        createLog(transactionData);
+        }
+        else if(transactionRef.startsWith('MY') || transactionRef.startsWith('WP')){
+          const transactionData = {
+            transactionId: responseData.transaction_id,
+            customerId: responseData.customer_id,
+            customerAccountId: responseData.customer_account_id,
+            queueNumber: responseData.transactionRef,
+            windowId: null,
+            staffId: null,
+            date: formattedDate,
+            startTime: null,
+            endTime: null,
+            refQueueNumber: transactionRef,
           };
         createLog(transactionData);
         }

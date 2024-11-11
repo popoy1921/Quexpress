@@ -64,6 +64,11 @@ function useTransactionData(transactionCode: string) {
           queueNumber = response.data.transaction_ref !== null 
           ? response.data.transaction_ref 
           : response.data.transactions_queue;
+        } else if(transactionCode.startsWith('BPLO3') || transactionCode.startsWith('LCRT')) {
+          const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/${transactionCode}`);
+          queueNumber = response.data.transaction_ref !== null 
+          ? response.data.transaction_ref 
+          : response.data.transactions_queue;
         } else {
           const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/${transactionCode}`);
           queueNumber = response.data.transactions_queue;

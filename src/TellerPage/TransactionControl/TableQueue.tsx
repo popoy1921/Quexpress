@@ -70,7 +70,7 @@ export default function BasicTable() {
                           {localStorage.getItem('AccessId') === '3' 
                             ? (element.transaction_ref || element.transactions_queue)
                             : localStorage.getItem('AccessId') === '2'
-                            ? element.transactions_queue
+                            ? (element.transaction_ref || element.transactions_queue)
                             : null }
                         </TableCell>
                         <TableCell>{element.customer_account_id}</TableCell>

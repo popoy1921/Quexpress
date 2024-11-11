@@ -259,7 +259,7 @@ app.get('/transaction_log/get/:transactionCode', async (req, res) => {
       + ' OR transactions_queue LIKE \'WPI%\' OR transactions_queue LIKE \'WPR%\')';
     } else if (transactionCode === 'BPLO3%') {
       var queryString = baseQuery + ' AND (transactions_queue LIKE \'MYT%\' OR transactions_queue LIKE \'WPT%\' OR transactions_queue LIKE \'BPT%\' OR transactions_queue LIKE \'BST%\''
-      + ' OR transactions_queue LIKE \'BBT%\' OR transactions_queue LIKE \'BZT%\' OR transactions_queue LIKE \'BFT%\' OR transactions_queue LIKE \'POT%\')';
+      + ' OR transactions_queue LIKE \'BBT%\' OR transactions_queue LIKE \'BZT%\' OR transactions_queue LIKE \'BFT%\' OR transactions_queue LIKE \'POT%\' OR transactions_queue LIKE \'BTC%\')';
     } else if (transactionCode === 'BPS%') {
       var queryString = baseQuery + ' AND (transactions_queue LIKE \'BSI%\' OR transactions_queue LIKE \'BSR%\')';
     } else if (transactionCode === 'BPB%') {
@@ -277,7 +277,7 @@ app.get('/transaction_log/get/:transactionCode', async (req, res) => {
     } else if (transactionCode === 'LCC%') {
       var queryString = baseQuery + ' AND (transactions_queue LIKE \'LCB%\' OR transactions_queue LIKE \'LCD%\' OR transactions_queue LIKE \'LCM%\')';
     } else if (transactionCode === 'LCRT%') {
-      var queryString = baseQuery + ' AND (transactions_queue LIKE \'LBT%\' OR transactions_queue LIKE \'LDT%\' OR transactions_queue LIKE \'LMT%\' OR transactions_queue LIKE \'LCT%\')';
+      var queryString = baseQuery + ' AND (transactions_queue LIKE \'LBT%\' OR transactions_queue LIKE \'LDT%\' OR transactions_queue LIKE \'LMT%\' OR transactions_queue LIKE \'LCT%\' OR transactions_queue LIKE \'LTC%\')';
     } else if (transactionCode === 'DTIM%') {
       var queryString = baseQuery + ' AND (transactions_queue LIKE \'DTI%\' OR transactions_queue LIKE \'DTR%\' OR transactions_queue LIKE \'DTP%\' OR transactions_queue LIKE \'DTT%\')';
     } else {
@@ -387,7 +387,7 @@ app.get('/transaction_log/get/:transactionCode/:transactionStatus', async (req, 
 
     } else if (transactionCode === 'BPLO3') {
       var queryString = baseQuery + ' where (transactions_queue LIKE \'MYT%\' OR transactions_queue LIKE \'WPT%\' OR transactions_queue LIKE \'BPT%\' OR transactions_queue LIKE \'BST%\''
-      + ' OR transactions_queue LIKE \'BBT%\' OR transactions_queue LIKE \'BZT%\' OR transactions_queue LIKE \'BFT%\' OR transactions_queue LIKE \'POT%\')'
+      + ' OR transactions_queue LIKE \'BBT%\' OR transactions_queue LIKE \'BZT%\' OR transactions_queue LIKE \'BFT%\' OR transactions_queue LIKE \'POT%\' OR transactions_queue LIKE \'BTC%\')'
       + ' and (transaction_datetime >= CURRENT_DATE';
 
       if (transactionStatus === 'toQueue') {
@@ -487,7 +487,7 @@ app.get('/transaction_log/get/:transactionCode/:transactionStatus', async (req, 
       }
 
     } else if (transactionCode === 'LCRT') {
-      var queryString = baseQuery + ' where (transactions_queue LIKE \'LCT%\' OR transactions_queue LIKE \'LBT%\' OR transactions_queue LIKE \'LDT%\' OR transactions_queue LIKE \'LMT%\')'
+      var queryString = baseQuery + ' where (transactions_queue LIKE \'LCT%\' OR transactions_queue LIKE \'LBT%\' OR transactions_queue LIKE \'LDT%\' OR transactions_queue LIKE \'LMT%\' OR transactions_queue LIKE \'LTC%\')'
       + ' and (transaction_datetime >= CURRENT_DATE';
 
       if (transactionStatus === 'toQueue') {
@@ -497,9 +497,9 @@ app.get('/transaction_log/get/:transactionCode/:transactionStatus', async (req, 
       }
 
     } else if (transactionCode === 'CSH1' || transactionCode === "CSH2") {
-      var queryString = baseQuery + ' WHERE (transaction_ref LIKE \'BP%\' OR transaction_ref LIKE \'MY%\' OR transaction_ref LIKE \'WP%\' OR transaction_ref LIKE \'BP%\''
-      + ' OR transaction_ref LIKE \'BS%\' OR transaction_ref LIKE \'BB%\' OR transaction_ref LIKE \'BZ%\' OR transaction_ref LIKE \'BF%\' OR transaction_ref LIKE \'PO%\''
-      + ' OR transactions_queue LIKE \'BPP%\' OR transactions_queue LIKE \'POP%\')'
+      var queryString = baseQuery + ' WHERE (((transaction_ref LIKE \'BP%\' OR transaction_ref LIKE \'MY%\' OR transaction_ref LIKE \'WP%\' OR transaction_ref LIKE \'BP%\''
+      + ' OR transaction_ref LIKE \'BS%\' OR transaction_ref LIKE \'BB%\' OR transaction_ref LIKE \'BZ%\' OR transaction_ref LIKE \'BF%\' OR transaction_ref LIKE \'PO%\') and transactions_queue like \'CSH%\')'
+      + ' OR (transactions_queue LIKE \'BPP%\' OR transactions_queue LIKE \'POP%\' OR transactions_queue LIKE \'BSP%\' OR transactions_queue LIKE \'BBP%\' OR transactions_queue LIKE \'BZP%\' OR transactions_queue LIKE \'BFP%\' OR transactions_queue LIKE \'BBP%\' OR transactions_queue LIKE \'MYP%\' OR transactions_queue LIKE \'WPP%\'))'
       + ' and (transaction_datetime >= CURRENT_DATE';
       
       if (transactionStatus === 'toQueue') {
@@ -526,9 +526,9 @@ app.get('/transaction_log/get/:transactionCode/:transactionStatus', async (req, 
         queryString += ' or transaction_datetime <= CURRENT_DATE) and (transaction_status IS NOT NULL)';
       }
     } else if (transactionCode === 'CSH7' || transactionCode === "CSH8") {
-      var queryString = baseQuery + ' WHERE (transaction_ref LIKE \'LC%\' OR transaction_ref LIKE \'LB%\' OR transaction_ref LIKE \'LD%\' OR transaction_ref LIKE \'LM%\''
-      + ' OR transactions_queue LIKE \'VLP%\' OR transactions_queue LIKE \'OTP%\''
-      + ' OR transactions_queue LIKE \'LBP%\' OR transactions_queue LIKE \'LDP%\' OR transactions_queue LIKE \'LMP%\' OR transactions_queue LIKE \'LCP%\')'
+      var queryString = baseQuery + ' WHERE (((transaction_ref LIKE \'LC%\' OR transaction_ref LIKE \'LB%\' OR transaction_ref LIKE \'LD%\' OR transaction_ref LIKE \'LM%\') and transactions_queue like \'CSH%\')'
+      + ' OR (transactions_queue LIKE \'VLP%\' OR transactions_queue LIKE \'OTP%\''
+      + ' OR transactions_queue LIKE \'LBP%\' OR transactions_queue LIKE \'LDP%\' OR transactions_queue LIKE \'LMP%\' OR transactions_queue LIKE \'LCP%\'))'
       + ' and (transaction_datetime >= CURRENT_DATE';
       
       if (transactionStatus === 'toQueue') {
