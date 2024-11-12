@@ -59,8 +59,8 @@ export default function TransactionControl() {
   function cancelNumber(event: any) {
     event.preventDefault();
     let transactionRef = localStorage.getItem(transactionCode + 'NowServing') as string;
-    toEnd(transactionRef);
     updateNumber('cancelled');
+    toEnd(transactionRef);    
     if (document.getElementById('nowServing')?.innerText !== 'No Available Number') {
       updateForMonitorBlink(transactionCode);
     }
