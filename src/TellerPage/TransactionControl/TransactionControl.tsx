@@ -72,12 +72,66 @@ export default function TransactionControl() {
   }
 
   async function toEnd(transactionRef: string) {
-    alert(transactionRef)
-    await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/${transactionRef}`)
-    .then(async function (response) {
-
-      var responseData = response.data;
-      const transactionData = {
+    let date: Date = new Date();
+    let transactionQueue = localStorage.getItem(transactionCode + 'NowServing');
+    let transactionData: any = {};
+    
+    if (!transactionData.transactionRef) {
+      if (accessId === '2') {
+        if (transactionCode === 'BPLO3') {
+          if (transactionQueue) {
+            if (transactionQueue.startsWith('BPT') || transactionQueue.startsWith('BST') || transactionQueue.startsWith('BBT') || transactionQueue.startsWith('BZT') || transactionQueue.startsWith('BFT') || transactionQueue.startsWith('MYT') || transactionQueue.startsWith('WPT') || transactionQueue.startsWith('POT')) {
+              transactionData.transactionQueue = transactionQueue;
+            } else {
+              transactionData.transactionRef = transactionQueue;
+              transactionData.forClaim = true;
+            }
+          }
+        } else if (transactionCode === 'BPLO2') {
+          if (transactionQueue) {
+            if (transactionQueue.startsWith('MYT') || transactionQueue.startsWith('WPT')) {
+              transactionData.transactionQueue = transactionQueue;
+            } else {
+              transactionData.transactionRef = transactionQueue;
+              transactionData.forClaim = true;
+            }
+          }
+        } else if (transactionCode === 'LCRT') {
+          if (transactionQueue) {
+            if (transactionQueue.startsWith('LBT') || transactionQueue.startsWith('LDT') || transactionQueue.startsWith('LMT') || transactionQueue.startsWith('LCT') || transactionQueue.startsWith('LTC')) {
+              transactionData.transactionQueue = transactionQueue;
+            } else {
+              transactionData.transactionRef = transactionQueue;
+              transactionData.forClaim = true;
+            }
+          }
+        } else {
+          transactionData.transactionQueue = transactionQueue;
+        }
+      } else if (accessId === '3') {
+        if (transactionCode === 'CSH1' || transactionCode === 'CSH2' || transactionCode === 'CSH7' || transactionCode === 'CSH8') {
+          if (transactionQueue) {
+            if (transactionQueue.startsWith('BPP') || transactionQueue.startsWith('POP') || transactionQueue.startsWith('VLP') || transactionQueue.startsWith('OTP') || transactionQueue.startsWith('LBP') || transactionQueue.startsWith('LDP') || transactionQueue.startsWith('LMP') || transactionQueue.startsWith('LCP')
+              || transactionQueue.startsWith('BSP') || transactionQueue.startsWith('BBP') || transactionQueue.startsWith('BZP') || transactionQueue.startsWith('BFP') || transactionQueue.startsWith('MYP') || transactionQueue.startsWith('WPP')) {
+              transactionData.transactionQueue = transactionQueue;
+            } else {
+              transactionData.transactionRef = transactionQueue;
+            }
+          }
+        } else {
+          transactionData.transactionQueue = transactionQueue;
+        }
+      }
+    }
+    if (transactionQueue === '0') {
+      return false;
+    }
+    const params = new URLSearchParams(transactionData).toString();
+    
+    await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get?${params}`)
+    .then(async response => {
+      var responseData = response.data[0];
+      const createData = {
         transactionId: responseData.transaction_id,
         customerId: responseData.customer_id,
         customerAccountId: responseData.customer_account_id,
@@ -87,10 +141,11 @@ export default function TransactionControl() {
         date: formattedDate,
         startTime: null,
         endTime: null,
-        refQueueNumber: responseData.trasaction_ref,
+        refQueueNumber: responseData.transaction_ref,
       };
-      createLog(transactionData);
-    })
+      createLog(createData);
+      }
+    )
     .catch(function (error) {
       alert(' ' + error);
     });
@@ -113,6 +168,25 @@ export default function TransactionControl() {
               transactionData.transactionQueue = transactionQueue;
             } else {
               transactionData.transactionRef = transactionQueue;
+              transactionData.forClaim = true;
+            }
+          }
+        } else if (transactionCode === 'BPLO2') {
+          if (transactionQueue) {
+            if (transactionQueue.startsWith('MYT') || transactionQueue.startsWith('WPT')) {
+              transactionData.transactionQueue = transactionQueue;
+            } else {
+              transactionData.transactionRef = transactionQueue;
+              transactionData.forClaim = true;
+            }
+          }
+        } else if (transactionCode === 'LCRT') {
+          if (transactionQueue) {
+            if (transactionQueue.startsWith('LBT') || transactionQueue.startsWith('LDT') || transactionQueue.startsWith('LMT') || transactionQueue.startsWith('LCT') || transactionQueue.startsWith('LTC')) {
+              transactionData.transactionQueue = transactionQueue;
+            } else {
+              transactionData.transactionRef = transactionQueue;
+              transactionData.forClaim = true;
             }
           }
         } else {
@@ -133,7 +207,6 @@ export default function TransactionControl() {
         }
       }
     }
-  
     if (transactionQueue === '0') {
       return false;
     }
@@ -149,7 +222,7 @@ export default function TransactionControl() {
         var windowData: any = {
           transactionLogId: response.data.transaction_log_id,
         };
-    
+        console.log(transactionQueue)
         switch (transactionCode) {
           case 'BPLO1':
               windowData.windowId = 1;
@@ -238,7 +311,7 @@ export default function TransactionControl() {
             console.log('No matching transaction code.');
             return; // exit early if no matching code
         }
-    
+        console.log(windowData)
         // Update window data if a transaction code matches
         if (windowData.windowId) {
           await axios.put(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/updateWindow`, windowData);
@@ -272,6 +345,25 @@ export default function TransactionControl() {
               transactionData.transactionQueue = queueNumber;
             } else {
               transactionData.transactionRef = queueNumber;
+              transactionData.forClaim = true;
+            }
+          }
+        } else if (transactionCode === 'BPLO2') {
+          if (queueNumber) {
+            if (queueNumber.startsWith('MYT') || queueNumber.startsWith('WPT')) {
+              transactionData.transactionQueue = queueNumber;
+            } else {
+              transactionData.transactionRef = queueNumber;
+              transactionData.forClaim = true;
+            }
+          }
+        }  else if (transactionCode === 'LCRT') {
+          if (queueNumber) {
+            if (queueNumber.startsWith('LBT') || queueNumber.startsWith('LDT') || queueNumber.startsWith('LMT') || queueNumber.startsWith('LCT') || queueNumber.startsWith('LTC')) {
+              transactionData.transactionQueue = queueNumber;
+            } else {
+              transactionData.transactionRef = queueNumber;
+              transactionData.forClaim = true;
             }
           }
         } else {
@@ -494,7 +586,7 @@ export default function TransactionControl() {
         localStorage.setItem('CLAIM' + '#', transactionCodeCounter);
         
         var responseData = response.data;
-        if(transactionRef.startsWith('BP') || transactionRef.startsWith('BS') || transactionRef.startsWith('BB') || transactionRef.startsWith('BZ') || transactionRef.startsWith('BF') || transactionRef.startsWith('BC') || transactionRef.startsWith('PO')){
+        if(transactionRef.startsWith('BP') || transactionRef.startsWith('BS') || transactionRef.startsWith('BB') || transactionRef.startsWith('BZ') || transactionRef.startsWith('BF') || transactionRef.startsWith('BC') || transactionRef.startsWith('PO') || transactionRef.startsWith('WP') || transactionRef.startsWith('MY')){
           const transactionData = {
             transactionId: responseData.transaction_id,
             customerId: responseData.customer_id,
@@ -618,8 +710,7 @@ export default function TransactionControl() {
                       CANCEL NUMBER
                     </Button>
                   </Grid>
-                  {/* Conditionally render the PASS TO CASHIER button based on accessId */}
-                  {accessId === '2' && (
+                  {(accessId === '2' && transactionCode !== 'BPLO3' && transactionCode !== 'DTIM' && transactionCode !== 'LCRT') && (
                     <Grid item xs={6}>
                       <Button
                         fullWidth

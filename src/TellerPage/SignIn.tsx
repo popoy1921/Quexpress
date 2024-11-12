@@ -184,7 +184,7 @@ const SignIn: React.FC = () => {
     localStorage.setItem('AccessId', user.access_id);
     localStorage.setItem('WindowId', user.window_id);
     localStorage.setItem('TransactionAccess', capitalizeAndRemoveSpaces(transaction));
-    navigate(`/Teller/${transaction}`);
+    navigate(`/Teller/${capitalizeAndRemoveSpaces(transaction)}`);
   };
   
   // Reset counters if a new day

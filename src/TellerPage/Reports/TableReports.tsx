@@ -52,10 +52,10 @@ const App = () => {
   // Define the columns for the DataTable
   const tableTransactionLogColumns = [
     {
-      name: accessid === '2' ? 'Transaction Queue' : 'Transaction Reference', 
+      name: 'Transaction Reference', 
       sortable: true,
-      selector: (row: Row) => accessid === '2' ? row.transactions_queue : row.transaction_ref,
-      cellExport: (row: Row) => accessid === '2' ? row.transactions_queue : row.transaction_ref,
+      selector: (row: Row) => row.transaction_ref != null ? row.transaction_ref : row.transactions_queue,
+      cellExport: (row: Row) => row.transaction_ref != null ? row.transaction_ref : row.transactions_queue,
     },
     {name : 'Customer Account ID'   , sortable: true, selector : (row : Row)  => row.customer_account_id, cellExport: (row : Row) => row.customer_account_id},
     {name : 'Customer Name'         , sortable: true, selector : (row : Row)  => row.customer_first_name +' '+ row.customer_last_name, cellExport: (row : Row) => row.customer_first_name + row.customer_last_name},

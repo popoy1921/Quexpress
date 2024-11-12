@@ -255,11 +255,12 @@ app.get('/transaction_log/get/:transactionCode', async (req, res) => {
       var queryString = baseQuery + ' AND (transactions_queue LIKE \'BPI%\' OR transactions_queue LIKE \'BPN%\' OR transactions_queue LIKE \'BPR%\''
       + ' OR transactions_queue LIKE \'BPC%\' OR transactions_queue LIKE \'POI%\' OR transactions_queue LIKE \'POR%\')';
     } else if (transactionCode === 'BPLO2%') {
-      var queryString = baseQuery + ' AND (transactions_queue LIKE \'MYI%\' OR transactions_queue LIKE \'MYR%\''
-      + ' OR transactions_queue LIKE \'WPI%\' OR transactions_queue LIKE \'WPR%\')';
+      var queryString = baseQuery + ' AND (transactions_queue LIKE \'MYI%\' OR transactions_queue LIKE \'MYR%\' OR transactions_queue LIKE \'MYT%\''
+      + ' OR transactions_queue LIKE \'WPI%\' OR transactions_queue LIKE \'WPR%\' OR transactions_queue LIKE \'WPT%\' OR ((transaction_ref LIKE \'WP%\' OR transaction_ref LIKE \'MY%\') AND transactions_queue LIKE \'BTC%\'))';
     } else if (transactionCode === 'BPLO3%') {
-      var queryString = baseQuery + ' AND (transactions_queue LIKE \'MYT%\' OR transactions_queue LIKE \'WPT%\' OR transactions_queue LIKE \'BPT%\' OR transactions_queue LIKE \'BST%\''
-      + ' OR transactions_queue LIKE \'BBT%\' OR transactions_queue LIKE \'BZT%\' OR transactions_queue LIKE \'BFT%\' OR transactions_queue LIKE \'POT%\' OR transactions_queue LIKE \'BTC%\')';
+      var queryString = baseQuery + ' AND (transactions_queue LIKE \'BPT%\' OR transactions_queue LIKE \'BST%\''
+      + ' OR transactions_queue LIKE \'BBT%\' OR transactions_queue LIKE \'BZT%\' OR transactions_queue LIKE \'BFT%\' OR transactions_queue LIKE \'POT%\''
+      + ' OR (transaction_ref LIKE \'BP%\' OR transaction_ref LIKE \'BS%\' OR transaction_ref LIKE \'BB%\' OR transaction_ref LIKE \'BZ%\' OR transaction_ref LIKE \'BF%\' OR transaction_ref LIKE \'PO%\') AND transactions_queue LIKE \'BTC%\')'
     } else if (transactionCode === 'BPS%') {
       var queryString = baseQuery + ' AND (transactions_queue LIKE \'BSI%\' OR transactions_queue LIKE \'BSR%\')';
     } else if (transactionCode === 'BPB%') {
@@ -310,13 +311,13 @@ app.get('/transaction_log/CSH/:transactionCode', async (req, res) => {
 
     // Determine query based on transactionCode, making sure all parentheses match
     if (transactionCode === 'CSH1') {
-      queryString = baseQuery + ' AND (transaction_ref LIKE \'BP%\' OR transaction_ref LIKE \'MY%\' OR transaction_ref LIKE \'WP%\''
-      + ' OR transaction_ref LIKE \'BS%\' OR transaction_ref LIKE \'BB%\' OR transaction_ref LIKE \'BZ%\' OR transaction_ref LIKE \'BF%\' OR transaction_ref LIKE \'PO%\''
+      queryString = baseQuery + ' AND (((transaction_ref LIKE \'BP%\' OR transaction_ref LIKE \'MY%\' OR transaction_ref LIKE \'WP%\''
+      + ' OR transaction_ref LIKE \'BS%\' OR transaction_ref LIKE \'BB%\' OR transaction_ref LIKE \'BZ%\' OR transaction_ref LIKE \'BF%\' OR transaction_ref LIKE \'PO%\') AND transactions_queue LIKE \'CSH%\')'
       + ' OR transactions_queue LIKE \'BPP%\' OR transactions_queue LIKE \'POP%\' OR transactions_queue LIKE \'MYP%\' OR transactions_queue LIKE \'WPP%\''
       + ' OR transactions_queue LIKE \'BSP%\' OR transactions_queue LIKE \'BBP%\' OR transactions_queue LIKE \'BZP%\' OR transactions_queue LIKE \'BFP%\') AND window_id = 14';
     } else if (transactionCode === 'CSH2') {
-      queryString = baseQuery + ' AND (transaction_ref LIKE \'BP%\' OR transaction_ref LIKE \'MY%\' OR transaction_ref LIKE \'WP%\''
-      + ' OR transaction_ref LIKE \'BS%\' OR transaction_ref LIKE \'BB%\' OR transaction_ref LIKE \'BZ%\' OR transaction_ref LIKE \'BF%\''
+      queryString = baseQuery + ' AND (((transaction_ref LIKE \'BP%\' OR transaction_ref LIKE \'MY%\' OR transaction_ref LIKE \'WP%\''
+      + ' OR transaction_ref LIKE \'BS%\' OR transaction_ref LIKE \'BB%\' OR transaction_ref LIKE \'BZ%\' OR transaction_ref LIKE \'BF%\' OR transaction_ref LIKE \'PO%\') AND transactions_queue LIKE \'CSH%\')'
       + ' OR transactions_queue LIKE \'BPP%\' OR transactions_queue LIKE \'POP%\' OR transactions_queue LIKE \'MYP%\' OR transactions_queue LIKE \'WPP%\''
       + ' OR transactions_queue LIKE \'BSP%\' OR transactions_queue LIKE \'BBP%\' OR transactions_queue LIKE \'BZP%\' OR transactions_queue LIKE \'BFP%\') AND window_id = 15';
     } else if (transactionCode === 'CSH3') {
@@ -349,6 +350,41 @@ app.get('/transaction_log/CSH/:transactionCode', async (req, res) => {
   }
 });
 
+// Route for Cancelled
+app.get('/transaction_log/get', async (req, res) => {
+  const transactionData = req.query;
+  const transactionQueue = transactionData.transactionQueue;
+  const transactionRef = transactionData.transactionRef ?? null; 
+  const forClaim = transactionData.forClaim ?? null;
+  let queryParameters = [];
+  
+  try {
+    let queryString = 'SELECT * FROM quexpress.tbl_quexpress_transaction_log';
+
+    if (transactionRef) {
+      queryString += ' WHERE transaction_ref = $1';
+      queryParameters.push(transactionRef);
+    } else if (transactionQueue) {
+      queryString += ' WHERE transactions_queue = $1';
+      queryParameters.push(transactionQueue);
+    }
+
+    if (forClaim === true) {
+      queryString += ' AND transactions_queue NOT LIKE \'CSH%\'';
+    }
+
+    queryString += ' AND transaction_datetime >= CURRENT_DATE AND transaction_status IS NOT NULL'
+    + ' ORDER BY transaction_log_id desc limit 1';
+
+    const client = await pool.connect();
+    const result = await client.query(queryString, queryParameters);
+    res.json(result.rows);
+    client.release();
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server Error');
+  }
+});
 
 
 // Route for Displaying QueueNumber
@@ -375,8 +411,9 @@ app.get('/transaction_log/get/:transactionCode/:transactionStatus', async (req, 
       }
 
     } else if (transactionCode === 'BPLO2') {
-      var queryString = baseQuery + ' where (transactions_queue LIKE \'MYI%\' OR transactions_queue LIKE \'MYR%\''
-      + ' OR transactions_queue LIKE \'WPI%\' OR transactions_queue LIKE \'WPR%\')'
+      var queryString = baseQuery + ' where (transactions_queue LIKE \'MYI%\' OR transactions_queue LIKE \'MYR%\' OR transactions_queue LIKE \'MYT%\''
+      + ' OR transactions_queue LIKE \'WPI%\' OR transactions_queue LIKE \'WPR%\' OR transactions_queue LIKE \'WPT%\''
+      + ' OR ((transaction_ref LIKE \'MY%\' OR transaction_ref LIKE \'WP%\') AND transactions_queue LIKE \'BTC%\'))'
       + ' and (transaction_datetime >= CURRENT_DATE';
 
       if (transactionStatus === 'toQueue') {
@@ -386,8 +423,8 @@ app.get('/transaction_log/get/:transactionCode/:transactionStatus', async (req, 
       }
 
     } else if (transactionCode === 'BPLO3') {
-      var queryString = baseQuery + ' where (transactions_queue LIKE \'MYT%\' OR transactions_queue LIKE \'WPT%\' OR transactions_queue LIKE \'BPT%\' OR transactions_queue LIKE \'BST%\''
-      + ' OR transactions_queue LIKE \'BBT%\' OR transactions_queue LIKE \'BZT%\' OR transactions_queue LIKE \'BFT%\' OR transactions_queue LIKE \'POT%\' OR transactions_queue LIKE \'BTC%\')'
+      var queryString = baseQuery + ' where (transactions_queue LIKE \'BPT%\' OR transactions_queue LIKE \'BST%\' OR transactions_queue LIKE \'BBT%\' OR transactions_queue LIKE \'BZT%\' OR transactions_queue LIKE \'BFT%\''
+      + '  OR transactions_queue LIKE \'POT%\' OR (transaction_ref LIKE \'BS%\' OR transaction_ref LIKE \'BB%\' OR transaction_ref LIKE \'BZ%\' OR transaction_ref LIKE \'BF%\' OR transaction_ref LIKE \'BP%\' OR transaction_ref LIKE \'PO%\') AND transactions_queue LIKE \'BTC%\')'
       + ' and (transaction_datetime >= CURRENT_DATE';
 
       if (transactionStatus === 'toQueue') {
@@ -656,6 +693,8 @@ app.put('/transaction_log/update', async (req, res) => {
   const transactionRef = transactionData.transactionRef ?? null; 
   const transactionEndTime = transactionData.transactionEndTime ?? null;
   const transactionStartTime = transactionData.transactionStartTime ?? null;
+  const forClaim = transactionData.forClaim ?? null;
+  const forCashier = transactionData.forCashier ?? null;
 
   try {
     let queryString = 'UPDATE quexpress.tbl_quexpress_transaction_log SET transaction_status = $1';
@@ -677,7 +716,11 @@ app.put('/transaction_log/update', async (req, res) => {
       transactionLogDetails.push(transactionQueue);
     }
 
-    queryString += ' AND transaction_datetime >= CURRENT_DATE RETURNING *';
+    queryString += ' AND transaction_datetime >= CURRENT_DATE';
+    if (forClaim === true) {
+      queryString += ' AND transactions_queue not like \'CSH%\'';
+    }
+    queryString += ' RETURNING *';
     const client = await pool.connect();
     const result = await client.query(queryString, transactionLogDetails);
     res.json(result.rows[0]);

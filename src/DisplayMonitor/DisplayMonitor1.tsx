@@ -62,7 +62,12 @@ function useTransactionData(transactionCode: string) {
         if(transactionCode === 'CSH') {
           const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/CSH/${transactionCode}`);
           queueNumber = response.data.transaction_ref;
-        } else {
+        } else if(transactionCode.startsWith('BPLO2')) {
+          const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/${transactionCode}`);
+          queueNumber = response.data.transaction_ref !== null 
+          ? response.data.transaction_ref 
+          : response.data.transactions_queue;
+        }  else {
           const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/${transactionCode}`);
           queueNumber = response.data.transactions_queue;
         }
