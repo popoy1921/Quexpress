@@ -74,6 +74,7 @@ export default function TransactionControl() {
   async function toEnd(transactionRef: string) {
     let date: Date = new Date();
     let transactionQueue = localStorage.getItem(transactionCode + 'NowServing');
+    let isTransactionRef = localStorage.getItem('IsTransactionRef');
     let transactionData: any = {};
     
     if (!transactionData.transactionRef) {
@@ -89,11 +90,11 @@ export default function TransactionControl() {
           }
         } else if (transactionCode === 'BPLO2') {
           if (transactionQueue) {
-            if (transactionQueue.startsWith('MYT') || transactionQueue.startsWith('WPT')) {
-              transactionData.transactionQueue = transactionQueue;
-            } else {
+            if (isTransactionRef === 'isTransactionRef'){
               transactionData.transactionRef = transactionQueue;
-              transactionData.forClaim = true;
+              transactionData.forClaim = true;         
+            } else {
+              transactionData.transactionQueue = transactionQueue;
             }
           }
         } else if (transactionCode === 'LCRT') {
@@ -155,6 +156,7 @@ export default function TransactionControl() {
     // current number move to done
     let date: Date = new Date();
     let transactionQueue = localStorage.getItem(transactionCode + 'NowServing');
+    let isTransactionRef = localStorage.getItem('IsTransactionRef');
     let transactionData: any = {
       status: nextTransactionStatus,
       transactionEndTime: format(date, 'HH:mm:ss'),
@@ -164,7 +166,7 @@ export default function TransactionControl() {
       if (accessId === '2') {
         if (transactionCode === 'BPLO3') {
           if (transactionQueue) {
-            if (transactionQueue.startsWith('BPT') || transactionQueue.startsWith('BST') || transactionQueue.startsWith('BBT') || transactionQueue.startsWith('BZT') || transactionQueue.startsWith('BFT') || transactionQueue.startsWith('MYT') || transactionQueue.startsWith('WPT') || transactionQueue.startsWith('POT')) {
+            if (transactionQueue.startsWith('BPT') || transactionQueue.startsWith('BST') || transactionQueue.startsWith('BBT') || transactionQueue.startsWith('BZT') || transactionQueue.startsWith('BFT') || transactionQueue.startsWith('POT')) {
               transactionData.transactionQueue = transactionQueue;
             } else {
               transactionData.transactionRef = transactionQueue;
@@ -173,11 +175,11 @@ export default function TransactionControl() {
           }
         } else if (transactionCode === 'BPLO2') {
           if (transactionQueue) {
-            if (transactionQueue.startsWith('MYT') || transactionQueue.startsWith('WPT')) {
-              transactionData.transactionQueue = transactionQueue;
-            } else {
+            if (isTransactionRef === 'isTransactionRef'){
               transactionData.transactionRef = transactionQueue;
-              transactionData.forClaim = true;
+              transactionData.forClaim = true;         
+            } else {
+              transactionData.transactionQueue = transactionQueue;
             }
           }
         } else if (transactionCode === 'LCRT') {
@@ -210,7 +212,7 @@ export default function TransactionControl() {
     if (transactionQueue === '0') {
       return false;
     }
-    
+
     await axios.put(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/update`, transactionData)
       .then(async response => {
         var staffIdData = {
@@ -222,7 +224,6 @@ export default function TransactionControl() {
         var windowData: any = {
           transactionLogId: response.data.transaction_log_id,
         };
-        console.log(transactionQueue)
         switch (transactionCode) {
           case 'BPLO1':
               windowData.windowId = 1;
@@ -311,7 +312,6 @@ export default function TransactionControl() {
             console.log('No matching transaction code.');
             return; // exit early if no matching code
         }
-        console.log(windowData)
         // Update window data if a transaction code matches
         if (windowData.windowId) {
           await axios.put(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/updateWindow`, windowData);
@@ -329,10 +329,12 @@ export default function TransactionControl() {
     let tableQueueBody = tableQueue.getElementsByTagName('tbody')[0];
     let rows = tableQueueBody.getElementsByTagName("tr");
     let queueNumber = '';
+    let isTransactionRef = '';
   
     if (rows.length > 0) {
       // move next number to on going
       queueNumber = rows[0].getElementsByTagName("td")[0].innerText;
+      isTransactionRef = rows[0].getElementsByTagName("td")[4].innerHTML;
       let transactionData: any = {
         status: 'on going',
         transactionStartTime: format(date, 'HH:mm:ss'),
@@ -341,7 +343,8 @@ export default function TransactionControl() {
       if (accessId === '2') {
         if (transactionCode === 'BPLO3') {
           if (queueNumber) {
-            if (queueNumber.startsWith('BPT') || queueNumber.startsWith('BST') || queueNumber.startsWith('BBT') || queueNumber.startsWith('BZT') || queueNumber.startsWith('BFT') || queueNumber.startsWith('MYT') || queueNumber.startsWith('WPT') || queueNumber.startsWith('POT')) {
+            
+            if (queueNumber.startsWith('BPT') || queueNumber.startsWith('BST') || queueNumber.startsWith('BBT') || queueNumber.startsWith('BZT') || queueNumber.startsWith('BFT') || queueNumber.startsWith('POT')) {
               transactionData.transactionQueue = queueNumber;
             } else {
               transactionData.transactionRef = queueNumber;
@@ -350,11 +353,11 @@ export default function TransactionControl() {
           }
         } else if (transactionCode === 'BPLO2') {
           if (queueNumber) {
-            if (queueNumber.startsWith('MYT') || queueNumber.startsWith('WPT')) {
-              transactionData.transactionQueue = queueNumber;
-            } else {
+            if (isTransactionRef === 'isTransactionRef'){
               transactionData.transactionRef = queueNumber;
-              transactionData.forClaim = true;
+              transactionData.forClaim = true;         
+            } else {
+              transactionData.transactionQueue = queueNumber;
             }
           }
         }  else if (transactionCode === 'LCRT') {
@@ -497,6 +500,7 @@ export default function TransactionControl() {
     let nowServingContainer = document.getElementById('nowServing') ?? document as any;
     if (nowServingContainer.innerText !== '') {
       localStorage.setItem(transactionCode + 'NowServing', nowServingContainer.innerText);
+      localStorage.setItem('IsTransactionRef', isTransactionRef);
     }
   }
 
@@ -573,7 +577,6 @@ export default function TransactionControl() {
   async function toClaim(transactionRef: string) {
     await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/${transactionRef}`)
       .then(async function (response) {
-        console.log(transactionRef);
         const currentDate = localStorage.getItem('currentDate');
         const dateToday = format(new Date(), "yyyy-MM-dd");
         // reset counters

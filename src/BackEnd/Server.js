@@ -694,7 +694,6 @@ app.put('/transaction_log/update', async (req, res) => {
   const transactionEndTime = transactionData.transactionEndTime ?? null;
   const transactionStartTime = transactionData.transactionStartTime ?? null;
   const forClaim = transactionData.forClaim ?? null;
-  const forCashier = transactionData.forCashier ?? null;
 
   try {
     let queryString = 'UPDATE quexpress.tbl_quexpress_transaction_log SET transaction_status = $1';

@@ -8,8 +8,9 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import axios from 'axios';
 import { useState, useEffect } from 'react';
-import { Container, Grid } from '@mui/material';
+import { Container, Grid, Hidden } from '@mui/material';
 import Title from '../Title';
+import { visibility } from 'html2canvas/dist/types/css/property-descriptors/visibility';
 
 export default function BasicTable() {
   const [queueNumbers, setQueueNumbers] = useState<any[]>([]);
@@ -76,6 +77,13 @@ export default function BasicTable() {
                         <TableCell>{element.customer_account_id}</TableCell>
                         <TableCell>{element.transaction_desc} {element.sub_transaction_desc}</TableCell>
                         <TableCell>{element.customer_first_name} {element.customer_last_name}</TableCell>
+                        <TableCell className='hiddenColumn'>
+                          {element.transaction_ref != null
+                            ? ('isTransactionRef')
+                            : element.transactions_queue
+                            ? ('isNotTransactionRef')
+                            : null }
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

@@ -204,11 +204,11 @@ export default function SignUp() {
                   >
                     <MenuItem value="1">BPLO RECEIVING</MenuItem>
                     <MenuItem value="2">CLEARANCE/ WORK PERMIT</MenuItem>
-                    <MenuItem value="3">BPLO CLAIM</MenuItem>
-                    <MenuItem value="4">SANITARY</MenuItem>
-                    <MenuItem value="5">BUILDING PERMIT</MenuItem>
-                    <MenuItem value="6">ZONING</MenuItem>
-                    <MenuItem value="7">FIRE SAFETY INSPECTION CERTIFICATE</MenuItem>
+                    <MenuItem value="7">BPLO CLAIM</MenuItem>
+                    <MenuItem value="3">SANITARY</MenuItem>
+                    <MenuItem value="4">BUILDING PERMIT</MenuItem>
+                    <MenuItem value="5">ZONING</MenuItem>
+                    <MenuItem value="6">FIRE SAFETY INSPECTION CERTIFICATE</MenuItem>
                     <MenuItem value="8">BIRTH CERTIFICATE</MenuItem>
                     <MenuItem value="9">DEATH CERTIFICATE</MenuItem>
                     <MenuItem value="10">MARRIAGE CERTIFICATE</MenuItem>
