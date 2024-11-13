@@ -192,7 +192,7 @@ app.get('/transactions/get/:description', async (req, res) => {
   let queryString = '';
   try {
     const client = await pool.connect();
-    if (description === 'CEDULA' || description === 'REALPROPERTYTAX') {
+    if (description === 'CEDULA' || description === 'REAL PROPERTY TAX') {
       queryString = await client.query('SELECT * FROM quexpress.tbl_quexpress_transactions WHERE transaction_desc = $1', [description]);
     } else {
       queryString = await client.query('SELECT * FROM quexpress.tbl_quexpress_transactions WHERE (transaction_desc || \' \' || sub_transaction_desc) = $1', [description]);
