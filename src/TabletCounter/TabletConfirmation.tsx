@@ -143,9 +143,11 @@ export default function ConfirmQueue() {
 
   const yesButton = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    
+    console.log(transactionType)
     const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transactions/get/${transactionType}`)
     .then(async function (response) {
+      
       if(transactionType !== null) {
         const transactionDesc = capitalizeAndRemoveSpaces(transactionType);
         let transactionCodeCounter = (parseInt(localStorage.getItem(transactionDesc + '#') ?? '0') + 1).toString().padStart(5, '0');
@@ -155,7 +157,7 @@ export default function ConfirmQueue() {
     })
     const response2 = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transactions/get/${transactionType}`)
       .then(async function (response2) {
-
+        
         // Send a request to your backend to retrieve user info based on the email
         const transactionData = {
           transactionId        : response2.data.transaction_id,

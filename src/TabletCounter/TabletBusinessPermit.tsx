@@ -146,7 +146,7 @@ export default function SignIn() {
               <Grid item xs={2}/>
               <Grid item xs={4}>
                 <CustomButton details={'BUSINESS PERMIT CLOSING BUSINESS'} destination='/CounterConfirmation'>
-                    BISINESS CLOSURE
+                    BUSINESS CLOSURE
                 </CustomButton>
               </Grid>
               <Grid item xs={4}>

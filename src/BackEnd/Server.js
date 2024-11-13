@@ -189,10 +189,15 @@ app.get('/customer/get/:accountId', async (req, res) => {
 // Route for transaction types
 app.get('/transactions/get/:description', async (req, res) => {
   const description = req.params.description;
+  let queryString = '';
   try {
     const client = await pool.connect();
-    const result = await client.query('SELECT * FROM quexpress.tbl_quexpress_transactions WHERE (transaction_desc || \' \' || sub_transaction_desc) = $1', [description]);
-    res.json(result.rows[0]);
+    if (description === 'CEDULA' || description === 'REALPROPERTYTAX') {
+      queryString = await client.query('SELECT * FROM quexpress.tbl_quexpress_transactions WHERE transaction_desc = $1', [description]);
+    } else {
+      queryString = await client.query('SELECT * FROM quexpress.tbl_quexpress_transactions WHERE (transaction_desc || \' \' || sub_transaction_desc) = $1', [description]);
+    }
+    res.json(queryString.rows[0]);
     client.release();
   } catch (err) {
     console.error(err);
