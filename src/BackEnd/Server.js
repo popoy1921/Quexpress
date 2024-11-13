@@ -220,11 +220,12 @@ app.post('/transaction_log/create', async (req, res) => {
   const startTime            = transactionData.startTime ?? null;
   const endTime              = transactionData.endTime ?? null;
   const refQueue             = transactionData.refQueueNumber ?? null;
+  const transactionStatus    = transactionData.transactionStatus ?? null;
   
   try {
     const queryString = 'INSERT INTO quexpress.tbl_quexpress_transaction_log (transaction_id,'
       + ' customer_id, customer_account_id, transactions_queue, window_id, staff_id, transaction_datetime,'
-      + ' transaction_starttime, transaction_endtime, transaction_ref) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *';
+      + ' transaction_starttime, transaction_endtime, transaction_ref, transaction_status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *';
     const transactionLogDetails = [
       transactionId, 
       customerId,
@@ -236,6 +237,7 @@ app.post('/transaction_log/create', async (req, res) => {
       startTime,
       endTime,
       refQueue,
+      transactionStatus,
     ];
     const client = await pool.connect();
     const result = await client.query(queryString, transactionLogDetails);
@@ -391,6 +393,41 @@ app.get('/transaction_log/get', async (req, res) => {
   }
 });
 
+app.get('/transaction_log/get_count', async (req, res) => {
+  const transactionData = req.query;
+  const transactionQueue = transactionData.transactionQueue;
+  const transactionRef = transactionData.transactionRef ?? null; 
+  const forClaim = transactionData.forClaim ?? null;
+  let queryParameters = [];
+  let queryString = '';
+  
+  try {
+    if (!transactionRef) {
+      queryString += 'SELECT COUNT(transactions_queue) AS finalcount FROM quexpress.tbl_quexpress_transaction_log'
+      + ' WHERE transactions_queue = $1';
+      queryParameters.push(transactionQueue);
+    } else {
+      queryString += 'SELECT COUNT(transaction_ref) FROM quexpress.tbl_quexpress_transaction_log'
+      + ' WHERE transaction_ref = $1';
+      queryParameters.push(transactionQueue);
+    }
+    if (forClaim === true) {
+      queryString += ' AND transactions_queue NOT LIKE \'CSH%\'';
+    }
+
+    queryString += ' AND transaction_datetime >= CURRENT_DATE AND (transaction_status = \'cancelled\' OR transaction_status = \'on going\')'
+    
+    console.log(queryString)
+    console.log(queryParameters)
+    const client = await pool.connect();
+    const result = await client.query(queryString, queryParameters);
+    res.json(result.rows);
+    client.release();
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server Error');
+  }
+});
 
 // Route for Displaying QueueNumber
 app.get('/transaction_log/get/:transactionCode/:transactionStatus', async (req, res) => {
@@ -693,6 +730,7 @@ app.get('/transaction_log/admin/queued', async (req, res) => {
 // Route to update status and end time
 app.put('/transaction_log/update', async (req, res) => {
   const transactionData = req.body;
+  const transactionLogId = transactionData.transactionLogId;
   const transactionQueue = transactionData.transactionQueue;
   const status = transactionData.status;
   const transactionRef = transactionData.transactionRef ?? null; 
@@ -719,8 +757,9 @@ app.put('/transaction_log/update', async (req, res) => {
       queryString += ' WHERE transactions_queue = $3';
       transactionLogDetails.push(transactionQueue);
     }
-
-    queryString += ' AND transaction_datetime >= CURRENT_DATE';
+    
+    queryString += ' AND transaction_log_id = $4 AND transaction_datetime >= CURRENT_DATE';
+    transactionLogDetails.push(transactionLogId);
     if (forClaim === true) {
       queryString += ' AND transactions_queue not like \'CSH%\'';
     }

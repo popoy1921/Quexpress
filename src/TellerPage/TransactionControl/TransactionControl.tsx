@@ -59,8 +59,9 @@ export default function TransactionControl() {
   function cancelNumber(event: any) {
     event.preventDefault();
     let transactionRef = localStorage.getItem(transactionCode + 'NowServing') as string;
-    updateNumber('cancelled');
-    toEnd(transactionRef);    
+    toEnd(transactionRef);
+    updateTransactionStatus('cancelled');
+    getNumber();
     if (document.getElementById('nowServing')?.innerText !== 'No Available Number') {
       updateForMonitorBlink(transactionCode);
     }
@@ -127,29 +128,40 @@ export default function TransactionControl() {
     if (transactionQueue === '0') {
       return false;
     }
+
     const params = new URLSearchParams(transactionData).toString();
-    
-    await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get?${params}`)
-    .then(async response => {
-      var responseData = response.data[0];
-      const createData = {
-        transactionId: responseData.transaction_id,
-        customerId: responseData.customer_id,
-        customerAccountId: responseData.customer_account_id,
-        queueNumber: responseData.transactions_queue,
-        windowId: null,
-        staffId: null,
-        date: formattedDate,
-        startTime: null,
-        endTime: null,
-        refQueueNumber: responseData.transaction_ref,
-      };
-      createLog(createData);
-      }
-    )
-    .catch(function (error) {
-      alert(' ' + error);
-    });
+
+    await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get_count?${params}`)
+      .then(async response2 => {
+      if(response2.data[0].finalcount <= 2){
+        await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get?${params}`)
+          .then(async response => {
+            var responseData = response.data[0];
+            const createData = {
+              transactionId: responseData.transaction_id,
+              customerId: responseData.customer_id,
+              customerAccountId: responseData.customer_account_id,
+              queueNumber: responseData.transactions_queue,
+              windowId: null,
+              staffId: null,
+              date: formattedDate,
+              startTime: null,
+              endTime: null,
+              refQueueNumber: responseData.transaction_ref,
+              transactionStatus: null,
+            };
+            console.log(responseData);
+            createLog(createData);
+            }
+          )
+          .catch(function (error) {
+            alert(' ' + error);
+          });
+        }
+      })
+      .catch(function (error) {
+        alert(' ' + error);
+      });
   }
 
   async function updateTransactionStatus(nextTransactionStatus: string) {
@@ -157,11 +169,13 @@ export default function TransactionControl() {
     let date: Date = new Date();
     let transactionQueue = localStorage.getItem(transactionCode + 'NowServing');
     let isTransactionRef = localStorage.getItem('IsTransactionRef');
+    let transactionLogId = localStorage.getItem('TransactionLogID');
     let transactionData: any = {
+      transactionLogId: transactionLogId,
       status: nextTransactionStatus,
       transactionEndTime: format(date, 'HH:mm:ss'),
     };
-    
+
     if (!transactionData.transactionRef) {
       if (accessId === '2') {
         if (transactionCode === 'BPLO3') {
@@ -329,13 +343,16 @@ export default function TransactionControl() {
     let tableQueueBody = tableQueue.getElementsByTagName('tbody')[0];
     let rows = tableQueueBody.getElementsByTagName("tr");
     let queueNumber = '';
+    let transactionLogId = '';
     let isTransactionRef = '';
   
     if (rows.length > 0) {
       // move next number to on going
-      queueNumber = rows[0].getElementsByTagName("td")[0].innerText;
+      queueNumber = rows[0].getElementsByTagName("td")[1].innerText;
+      transactionLogId = rows[0].getElementsByTagName("td")[0].innerHTML;
       isTransactionRef = rows[0].getElementsByTagName("td")[4].innerHTML;
       let transactionData: any = {
+        transactionLogId: transactionLogId,
         status: 'on going',
         transactionStartTime: format(date, 'HH:mm:ss'),
       };
@@ -501,6 +518,7 @@ export default function TransactionControl() {
     if (nowServingContainer.innerText !== '') {
       localStorage.setItem(transactionCode + 'NowServing', nowServingContainer.innerText);
       localStorage.setItem('IsTransactionRef', isTransactionRef);
+      localStorage.setItem('TransactionLogID', transactionLogId);
     }
   }
 
@@ -640,6 +658,7 @@ export default function TransactionControl() {
   }
 
   function createLog(transactionData: Object) {
+    console.log(transactionData)
     axios.post(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/create`, transactionData)
       .then(response => { })
       .catch(error => {

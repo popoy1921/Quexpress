@@ -57,6 +57,7 @@ export default function BasicTable() {
                 <Table sx={{ minWidth: 650 }} aria-label="simple table" id="QueueTable">
                   <TableHead>
                     <TableRow>
+                      <TableCell className='hiddenColumn'>Transaction ID</TableCell>
                       <TableCell>Queue Number</TableCell>
                       <TableCell>Customer Account Number</TableCell>
                       <TableCell>Transaction</TableCell>
@@ -67,6 +68,9 @@ export default function BasicTable() {
                   <TableBody>
                     {queueNumbers.map((element, index) => (
                       <TableRow key={index}>
+                        <TableCell className='hiddenColumn'>
+                          {element.transaction_log_id}
+                        </TableCell>
                         <TableCell>
                           {localStorage.getItem('AccessId') === '3' 
                             ? (element.transaction_ref || element.transactions_queue)
@@ -88,6 +92,7 @@ export default function BasicTable() {
                             ? ('isNotTransactionRef')
                             : null }
                         </TableCell>
+                        
                       </TableRow>
                     ))}
                   </TableBody>

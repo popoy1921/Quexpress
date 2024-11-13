@@ -77,5 +77,5 @@
 }
 
 .hiddenColumn {
-  visibility: hidden; /* or use visibility: hidden; to hide the content but maintain layout space */
+  display: none !important; /* or use visibility: hidden; to hide the content but maintain layout space */
 }
