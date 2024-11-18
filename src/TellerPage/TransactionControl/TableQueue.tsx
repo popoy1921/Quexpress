@@ -8,7 +8,7 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import axios from 'axios';
 import { useState, useEffect } from 'react';
-import { Container, Grid, Hidden } from '@mui/material';
+import { Container, Grid } from '@mui/material';
 import Title from '../Title';
 
 export default function BasicTable() {
@@ -63,6 +63,7 @@ export default function BasicTable() {
                       <TableCell>Transaction</TableCell>
                       <TableCell>Customer Name</TableCell>
                       <TableCell className='hiddenColumn'>Status</TableCell>
+                      <TableCell className='hiddenColumn'>Claim Status</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -92,6 +93,7 @@ export default function BasicTable() {
                             ? ('isNotTransactionRef')
                             : null }
                         </TableCell>
+                        <TableCell className='hiddenColumn'>{element.transaction_pass}</TableCell>
                         
                       </TableRow>
                     ))}

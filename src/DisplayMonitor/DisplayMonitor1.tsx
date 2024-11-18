@@ -54,53 +54,87 @@ function playSound() {
   }
 }
 
-function useTransactionData(transactionCode: string) {
+function useTransactionData(transactionConfigs: {transactionCode: string; windowId: number}[]) {
+  const [statuses, setStatuses] = React.useState<Record<string, string>>({});
   React.useEffect(() => {
     const interval = setInterval(async () => {
-      try {
-        let queueNumber = '';
-        if(transactionCode === 'CSH') {
-          const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/CSH/${transactionCode}`);
-          queueNumber = response.data.transaction_ref;
-        } else if(transactionCode.startsWith('BPLO2')) {
-          const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/${transactionCode}`);
-          queueNumber = response.data.transaction_ref !== null 
-          ? response.data.transaction_ref 
-          : response.data.transactions_queue;
-        }  else {
-          const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/${transactionCode}`);
-          queueNumber = response.data.transactions_queue;
-        }
-        let nowServingContainer = document.getElementById('NowServing' + transactionCode);
-        if (nowServingContainer) {
-          const blinkResponse = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transactions/getBlink/${transactionCode}`);
-          if (blinkResponse.data['blink'] === 1) {
-            nowServingContainer.innerText = queueNumber;
-            playSound();
-            nowServingContainer.classList.add('animate');
+      const newStatuses: Record<string, string> = {};
+      for (const { transactionCode, windowId } of transactionConfigs) {
+        try {
+          const isOnlineResponse = await axios.get(
+            process.env.REACT_APP_OTHER_BACKEND_SERVER + `/window/status/${windowId}`
+          );
+          newStatuses[transactionCode] = isOnlineResponse.data.window_status; // 'online' or other status
+        
+          let queueNumber = '';
+          if (transactionCode === 'CSH') {
+            const response = await axios.get(
+              process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/CSH/${transactionCode}`
+            );
+            queueNumber = response.data.transaction_ref;
+          } else if (transactionCode.startsWith('BPLO2')) {
+            const response = await axios.get(
+              process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/${transactionCode}`
+            );
+            queueNumber =
+              response.data.transaction_ref !== null
+                ? response.data.transaction_ref
+                : response.data.transactions_queue;
+          } else {
+            const response = await axios.get(
+              process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/${transactionCode}`
+            );
+            queueNumber = response.data.transactions_queue;
+          }
 
-            setTimeout(async() => {
-              await axios.put(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/updateBlink/` + transactionCode, {'blink' : 0});
-              if (nowServingContainer) {
-                nowServingContainer.classList.remove('animate');
+          const nowServingContainer = document.getElementById('NowServing' + transactionCode);
+          if (nowServingContainer) {
+            const blinkResponse = await axios.get(
+              process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transactions/getBlink/${transactionCode}`
+            );
+            if (blinkResponse.data['blink'] === 1) {
+              nowServingContainer.innerText = queueNumber;
+              playSound();
+              nowServingContainer.classList.add('animate');
+
+              setTimeout(async () => {
+                await axios.put(
+                  process.env.REACT_APP_OTHER_BACKEND_SERVER +
+                    `/transaction_log/updateBlink/` +
+                    transactionCode,
+                  { blink: 0 }
+                );
+                if (nowServingContainer) {
+                  nowServingContainer.classList.remove('animate');
+                }
+              }, 2000);
+            } 
+            
+            if (isOnlineResponse.data.window_status === 'online') {
+              if (queueNumber === undefined) {
+                nowServingContainer.innerText = transactionCode + '00000';
+                nowServingContainer.style.opacity = '0';
+              } else {
+                nowServingContainer.innerText = queueNumber;
+                nowServingContainer.style.opacity = '1';
               }
-            }, 2000);
-          } else if (queueNumber === undefined) {
-            nowServingContainer.innerText = transactionCode+'00000';
-            nowServingContainer.style.opacity = '0';
+            } else {
+              nowServingContainer.innerText = 'Not Available';
+              nowServingContainer.style.opacity = '1';
+            }
           }
-          else {
-            nowServingContainer.innerText = queueNumber;
-            nowServingContainer.style.opacity = '1';
-          }
+        } catch (error) {
+          console.error(`Error fetching transaction status for ${transactionCode}:`, error);
+          newStatuses[transactionCode] = 'offline'; // Default to offline on error
         }
-      } catch (error) {
-        console.error('Error fetching transaction status:', error);
       }
-    }, 3000); 
+      setStatuses(newStatuses);
+    }, 3000);
 
-    return () => clearInterval(interval); 
-  }, [transactionCode]);
+    return () => clearInterval(interval);
+  }, [transactionConfigs]);
+
+  return statuses;
 }
 
 export default function DisplayMonitor1() {
@@ -152,21 +186,22 @@ export default function DisplayMonitor1() {
     updateDisplayedAnnouncement();
   }, []);
 
-  function callMe() {
-    console.log(1);
-  }
-
-  useTransactionData('BPLO1');
-  useTransactionData('BPLO2');
-  useTransactionData('BPS');
-  useTransactionData('BPB');
-  useTransactionData('BPZ');
-  useTransactionData('BPF');
-  useTransactionData('DTIM');
-  useTransactionData('LBC');
-  useTransactionData('LDC');
-  useTransactionData('LMC');
-  useTransactionData('LCC');
+  const transactionConfigs = React.useMemo(
+    () => [
+      { transactionCode: 'BPLO1', windowId: 1 },
+      { transactionCode: 'BPLO2', windowId: 2 },
+      { transactionCode: 'BPS', windowId: 3 },
+      { transactionCode: 'BPB', windowId: 4 },
+      { transactionCode: 'BPZ', windowId: 5 },
+      { transactionCode: 'BPF', windowId: 6 },
+      { transactionCode: 'DTIM', windowId: 13 },
+      { transactionCode: 'LBC', windowId: 8 },
+      { transactionCode: 'LDC', windowId: 9 },
+      { transactionCode: 'LMC', windowId: 10 },
+      { transactionCode: 'LCC', windowId: 11 },
+    ],
+ []);
+    const statuses = useTransactionData(transactionConfigs);
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -250,8 +285,7 @@ export default function DisplayMonitor1() {
 
         {/* Render transaction windows in two columns */}
         <Grid container item xs={12} sm={6}>
-          {['BPLO1', 'BPLO2', 'BPS', 'BPB', 'BPZ', 'BPF', 'DTIM', 'LBC', 'LDC', 'LMC', 'LCC',
-            ].map((transactionCode, index) => (
+          {transactionConfigs.map(({ transactionCode }, index) => (
             <Grid item xs={12} sm={6} key={transactionCode}>
               <Paper
                 elevation={24}
@@ -261,15 +295,19 @@ export default function DisplayMonitor1() {
                   flexDirection: 'column',
                   p: 0,
                   opacity: 0.95,
+                  backgroundColor: statuses[transactionCode] === 'online' ? '#3EB489' : '#B44E3E', // Green if online
+                  border: statuses[transactionCode] === 'online' ? '4px solid #2E8565' : '4px solid #8B0000',
+                  boxShadow: '0 8px 15px rgba(0, 0, 0, 0.3)',
+                  borderRadius: '12px',
                 }}
               >
-                <Typography component="h1" variant="h4" align="center" fontFamily={"serif"} color={'primary'}>
-                {transactionCode?.startsWith('CSH') ? `CASHIER ${cshIndex++}` : `WINDOW ${index + 1}`}
+                <Typography component="h1" variant="h4" align="center" fontFamily={"serif"} color={'white'} sx={{ textShadow: '2px 2px 6px rgba(0, 0, 0, 0.5)' }}>
+                {transactionCode?.startsWith('CSH') ? `CASHIER ${cshIndex++}` : `WINDOW ${index + 1}`} 
                 </Typography>
-                <Typography component="h1" variant="h6" align="center" marginTop={0} marginBottom={0} fontFamily={"serif"} color={'grey'}>
+                <Typography component="h1" variant="h6" align="center" marginTop={0} marginBottom={0} fontFamily={"serif"} color={'white'} sx={{ textShadow: '1px 1px 4px rgba(0, 0, 0, 0.5)' }}>
                   NOW SERVING
                 </Typography>
-                <Typography component="h1" variant="h2" align="center" fontFamily={"serif"} color={'black'} marginTop={0} id={'NowServing' + transactionCode}>
+                <Typography component="h1" variant="h2" align="center" fontFamily={"serif"} color={'black'} marginTop={0} id={'NowServing' + transactionCode} sx={{fontSize: '3rem', color: statuses[transactionCode] === 'online' ? '#000' : '#FFD700', textShadow: '3px 3px 8px rgba(0, 0, 0, 0.7)'}}>
                   {/* display queueNumber */}
                 </Typography>
               </Paper>

@@ -191,7 +191,7 @@ const SignIn: React.FC = () => {
           localStorage.setItem('UserLastName', response.data.customer_last_name);
           localStorage.setItem('UserEmail', response.data.customer_email);
           localStorage.setItem('UserID', response.data.customer_id);
-          navigate('/Counter');
+          navigate('/CounterTablet');
         }
       })
       .catch(function (error) {

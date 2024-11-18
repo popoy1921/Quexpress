@@ -27,7 +27,7 @@ app.use(cors());
 app.get('/window/get', async (req, res) => {
   try {
     var queryParameters = [];
-    var queryString = 'SELECT a.window_id, a.window_desc, CASE'
+    var queryString = 'SELECT a.window_id, a.window_desc, a.window_status, CASE'
     + ' WHEN MAX(b.transaction_ref) IS NOT NULL THEN MAX(b.transaction_ref)'
     + ' ELSE MAX(b.transactions_queue)'
     + ' END AS transactions_queue'
@@ -42,6 +42,68 @@ app.get('/window/get', async (req, res) => {
     const client = await pool.connect();
     const queryResult = await client.query(queryString, queryParameters);
     res.json(queryResult.rows);
+    client.release();
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server Error');
+  }
+});
+
+// Route for Window Online update
+app.get('/window/updateOnline/:windowId', async (req, res) => {
+  const windowId = req.params.windowId;
+  var queryParameters = [];
+  try {
+    
+    var queryString = 'UPDATE quexpress.tbl_quexpress_window'
+    + ' SET window_status = \'online\''
+    + ' WHERE window_id = $1'
+    queryParameters.push(windowId);
+
+    const client = await pool.connect();
+    const queryResult = await client.query(queryString, queryParameters);
+    res.json(queryResult.rows);
+    client.release();
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server Error');
+  }
+});
+
+// Route for Window Offline update
+app.get('/window/updateOffline/:windowId', async (req, res) => {
+  const windowId = req.params.windowId;
+  var queryParameters = [];
+  try {
+    
+    var queryString = 'UPDATE quexpress.tbl_quexpress_window'
+    + ' SET window_status = \'offline\''
+    + ' WHERE window_id = $1'
+    queryParameters.push(windowId);
+
+    const client = await pool.connect();
+    const queryResult = await client.query(queryString, queryParameters);
+    res.json(queryResult.rows);
+    client.release();
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server Error');
+  }
+});
+
+// Route for Window Status
+app.get('/window/status/:windowId', async (req, res) => {
+  const windowId = req.params.windowId;
+  var queryParameters = [];
+  try {
+    
+    var queryString = 'SELECT * FROM quexpress.tbl_quexpress_window'
+    + ' WHERE window_id = $1'
+    queryParameters.push(windowId);
+
+    const client = await pool.connect();
+    const queryResult = await client.query(queryString, queryParameters);
+    res.json(queryResult.rows[0]);
     client.release();
   } catch (err) {
     console.error(err);
@@ -221,11 +283,12 @@ app.post('/transaction_log/create', async (req, res) => {
   const endTime              = transactionData.endTime ?? null;
   const refQueue             = transactionData.refQueueNumber ?? null;
   const transactionStatus    = transactionData.transactionStatus ?? null;
+  const transactionPass      = transactionData.transactionPass ?? null;
   
   try {
     const queryString = 'INSERT INTO quexpress.tbl_quexpress_transaction_log (transaction_id,'
       + ' customer_id, customer_account_id, transactions_queue, window_id, staff_id, transaction_datetime,'
-      + ' transaction_starttime, transaction_endtime, transaction_ref, transaction_status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *';
+      + ' transaction_starttime, transaction_endtime, transaction_ref, transaction_status, transaction_pass) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *';
     const transactionLogDetails = [
       transactionId, 
       customerId,
@@ -238,6 +301,7 @@ app.post('/transaction_log/create', async (req, res) => {
       endTime,
       refQueue,
       transactionStatus,
+      transactionPass,
     ];
     const client = await pool.connect();
     const result = await client.query(queryString, transactionLogDetails);
@@ -363,6 +427,7 @@ app.get('/transaction_log/get', async (req, res) => {
   const transactionQueue = transactionData.transactionQueue;
   const transactionRef = transactionData.transactionRef ?? null; 
   const forClaim = transactionData.forClaim ?? null;
+  const forCashier = transactionData.forCashier ?? null;
   let queryParameters = [];
   
   try {
@@ -378,6 +443,8 @@ app.get('/transaction_log/get', async (req, res) => {
 
     if (forClaim === true) {
       queryString += ' AND transactions_queue NOT LIKE \'CSH%\'';
+    } else if (forCashier === true) {
+      queryString += ' AND transactions_queue LIKE \'CSH%\'';
     }
 
     queryString += ' AND transaction_datetime >= CURRENT_DATE AND transaction_status IS NOT NULL'
@@ -398,27 +465,29 @@ app.get('/transaction_log/get_count', async (req, res) => {
   const transactionQueue = transactionData.transactionQueue;
   const transactionRef = transactionData.transactionRef ?? null; 
   const forClaim = transactionData.forClaim ?? null;
+  const forCashier = transactionData.forCashier ?? null;
   let queryParameters = [];
   let queryString = '';
-  
+
   try {
     if (!transactionRef) {
       queryString += 'SELECT COUNT(transactions_queue) AS finalcount FROM quexpress.tbl_quexpress_transaction_log'
       + ' WHERE transactions_queue = $1';
       queryParameters.push(transactionQueue);
     } else {
-      queryString += 'SELECT COUNT(transaction_ref) FROM quexpress.tbl_quexpress_transaction_log'
+      queryString += 'SELECT COUNT(transaction_ref) AS finalcount FROM quexpress.tbl_quexpress_transaction_log'
       + ' WHERE transaction_ref = $1';
-      queryParameters.push(transactionQueue);
+      queryParameters.push(transactionRef);
     }
-    if (forClaim === true) {
+
+    if (forClaim === 'true') {
       queryString += ' AND transactions_queue NOT LIKE \'CSH%\'';
+    } else if (forCashier === 'true') {
+      queryString += ' AND transactions_queue LIKE \'CSH%\'';
     }
 
     queryString += ' AND transaction_datetime >= CURRENT_DATE AND (transaction_status = \'cancelled\' OR transaction_status = \'on going\')'
     
-    console.log(queryString)
-    console.log(queryParameters)
     const client = await pool.connect();
     const result = await client.query(queryString, queryParameters);
     res.json(result.rows);
@@ -434,7 +503,7 @@ app.get('/transaction_log/get/:transactionCode/:transactionStatus', async (req, 
   let transactionCode = req.params.transactionCode;
   const transactionStatus = req.params.transactionStatus;
   try {
-    var baseQuery = 'SELECT * FROM quexpress.tbl_quexpress_transaction_log AS A'
+    var baseQuery = 'WITH latest_transactions AS (SELECT DISTINCT ON (transactions_queue) * FROM quexpress.tbl_quexpress_transaction_log AS A'
       + ' LEFT JOIN quexpress.tbl_quexpress_transactions AS B'
       + ' ON a.transaction_id = b.transaction_id'
       + ' LEFT JOIN quexpress.tbl_quexpress_customers AS C'
@@ -629,7 +698,9 @@ app.get('/transaction_log/get/:transactionCode/:transactionStatus', async (req, 
         + ' and (transaction_status IS NOT NULL)';
       } 
     }
-    queryString += ' order by transaction_log_id asc';
+    queryString += ' order by transactions_queue, transaction_log_id desc)'
+    + ' SELECT * FROM latest_transactions'
+    + ' order by transaction_log_id asc';
     const client = await pool.connect();
     const result = await client.query(queryString, queryParameters);
     res.json(result.rows);
@@ -643,15 +714,18 @@ app.get('/transaction_log/get/:transactionCode/:transactionStatus', async (req, 
 app.get('/transaction_log/admin/report', async (req, res) => {
   try {
     var queryParameters = [];
-    var queryString = 'SELECT * FROM quexpress.tbl_quexpress_transaction_log AS A'
+    var queryString = 'WITH latest_transactions AS ('
+    + ' SELECT DISTINCT ON (transactions_queue) *'
+    + ' FROM quexpress.tbl_quexpress_transaction_log AS A'
     + ' LEFT JOIN quexpress.tbl_quexpress_transactions AS B'
-    + ' ON a.transaction_id = b.transaction_id'
+    + ' ON A.transaction_id = B.transaction_id'
     + ' LEFT JOIN quexpress.tbl_quexpress_customers AS C'
-    + ' ON a.customer_id = c.customer_id'
-    + ' WHERE (transaction_datetime >= CURRENT_DATE'
-    + ' OR transaction_datetime <= CURRENT_DATE)'
+    + ' ON A.customer_id = C.customer_id'
+    + ' WHERE transaction_datetime <= CURRENT_DATE'
     + ' AND transaction_status IS NOT NULL'
-    + ' ORDER BY transaction_log_id ASC';
+    + ' ORDER BY transactions_queue, transaction_log_id DESC)'
+    + ' SELECT * FROM latest_transactions'
+    + ' ORDER BY transaction_log_id DESC';
     const client = await pool.connect();
     const queryResult = await client.query(queryString, queryParameters);
     res.json(queryResult.rows);
@@ -665,13 +739,21 @@ app.get('/transaction_log/admin/report', async (req, res) => {
 app.get('/transaction_log/admin/total', async (req, res) => {
   try {
     var queryParameters = [];
-    var queryString = 'SELECT * FROM quexpress.tbl_quexpress_transaction_log'
-    + ' WHERE (transaction_datetime >= CURRENT_DATE'
-    + ' OR transaction_datetime <= CURRENT_DATE)'
-    + ' AND transaction_status IS NOT NULL';
+    var queryString = 'WITH latest_transactions AS ('
+    + ' SELECT DISTINCT ON (transactions_queue) *'
+    + ' FROM quexpress.tbl_quexpress_transaction_log AS A'
+    + ' LEFT JOIN quexpress.tbl_quexpress_transactions AS B'
+    + ' ON A.transaction_id = B.transaction_id'
+    + ' LEFT JOIN quexpress.tbl_quexpress_customers AS C'
+    + ' ON A.customer_id = C.customer_id'
+    + ' WHERE transaction_datetime >= CURRENT_DATE'
+    + ' AND transaction_status IS NOT NULL'
+    + ' ORDER BY transactions_queue, transaction_log_id DESC)'
+    + ' SELECT count(*) as total_count'
+    + ' FROM latest_transactions';
     const client = await pool.connect();
     const queryResult = await client.query(queryString, queryParameters);
-    res.json(queryResult.rows);
+    res.json(queryResult.rows[0]);
     client.release();
   } catch (err) {
     console.error(err);
@@ -679,47 +761,29 @@ app.get('/transaction_log/admin/total', async (req, res) => {
   }
 });
 
-app.get('/transaction_log/admin/served', async (req, res) => {
+app.get('/transaction_log/admin/:windowId', async (req, res) => {
+  let windowId = req.params.windowId;
   try {
     var queryParameters = [];
-    var queryString = 'SELECT * FROM quexpress.tbl_quexpress_transaction_log'
-    + ' WHERE (transaction_datetime >= CURRENT_DATE)'
-    + ' AND transaction_status IS NOT NULL';
+    var queryString = 'WITH latest_transactions AS ('
+    + ' SELECT DISTINCT ON (transactions_queue) *'
+    + ' FROM quexpress.tbl_quexpress_transaction_log AS A'
+    + ' LEFT JOIN quexpress.tbl_quexpress_transactions AS B'
+    + ' ON A.transaction_id = B.transaction_id'
+    + ' LEFT JOIN quexpress.tbl_quexpress_customers AS C'
+    + ' ON A.customer_id = C.customer_id'
+    + ' WHERE transaction_datetime >= CURRENT_DATE'
+    + ' AND window_id = $1'
+    + ' AND transaction_status IS NOT NULL'
+    + ' ORDER BY transactions_queue, transaction_log_id DESC)'
+    + ' SELECT window_id, count(*) as total_count'
+    + ' FROM latest_transactions'
+    + ' GROUP BY window_id'
+    + ' ORDER BY window_id';
+    queryParameters.push(windowId)
     const client = await pool.connect();
     const queryResult = await client.query(queryString, queryParameters);
-    res.json(queryResult.rows);
-    client.release();
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Server Error');
-  }
-});
-
-app.get('/transaction_log/admin/cancelled', async (req, res) => {
-  try {
-    var queryParameters = [];
-    var queryString = 'SELECT * FROM quexpress.tbl_quexpress_transaction_log'
-    + ' WHERE (transaction_datetime >= CURRENT_DATE)'
-    + ' AND transaction_status = \'cancelled\'';
-    const client = await pool.connect();
-    const queryResult = await client.query(queryString, queryParameters);
-    res.json(queryResult.rows);
-    client.release();
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Server Error');
-  }
-});
-
-app.get('/transaction_log/admin/queued', async (req, res) => {
-  try {
-    var queryParameters = [];
-    var queryString = 'SELECT * FROM quexpress.tbl_quexpress_transaction_log'
-    + ' WHERE (transaction_datetime >= CURRENT_DATE)'
-    + ' AND (transaction_status IS NULL OR transaction_status IS NOT NULL)';
-    const client = await pool.connect();
-    const queryResult = await client.query(queryString, queryParameters);
-    res.json(queryResult.rows);
+    res.json(queryResult.rows[0]);
     client.release();
   } catch (err) {
     console.error(err);
@@ -737,6 +801,8 @@ app.put('/transaction_log/update', async (req, res) => {
   const transactionEndTime = transactionData.transactionEndTime ?? null;
   const transactionStartTime = transactionData.transactionStartTime ?? null;
   const forClaim = transactionData.forClaim ?? null;
+  const forCashier = transactionData.forCashier ?? null;
+  const transactionPass = transactionData ?? null;
 
   try {
     let queryString = 'UPDATE quexpress.tbl_quexpress_transaction_log SET transaction_status = $1';
@@ -757,11 +823,18 @@ app.put('/transaction_log/update', async (req, res) => {
       queryString += ' WHERE transactions_queue = $3';
       transactionLogDetails.push(transactionQueue);
     }
+    if(transactionLogId){
+      queryString += ' AND transaction_log_id = $4 AND transaction_datetime >= CURRENT_DATE';
+      transactionLogDetails.push(transactionLogId);
+    } else {
+      queryString += ' AND transaction_datetime >= CURRENT_DATE';
+    }
     
-    queryString += ' AND transaction_log_id = $4 AND transaction_datetime >= CURRENT_DATE';
-    transactionLogDetails.push(transactionLogId);
     if (forClaim === true) {
       queryString += ' AND transactions_queue not like \'CSH%\'';
+    }
+    if (forCashier === true) {
+      queryString += ' AND transactions_queue like \'CSH%\'';
     }
     queryString += ' RETURNING *';
     const client = await pool.connect();

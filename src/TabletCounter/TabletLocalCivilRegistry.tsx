@@ -10,6 +10,8 @@ import CustomButton from '../CommonElements/CustomButton';
 import CancelButton from '../CommonElements/CancelButton';
 import { useNavigate } from 'react-router-dom';
 import { useMediaQuery } from 'react-responsive';
+import { useState } from 'react';
+import axios from 'axios';
 
 const Logo = require('../Photos/coollogo_com-178391066.png');
 const mLogo = require('../Photos/lingayen-seal.png');
@@ -78,11 +80,22 @@ const defaultTheme = createTheme({
 
 export default function SignIn() {
   const navigate = useNavigate();
+  const [windows, setWindows] = useState<{ window_id: number; window_status: string }[]>([]);
   
   React.useEffect(() => {
     if (!localStorage.getItem('AccountId')) {
       navigate('/SignInCustomer'); 
     }
+    const fetchWindows = async () => {
+      try {
+        const response = await axios.get(`${process.env.REACT_APP_OTHER_BACKEND_SERVER}/window/get`);
+        setWindows(response.data); // Assuming the API returns an array of objects with window_id and window_status
+      } catch (error) {
+        console.error('Error fetching windows:', error);
+      }
+    };
+
+    fetchWindows();
   }, [navigate]);
   
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -92,6 +105,12 @@ export default function SignIn() {
       email: data.get('email'),
       password: data.get('password'),
     });
+  };
+
+  const isWindowOnline = (id: number) => {
+    const window = windows.find((win) => win.window_id === id);
+    console.log(window?.window_status === 'online');
+    return window?.window_status === 'online';
   };
 
   const isMobile = useMediaQuery({ query: '(max-width: 600px)' });
@@ -125,23 +144,23 @@ export default function SignIn() {
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 2 }}>
             <Grid container spacing={2}>
               <Grid item xs={4}>
-                <CustomButton details={'BIRTH CERTIFICATE'} destination='/CounterLocalCivilRegistrySub'>
+                <CustomButton details={'BIRTH CERTIFICATE'} destination='/CounterLocalCivilRegistrySub' windowId={[8]} disabled={!isWindowOnline(8)}>
                     BIRTH CERTIFICATE
                 </CustomButton>
               </Grid>
               <Grid item xs={4}>
-                <CustomButton details={'DEATH CERTIFICATE'} destination='/CounterLocalCivilRegistrySub'>
+                <CustomButton details={'DEATH CERTIFICATE'} destination='/CounterLocalCivilRegistrySub' windowId={[9]} disabled={!isWindowOnline(9)}>
                     DEATH CERTIFICATE
                 </CustomButton>
               </Grid>
               <Grid item xs={4}>
-                <CustomButton details={'MARRIAGE CERTIFICATE'} destination='/CounterLocalCivilRegistrySub'>
+                <CustomButton details={'MARRIAGE CERTIFICATE'} destination='/CounterLocalCivilRegistrySub' windowId={[10]} disabled={!isWindowOnline(10)}>
                     MARRIAGE CERTIFICATE
                 </CustomButton>
               </Grid>
               <Grid item xs={4} />
               <Grid item xs={4}>
-                <CustomButton details={'CORRECTION'} destination='/CounterLocalCivilRegistryCorrection'>
+                <CustomButton details={'CORRECTION'} destination='/CounterLocalCivilRegistryCorrection' windowId={[11]} disabled={!isWindowOnline(11)}>
                     CORRECTION
                 </CustomButton>
               </Grid>

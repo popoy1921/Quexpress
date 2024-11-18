@@ -169,6 +169,7 @@ export default function ConfirmQueue() {
           date                 : formattedDate,
           startTime            : null,
           endTime              : null,
+          transactionPass      : null,
         }
         createLog(transactionData);
         
@@ -252,7 +253,7 @@ export default function ConfirmQueue() {
                   variant="contained"
                   sx={{ mt: 3, mb: 2}}
                   onClick={yesButton}>
-                  YES  
+                  PROCEED  
                 </Button>
               </Grid>
               <Grid item xs={6}>
@@ -264,7 +265,7 @@ export default function ConfirmQueue() {
                   variant="contained"
                   sx={{ mt: 3, mb: 2}}
                   onClick={noButton}>
-                  NO  
+                  CANCEL  
                 </Button>
               </Grid>
             </Grid>

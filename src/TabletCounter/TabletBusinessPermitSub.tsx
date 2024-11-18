@@ -11,6 +11,8 @@ import CustomButton from '../CommonElements/CustomButton';
 import CancelButton from '../CommonElements/CancelButton';
 import { useMediaQuery } from 'react-responsive';
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import axios from 'axios';
 
 const Logo = require('../Photos/coollogo_com-178391066.png');
 const mLogo = require('../Photos/lingayen-seal.png');
@@ -82,11 +84,22 @@ const defaultTheme = createTheme({
 
 export default function SignIn() {
   const navigate = useNavigate();
+  const [windows, setWindows] = useState<{ window_id: number; window_status: string }[]>([]);
   
   React.useEffect(() => {
     if (!localStorage.getItem('AccountId')) {
       navigate('/SignInCustomer'); 
     }
+    const fetchWindows = async () => {
+      try {
+        const response = await axios.get(`${process.env.REACT_APP_OTHER_BACKEND_SERVER}/window/get`);
+        setWindows(response.data); // Assuming the API returns an array of objects with window_id and window_status
+      } catch (error) {
+        console.error('Error fetching windows:', error);
+      }
+    };
+
+    fetchWindows();
   }, [navigate]);
   
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -96,6 +109,12 @@ export default function SignIn() {
       email: data.get('email'),
       password: data.get('password'),
     });
+  };
+
+  const isWindowOnline = (id: number) => {
+    const window = windows.find((win) => win.window_id === id);
+    console.log(window?.window_status === 'online');
+    return window?.window_status === 'online';
   };
 
   const isMobile = useMediaQuery({ query: '(max-width: 600px)' });
@@ -129,23 +148,23 @@ export default function SignIn() {
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 2 }}>
             <Grid container spacing={2}>
               <Grid item xs={4}>
-                <CustomButton details={transactionType + ' INQUIRY'} destination='/CounterConfirmation'>
+                <CustomButton details={transactionType + ' INQUIRY'} destination='/CounterConfirmation' windowId={[1, 2, 3, 4, 5, 6, 13]} disabled={!isWindowOnline(1) && !isWindowOnline(2) && !isWindowOnline(3) && !isWindowOnline(4) && !isWindowOnline(5) && !isWindowOnline(6) && !isWindowOnline(13)}>
                     INQUIRY
                 </CustomButton>
               </Grid>
               <Grid item xs={4}>
-                <CustomButton details={transactionType + ' REQUIREMENTS'} destination='/CounterConfirmation'>
+                <CustomButton details={transactionType + ' REQUIREMENTS'} destination='/CounterConfirmation' windowId={[1, 2, 3, 4, 5, 6, 13]} disabled={!isWindowOnline(1) && !isWindowOnline(2) && !isWindowOnline(3) && !isWindowOnline(4) && !isWindowOnline(5) && !isWindowOnline(6) && !isWindowOnline(13)}>
                     PASS REQUIREMENTS
                 </CustomButton>
               </Grid>
               <Grid item xs={4}>
-                <CustomButton details={transactionType + ' PAYMENT'} destination='/CounterConfirmation'>
+                <CustomButton details={transactionType + ' PAYMENT'} destination='/CounterConfirmation' windowId={[14, 15]} disabled={!isWindowOnline(14) && !isWindowOnline(15)}>
                     PAYMENT
                 </CustomButton>
               </Grid>
               <Grid item xs={4}/>
               <Grid item xs={4}>
-                <CustomButton details={transactionType + ' CLAIM'} destination='/CounterConfirmation'>
+                <CustomButton details={transactionType + ' CLAIM'} destination='/CounterConfirmation' windowId={[7]} disabled={!isWindowOnline(7)}>
                     CLAIM
                 </CustomButton>
               </Grid>

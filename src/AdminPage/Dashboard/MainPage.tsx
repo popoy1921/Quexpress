@@ -16,9 +16,7 @@ import Link from '@mui/material/Link';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import { mainListItems } from '../ListItems';
-import Queue from './Queued';
 import Served from './Served';
-import Cancel from './Cancel';
 import TotalServed from './TotalServed';
 import { useNavigate } from 'react-router-dom';
 
@@ -177,9 +175,10 @@ export default function Dashboard() {
           }}
         >
           <Toolbar />
-          <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+          <Container maxWidth="xl" sx={{ mt: 2, mb: 2 }}>
             <Grid container spacing={3}>
               {/* Total Served - Larger and on its own row */}
+              <Grid item xs={3}/>
               <Grid item xs={6}>
                 <Paper
                   elevation={24}
@@ -197,50 +196,8 @@ export default function Dashboard() {
 
               {/* Second row with Queued, Served, and Cancelled */}
               <Grid container item spacing={3}>
-                {/* Queued */}
-                <Grid item xs={12} md={4}>
-                  <Paper
-                    elevation={24}
-                    sx={{
-                      p: 2,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      height: '290px',
-                      borderRadius: 2,
-                    }}
-                  >
-                    <Queue />
-                  </Paper>
-                </Grid>
-                {/* Served */}
-                <Grid item xs={12} md={4}>
-                  <Paper
-                    elevation={24}
-                    sx={{
-                      p: 2,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      height: '290px',
-                      borderRadius: 2,
-                    }}
-                  >
-                    <Served />
-                  </Paper>
-                </Grid>
-                {/* Cancelled */}
-                <Grid item xs={12} md={4}>
-                  <Paper
-                    elevation={24}
-                    sx={{
-                      p: 2,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      height: '290px',
-                      borderRadius: 2,
-                    }}
-                  >
-                    <Cancel />
-                  </Paper>
+                <Grid item xs={12}>
+                  <Served/>
                 </Grid>
               </Grid>
             </Grid>

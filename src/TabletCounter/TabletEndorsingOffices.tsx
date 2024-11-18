@@ -11,6 +11,8 @@ import CustomButton from '../CommonElements/CustomButton';
 import CancelButton from '../CommonElements/CancelButton';
 import { useMediaQuery } from 'react-responsive';
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import axios from 'axios';
 
 const Logo = require('../Photos/coollogo_com-178391066.png');
 const mLogo = require('../Photos/lingayen-seal.png');
@@ -82,11 +84,22 @@ const defaultTheme = createTheme({
 
 export default function SignIn() {
   const navigate = useNavigate();
+  const [windows, setWindows] = useState<{ window_id: number; window_status: string }[]>([]);
   
   React.useEffect(() => {
     if (!localStorage.getItem('AccountId')) {
       navigate('/SignInCustomer'); 
     }
+    const fetchWindows = async () => {
+      try {
+        const response = await axios.get(`${process.env.REACT_APP_OTHER_BACKEND_SERVER}/window/get`);
+        setWindows(response.data); // Assuming the API returns an array of objects with window_id and window_status
+      } catch (error) {
+        console.error('Error fetching windows:', error);
+      }
+    };
+
+    fetchWindows();
   }, [navigate]);
   
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -96,6 +109,12 @@ export default function SignIn() {
       email: data.get('email'),
       password: data.get('password'),
     });
+  };
+
+  const isWindowOnline = (id: number) => {
+    const window = windows.find((win) => win.window_id === id);
+    console.log(window?.window_status === 'online');
+    return window?.window_status === 'online';
   };
 
   const isMobile = useMediaQuery({ query: '(max-width: 600px)' });
@@ -129,23 +148,23 @@ export default function SignIn() {
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 2 }}>
             <Grid container spacing={2}>
               <Grid item xs={4}>
-                <CustomButton details={'SANITARY'} destination='/CounterBusinessPermitSub'>
+                <CustomButton details={'SANITARY'} destination='/CounterBusinessPermitSub' windowId={[3]} disabled={!isWindowOnline(3)}>
                     SANITARY PERMIT
                 </CustomButton>
               </Grid>
               <Grid item xs={4}>
-                <CustomButton details={'ZONING'} destination='/CounterBusinessPermitSub'>
+                <CustomButton details={'ZONING'} destination='/CounterBusinessPermitSub' windowId={[5]} disabled={!isWindowOnline(5)}>
                     ZONING PERMIT
                 </CustomButton>
               </Grid>
               <Grid item xs={4}>
-                <CustomButton details={'BUILDING PERMIT'} destination='/CounterBusinessPermitSub'>
+                <CustomButton details={'BUILDING PERMIT'} destination='/CounterBusinessPermitSub' windowId={[4]} disabled={!isWindowOnline(4)}>
                     BUILDING PERMIT
                 </CustomButton>
               </Grid>
               <Grid item xs={4}/>
               <Grid item xs={4}>
-                <CustomButton details={'FIRE SAFETY INSPECTION CERTIFICATE'} destination='/CounterBusinessPermitSub'>
+                <CustomButton details={'FIRE SAFETY INSPECTION CERTIFICATE'} destination='/CounterBusinessPermitSub' windowId={[6]} disabled={!isWindowOnline(6)}>
                     FIRE SAFETY INSPECTION CERTIFICATE
                 </CustomButton>
               </Grid>

@@ -10,6 +10,8 @@ import CustomButton from '../CommonElements/CustomButton';
 import CancelButton from '../CommonElements/CancelButton';
 import { useMediaQuery } from 'react-responsive';
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import axios from 'axios';
 
 const Logo = require('../Photos/coollogo_com-178391066.png');
 const mLogo = require('../Photos/lingayen-seal.png');
@@ -78,11 +80,22 @@ const defaultTheme = createTheme({
 
 export default function SignIn() {
   const navigate = useNavigate();
+  const [windows, setWindows] = useState<{ window_id: number; window_status: string }[]>([]);
   
   React.useEffect(() => {
     if (!localStorage.getItem('AccountId')) {
       navigate('/SignInCustomer'); 
     }
+    const fetchWindows = async () => {
+      try {
+        const response = await axios.get(`${process.env.REACT_APP_OTHER_BACKEND_SERVER}/window/get`);
+        setWindows(response.data); // Assuming the API returns an array of objects with window_id and window_status
+      } catch (error) {
+        console.error('Error fetching windows:', error);
+      }
+    };
+
+    fetchWindows();
   }, [navigate]);
   
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -92,6 +105,12 @@ export default function SignIn() {
       email: data.get('email'),
       password: data.get('password'),
     });
+  };
+
+  const isWindowOnline = (id: number) => {
+    const window = windows.find((win) => win.window_id === id);
+    console.log(window?.window_status === 'online');
+    return window?.window_status === 'online';
   };
 
   const isMobile = useMediaQuery({ query: '(max-width: 600px)' });
@@ -125,43 +144,43 @@ export default function SignIn() {
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 2 }}>
             <Grid container spacing={1}>
               <Grid item xs={4}>
-                <CustomButton details={'BUSINESS PERMIT ' + transactionType} destination='/CounterConfirmation'>
+                <CustomButton details={'BUSINESS PERMIT ' + transactionType} destination='/CounterConfirmation' windowId={[14, 15]} disabled={!isWindowOnline(14) && !isWindowOnline(15)}>
                 BUSINESS PERMIT
                 </CustomButton>
-                <CustomButton details={'BIRTH CERTIFICATE ' + transactionType} destination='/CounterConfirmation'>
+                <CustomButton details={'BIRTH CERTIFICATE ' + transactionType} destination='/CounterConfirmation' windowId={[20, 21]} disabled={!isWindowOnline(20) && !isWindowOnline(21)}>
                 BIRTH CERTIFICATE
                 </CustomButton>
-                <CustomButton details={'CORRECTION ' + transactionType} destination='/CounterConfirmation'>
+                <CustomButton details={'CORRECTION ' + transactionType} destination='/CounterConfirmation' windowId={[20, 21]} disabled={!isWindowOnline(20) && !isWindowOnline(21)}>
                 LCR CORRECTION
                 </CustomButton>
               </Grid>
 
               <Grid item xs={4}>
-                <CustomButton details={'RENTAL ' + transactionType} destination='/CounterConfirmation'>
+                <CustomButton details={'RENTAL ' + transactionType} destination='/CounterConfirmation' windowId={[18, 19]} disabled={!isWindowOnline(18) && !isWindowOnline(19)}>
                 RENTAL PAYMENT
                 </CustomButton>
-                <CustomButton details={'DEATH CERTIFICATE ' + transactionType} destination='/CounterConfirmation'>
+                <CustomButton details={'DEATH CERTIFICATE ' + transactionType} destination='/CounterConfirmation' windowId={[20, 21]} disabled={!isWindowOnline(20) && !isWindowOnline(21)}>
                 DEATH CERTIFICATE
                 </CustomButton>
-                <CustomButton details={'VIOLATION ' + transactionType} destination='/CounterConfirmation'>
+                <CustomButton details={'VIOLATION ' + transactionType} destination='/CounterConfirmation' windowId={[20, 21]} disabled={!isWindowOnline(20) && !isWindowOnline(21)}>
                 VIOLATION
                 </CustomButton>
               </Grid>
 
               <Grid item xs={4}>
-                <CustomButton details={'REAL PROPERTY TAX'} destination='/CounterConfirmation'>
+                <CustomButton details={'REAL PROPERTY TAX'} destination='/CounterConfirmation' windowId={[16, 17]} disabled={!isWindowOnline(16) && !isWindowOnline(17)}>
                 REAL PROPERTY TAX
                 </CustomButton>
-                <CustomButton details={'MARRIAGE CERTIFICATE ' + transactionType} destination='/CounterConfirmation'>
+                <CustomButton details={'MARRIAGE CERTIFICATE ' + transactionType} destination='/CounterConfirmation' windowId={[20, 21]} disabled={!isWindowOnline(20) && !isWindowOnline(21)}>
                 MARRIAGE CERTIFICATE
                 </CustomButton>
-                <CustomButton details={'PERMIT TO OPERATE ' + transactionType} destination='/CounterConfirmation'>
+                <CustomButton details={'PERMIT TO OPERATE ' + transactionType} destination='/CounterConfirmation' windowId={[14, 15]} disabled={!isWindowOnline(14) && !isWindowOnline(15)}>
                 PERMIT TO OPERATE
                 </CustomButton>
               </Grid>
               <Grid item xs={3}/>
               <Grid item xs={6}>
-                <CustomButton details={'OTHERS ' + transactionType} destination='/CounterConfirmation'>
+                <CustomButton details={'OTHERS ' + transactionType} destination='/CounterConfirmation' windowId={[20, 21]} disabled={!isWindowOnline(20) && !isWindowOnline(21)}>
                 OTHERS
                 </CustomButton>
                 <CancelButton details={'BACK'} destination='/CounterTablet'>

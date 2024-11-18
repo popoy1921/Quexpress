@@ -151,11 +151,18 @@ const SignIn: React.FC = () => {
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
-
+  let windowId = localStorage.getItem('WindowId');
+  
   useEffect(() => {
-    localStorage.removeItem('UserEmail');
-  }, []);
+    const updateWindow = async () => {
+      await axios.get(`${process.env.REACT_APP_OTHER_BACKEND_SERVER}/window/updateOffline/${windowId}`);
+      console.log(windowId);
+      localStorage.removeItem('UserEmail');
+    }
+    updateWindow();
+  }, [windowId]);
 
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -167,7 +174,7 @@ const SignIn: React.FC = () => {
         alert('Invalid email or password');
         return;
       }
-      
+      await axios.get(`${process.env.REACT_APP_OTHER_BACKEND_SERVER}/window/updateOnline/${user.window_id}`);
       grantAccess(user, user.window_desc);
       resetCountersIfNewDay();
     } catch (error) {

@@ -11,6 +11,8 @@ import CustomButton from '../CommonElements/CustomButton';
 import CancelButton from '../CommonElements/CancelButton';
 import { useMediaQuery } from 'react-responsive';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { useState } from 'react';
 
 const Logo = require('../Photos/coollogo_com-178391066.png');
 const mLogo = require('../Photos/lingayen-seal.png');
@@ -82,11 +84,22 @@ const defaultTheme = createTheme({
 
 export default function SignIn() {
   const navigate = useNavigate();
+  const [windows, setWindows] = useState<{ window_id: number; window_status: string }[]>([]);
   
   React.useEffect(() => {
     if (!localStorage.getItem('AccountId')) {
       navigate('/SignInCustomer'); 
     }
+    const fetchWindows = async () => {
+      try {
+        const response = await axios.get(`${process.env.REACT_APP_OTHER_BACKEND_SERVER}/window/get`);
+        setWindows(response.data); // Assuming the API returns an array of objects with window_id and window_status
+      } catch (error) {
+        console.error('Error fetching windows:', error);
+      }
+    };
+
+    fetchWindows();
   }, [navigate]);
   
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -96,6 +109,12 @@ export default function SignIn() {
       email: data.get('email'),
       password: data.get('password'),
     });
+  };
+  
+  const isWindowOnline = (id: number) => {
+    const window = windows.find((win) => win.window_id === id);
+    console.log(window?.window_status === 'online');
+    return window?.window_status === 'online';
   };
 
   const isMobile = useMediaQuery({ query: '(max-width: 600px)' });
@@ -129,28 +148,28 @@ export default function SignIn() {
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 2 }}>
             <Grid container spacing={2}>
               <Grid item xs={4}>
-                <CustomButton details={'BUSINESS PERMIT INQUIRY'} destination='/CounterConfirmation'>
+                <CustomButton details={'BUSINESS PERMIT INQUIRY'} destination='/CounterConfirmation' windowId={[1]} disabled={!isWindowOnline(1)}>
                     INQUIRY
                 </CustomButton>
               </Grid>
               <Grid item xs={4}>
-                <CustomButton details={'BUSINESS PERMIT NEW APPLICANT'} destination='/CounterConfirmation'>
+                <CustomButton details={'BUSINESS PERMIT NEW APPLICANT'} destination='/CounterConfirmation' windowId={[1]} disabled={!isWindowOnline(1)}>
                     NEW APPLICATION
                 </CustomButton>
               </Grid>
               <Grid item xs={4}>
-                <CustomButton details={'BUSINESS PERMIT RENEWAL'} destination='/CounterConfirmation'>
+                <CustomButton details={'BUSINESS PERMIT RENEWAL'} destination='/CounterConfirmation' windowId={[1]} disabled={!isWindowOnline(1)}>
                     RENEWAL
                 </CustomButton>
               </Grid>
               <Grid item xs={2}/>
               <Grid item xs={4}>
-                <CustomButton details={'BUSINESS PERMIT CLOSING BUSINESS'} destination='/CounterConfirmation'>
+                <CustomButton details={'BUSINESS PERMIT CLOSING BUSINESS'} destination='/CounterConfirmation' windowId={[1]} disabled={!isWindowOnline(1)}>
                     BUSINESS CLOSURE
                 </CustomButton>
               </Grid>
               <Grid item xs={4}>
-                <CustomButton details={'BUSINESS PERMIT CLAIM'} destination='/CounterConfirmation'>
+                <CustomButton details={'BUSINESS PERMIT CLAIM'} destination='/CounterConfirmation' windowId={[7]} disabled={!isWindowOnline(7)}>
                     CLAIM
                 </CustomButton>
               </Grid>

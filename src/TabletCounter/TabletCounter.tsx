@@ -1,6 +1,5 @@
 import * as React from 'react';
 import CssBaseline from '@mui/material/CssBaseline';
-import Link from '@mui/material/Link';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
@@ -10,6 +9,8 @@ import CustomButton from '../CommonElements/CustomButton';
 import CancelButton from '../CommonElements/CancelButton';
 import { useMediaQuery } from 'react-responsive';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { useState } from 'react';
 
 const Logo = require('../Photos/coollogo_com-178391066.png');
 const mLogo = require('../Photos/lingayen-seal.png');
@@ -76,13 +77,24 @@ const defaultTheme = createTheme({
 
 export default function SignIn() {
   const navigate = useNavigate();
+  const [windows, setWindows] = useState<{ window_id: number; window_status: string }[]>([]);
   
   React.useEffect(() => {
     if (!localStorage.getItem('AccountId')) {
       navigate('/SignInCustomer'); 
     }
+    const fetchWindows = async () => {
+      try {
+        const response = await axios.get(`${process.env.REACT_APP_OTHER_BACKEND_SERVER}/window/get`);
+        setWindows(response.data); // Assuming the API returns an array of objects with window_id and window_status
+      } catch (error) {
+        console.error('Error fetching windows:', error);
+      }
+    };
+
+    fetchWindows();
   }, [navigate]);
-  
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -90,6 +102,12 @@ export default function SignIn() {
       email: data.get('email'),
       password: data.get('password'),
     });
+  };
+
+  const isWindowOnline = (id: number) => {
+    const window = windows.find((win) => win.window_id === id);
+    console.log(window?.window_status === 'online');
+    return window?.window_status === 'online';
   };
 
   const isMobile = useMediaQuery({ query: '(max-width: 600px)' });
@@ -123,37 +141,37 @@ export default function SignIn() {
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 2 }}>
             <Grid container spacing={2}>
               <Grid item xs={4}>
-                <CustomButton details={'BUSINESS PERMIT'} destination='/CounterBusinessPermit'>
+                <CustomButton details={'BUSINESS PERMIT'} destination='/CounterBusinessPermit' windowId={[1, 7]} disabled={!isWindowOnline(1) && !isWindowOnline(7)}>
                 BUSINESS PERMIT
                 </CustomButton>
-                <CustomButton details={'LOCAL CIVIL REGISTRY'} destination='/CounterLocalCivilRegistry'>
+                <CustomButton details={'LOCAL CIVIL REGISTRY'} destination='/CounterLocalCivilRegistry' windowId={[8, 9, 10, 11, 13]} disabled={!isWindowOnline(8) && !isWindowOnline(9) && !isWindowOnline(10) && !isWindowOnline(11) && !isWindowOnline(13)}>
                 LOCAL CIVIL REGISTRY
                 </CustomButton>
-                <CustomButton details={'WORKING PERMIT'} destination='/CounterBusinessPermitSub'>
+                <CustomButton details={'WORKING PERMIT'} destination='/CounterBusinessPermitSub' windowId={[2]} disabled={!isWindowOnline(2)}>
                 WORKING PERMIT
                 </CustomButton>
               </Grid>
 
               <Grid item xs={4}>
-                <CustomButton details={'DTI'} destination='/CounterBusinessPermitSub'>
+                <CustomButton details={'DTI'} destination='/CounterBusinessPermitSub' windowId={[13]} disabled={!isWindowOnline(13)}>
                 DTI REGISTRATION
                 </CustomButton>
-                <CustomButton details={'CEDULA'} destination='/CounterConfirmation'>
+                <CustomButton details={'CEDULA'} destination='/CounterConfirmation' windowId={[5, 6]} disabled={!isWindowOnline(5) && !isWindowOnline(6)}>
                 CEDULA
                 </CustomButton>
-                <CustomButton details={'MAYOR CLEARANCE'} destination='/CounterBusinessPermitSub'>
+                <CustomButton details={'MAYOR CLEARANCE'} destination='/CounterBusinessPermitSub' windowId={[2]} disabled={!isWindowOnline(2)}>
                 MAYOR'S CLEARANCE
                 </CustomButton>
               </Grid>
 
               <Grid item xs={4}>
-                <CustomButton details={'ENDORSING OFFICES'} destination='/CounterEndorsingOffices'>
+                <CustomButton details={'ENDORSING OFFICES'} destination='/CounterEndorsingOffices' windowId={[3, 4, 5, 6]} disabled={!isWindowOnline(3) && !isWindowOnline(4) && !isWindowOnline(5) && !isWindowOnline(6)}>
                 ENDORSING OFFICES
                 </CustomButton>
-                <CustomButton details={'PAYMENT'} destination='/CounterPayment'>
+                <CustomButton details={'PAYMENT'} destination='/CounterPayment' windowId={[14, 15, 16, 17, 18, 19, 20, 21]} disabled={!isWindowOnline(14) && !isWindowOnline(15) && !isWindowOnline(16) && !isWindowOnline(17) && !isWindowOnline(18) && !isWindowOnline(19) && !isWindowOnline(20) && !isWindowOnline(21)}>
                 PAYMENT
                 </CustomButton>
-                <CustomButton details={'PERMIT TO OPERATE'} destination='/CounterBusinessPermitSub'>
+                <CustomButton details={'PERMIT TO OPERATE'} destination='/CounterBusinessPermitSub' windowId={[1]} disabled={!isWindowOnline(1)}>
                 PERMIT TO OPERATE
                 </CustomButton>
               </Grid>

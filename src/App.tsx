@@ -25,7 +25,6 @@ import TabletLocalCivilRegistrySub from './TabletCounter/TabletLocalCivilRegistr
 import TabletLocalCivilRegistryCorrection from './TabletCounter/TabletLocalCivilRegistryCorrection'
 import TabletPayment from './TabletCounter/TabletPayment'
 import TabletConfirmation from './TabletCounter/TabletConfirmation'
-import TabletPrint from './TabletCounter/CounterPrint'
 import DisplayMonitor1 from './DisplayMonitor/DisplayMonitor1'
 import DisplayMonitor2 from './DisplayMonitor/DisplayMonitor2';
 import TellerControl from './TellerPage/TransactionControl/MainPage'
@@ -57,7 +56,6 @@ const App: React.FC = () => {
           <Route path="/AdminAdsUpload" element={<UploadPage/>} />
           <Route path="/Teller/:TransactionCode" element={<TellerControl/>} />
           <Route path='/TellerReports/:TransactionCode' element={<TellerReports/>} />
-          <Route path="/Counter" element={<TabletCounter/>} />
           <Route path="/CounterTablet" element={<TabletCounter/>} />
           <Route path="/CounterBusinessPermit" element={<TabletBusinessPermit/>} />
           <Route path="/CounterBusinessPermitSub" element={<TabletBusinessPermitSub/>} />
@@ -67,7 +65,6 @@ const App: React.FC = () => {
           <Route path="/CounterLocalCivilRegistryCorrection" element={<TabletLocalCivilRegistryCorrection/>} />
           <Route path="/CounterPayment" element={<TabletPayment/>} />
           <Route path="/CounterConfirmation" element={<TabletConfirmation/>} />
-          <Route path="/CounterPrint" element={<TabletPrint/>} />
           <Route path="/DisplayMonitor1" element={<DisplayMonitor1/>}/>
           <Route path="/DisplayMonitor2" element={<DisplayMonitor2/>}/>
           

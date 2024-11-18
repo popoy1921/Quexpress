@@ -31,7 +31,7 @@ export default function TotalServed() {
         const response = await axios.get(
           `${process.env.REACT_APP_OTHER_BACKEND_SERVER}/transaction_log/admin/total`
         );
-        setNumberOfServed(response.data.length);
+        setNumberOfServed(response.data.total_count);
         setIsVisible(true); // Show animation once data is fetched
       } catch (err) {
         console.error("Error fetching total served transactions", err);

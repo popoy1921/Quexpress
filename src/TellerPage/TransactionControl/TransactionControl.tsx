@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Typography from '@mui/material/Typography';
 import Title from '../Title';
-import { Box, Button, Container, Grid, Paper } from '@mui/material';
+import { Box, Button, Container, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Paper } from '@mui/material';
 import axios from 'axios';
 import { format } from 'date-fns';
 import returnDateTime from '../../TimeStamp';
@@ -11,12 +11,23 @@ import CallIcon from '@mui/icons-material/Call'; // Call button icon
 import CancelIcon from '@mui/icons-material/Cancel'; // Cancel button icon
 import CashierIcon from '@mui/icons-material/AttachMoney'; // Pass to cashier button icon
 import DriveFileMoveIcon from '@mui/icons-material/DriveFileMove';
+import { useState } from 'react';
 
 const { formattedDate } = returnDateTime();
 const transactionAccess = localStorage.getItem('TransactionAccess');
 
 export default function TransactionControl() {  
+  let transactionCodeString = localStorage.getItem('TransactionCodes') as string;
+  let transactionCodes: { [key: string]: string } = {};
+  transactionCodes = JSON.parse(transactionCodeString);
+  let transactionCode = transactionCodes[useParams().TransactionCode ?? ''];
+
   const [accessId, setAccessId] = React.useState(localStorage.getItem('AccessId'));
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [nowServing, setNowServing] = useState(localStorage.getItem(transactionCode + 'NowServing') || 'No Available Number');
+  const [nowTransactionPass, setnowTransactionPass] = useState(localStorage.getItem('TransactionPass') || null);
+  const [nowServingColor, setNowServingColor] = useState('red'); // Default color
 
   // Set interval to update accessId
   React.useEffect(() => {
@@ -31,11 +42,34 @@ export default function TransactionControl() {
     return () => clearInterval(interval);
   }, [accessId]);
 
-  let transactionCodeString = localStorage.getItem('TransactionCodes') as string;
-  let transactionCodes: { [key: string]: string } = {};
-  transactionCodes = JSON.parse(transactionCodeString);
-  let transactionCode = transactionCodes[useParams().TransactionCode ?? ''];
+  // Effect to update nowServing and its color
+  React.useEffect(() => {
+    const updateNowServing = () => {
+      const newNowServing = localStorage.getItem(transactionCode + 'NowServing') || 'No Available Number';
+      setNowServing(newNowServing);
+      const nowTransactionPass = localStorage.getItem('TransactionPass') || null;
+      setnowTransactionPass(nowTransactionPass);
 
+      if (accessId === '2' && transactionCode !== 'BPLO3' && transactionCode !== 'DTIM' && transactionCode !== 'LCRT') {
+        setNowServingColor('black');
+      } else if (transactionCode === 'CSH1' || transactionCode === 'CSH2' || transactionCode === 'CSH7' || transactionCode === 'CSH8') {
+        if (nowServing !== 'No Available Number') {
+          if (nowTransactionPass === 'toClaim') {
+            setNowServingColor('green');
+          } else if (nowTransactionPass === 'toStop') {
+            setNowServingColor('red'); 
+          }
+        } else {
+          setNowServingColor('black');
+        }
+      }      
+    };
+
+    updateNowServing(); // Initial update
+    const interval = setInterval(updateNowServing, 1000); // Check every 5 seconds
+
+    return () => clearInterval(interval); // Cleanup on unmount
+  }, [transactionCode]);
 
   async function updateForMonitorBlink(transactionCode: string) {
     await axios.put(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/updateBlink/` + transactionCode, { 'blink': 1 });
@@ -77,16 +111,17 @@ export default function TransactionControl() {
     let transactionQueue = localStorage.getItem(transactionCode + 'NowServing');
     let isTransactionRef = localStorage.getItem('IsTransactionRef');
     let transactionData: any = {};
+    console.log(isTransactionRef)
     
     if (!transactionData.transactionRef) {
       if (accessId === '2') {
         if (transactionCode === 'BPLO3') {
           if (transactionQueue) {
-            if (transactionQueue.startsWith('BPT') || transactionQueue.startsWith('BST') || transactionQueue.startsWith('BBT') || transactionQueue.startsWith('BZT') || transactionQueue.startsWith('BFT') || transactionQueue.startsWith('MYT') || transactionQueue.startsWith('WPT') || transactionQueue.startsWith('POT')) {
-              transactionData.transactionQueue = transactionQueue;
-            } else {
+            if (isTransactionRef === 'isTransactionRef'){
               transactionData.transactionRef = transactionQueue;
-              transactionData.forClaim = true;
+              transactionData.forClaim = true;         
+            } else {
+              transactionData.transactionQueue = transactionQueue;
             }
           }
         } else if (transactionCode === 'BPLO2') {
@@ -100,11 +135,11 @@ export default function TransactionControl() {
           }
         } else if (transactionCode === 'LCRT') {
           if (transactionQueue) {
-            if (transactionQueue.startsWith('LBT') || transactionQueue.startsWith('LDT') || transactionQueue.startsWith('LMT') || transactionQueue.startsWith('LCT') || transactionQueue.startsWith('LTC')) {
-              transactionData.transactionQueue = transactionQueue;
-            } else {
+            if (isTransactionRef === 'isTransactionRef'){
               transactionData.transactionRef = transactionQueue;
-              transactionData.forClaim = true;
+              transactionData.forClaim = true;         
+            } else {
+              transactionData.transactionQueue = transactionQueue;
             }
           }
         } else {
@@ -113,11 +148,11 @@ export default function TransactionControl() {
       } else if (accessId === '3') {
         if (transactionCode === 'CSH1' || transactionCode === 'CSH2' || transactionCode === 'CSH7' || transactionCode === 'CSH8') {
           if (transactionQueue) {
-            if (transactionQueue.startsWith('BPP') || transactionQueue.startsWith('POP') || transactionQueue.startsWith('VLP') || transactionQueue.startsWith('OTP') || transactionQueue.startsWith('LBP') || transactionQueue.startsWith('LDP') || transactionQueue.startsWith('LMP') || transactionQueue.startsWith('LCP')
-              || transactionQueue.startsWith('BSP') || transactionQueue.startsWith('BBP') || transactionQueue.startsWith('BZP') || transactionQueue.startsWith('BFP') || transactionQueue.startsWith('MYP') || transactionQueue.startsWith('WPP')) {
-              transactionData.transactionQueue = transactionQueue;
-            } else {
+            if (isTransactionRef === 'isTransactionRef'){
               transactionData.transactionRef = transactionQueue;
+              transactionData.forCashier = true;         
+            } else {
+              transactionData.transactionQueue = transactionQueue;
             }
           }
         } else {
@@ -130,9 +165,10 @@ export default function TransactionControl() {
     }
 
     const params = new URLSearchParams(transactionData).toString();
-
+    console.log(params)
     await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get_count?${params}`)
       .then(async response2 => {
+      console.log(response2.data[0].finalcount);
       if(response2.data[0].finalcount <= 2){
         await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get?${params}`)
           .then(async response => {
@@ -149,8 +185,7 @@ export default function TransactionControl() {
               endTime: null,
               refQueueNumber: responseData.transaction_ref,
               transactionStatus: null,
-            };
-            console.log(responseData);
+            };            
             createLog(createData);
             }
           )
@@ -216,6 +251,7 @@ export default function TransactionControl() {
               transactionData.transactionQueue = transactionQueue;
             } else {
               transactionData.transactionRef = transactionQueue;
+              transactionData.forCashier = true;
             }
           }
         } else {
@@ -345,17 +381,19 @@ export default function TransactionControl() {
     let queueNumber = '';
     let transactionLogId = '';
     let isTransactionRef = '';
+    let transactionPass = '';
   
     if (rows.length > 0) {
       // move next number to on going
       queueNumber = rows[0].getElementsByTagName("td")[1].innerText;
       transactionLogId = rows[0].getElementsByTagName("td")[0].innerHTML;
-      isTransactionRef = rows[0].getElementsByTagName("td")[4].innerHTML;
+      isTransactionRef = rows[0].getElementsByTagName("td")[5].innerHTML;
+      transactionPass  = rows[0].getElementsByTagName("td")[6].innerHTML;
       let transactionData: any = {
         transactionLogId: transactionLogId,
-        status: 'on going',
         transactionStartTime: format(date, 'HH:mm:ss'),
-      };
+        status: 'on going',
+      }
   
       if (accessId === '2') {
         if (transactionCode === 'BPLO3') {
@@ -396,6 +434,7 @@ export default function TransactionControl() {
               transactionData.transactionQueue = queueNumber;
             } else {
               transactionData.transactionRef = queueNumber;
+              transactionData.forCashier = true;
             }
           }
         } else {
@@ -519,20 +558,34 @@ export default function TransactionControl() {
       localStorage.setItem(transactionCode + 'NowServing', nowServingContainer.innerText);
       localStorage.setItem('IsTransactionRef', isTransactionRef);
       localStorage.setItem('TransactionLogID', transactionLogId);
+      localStorage.setItem('TransactionPass', transactionPass);
     }
   }
 
   function passToCashier(event: any) {
     event.preventDefault();
-    let transactionRef = localStorage.getItem(transactionCode + 'NowServing') as string;
-    toCashier(transactionRef);
-    updateNumber('done');
+    setDialogOpen(true);
     if (document.getElementById('nowServing')?.innerText !== 'No Available Number') {
       updateForMonitorBlink(transactionCode);
     }
   }
 
-  async function toCashier(transactionRef: string) {
+  const handleOptionSelect = (option: string) => {
+    setSelectedOption(option);
+    setDialogOpen(false);
+    let transactionRef = localStorage.getItem(transactionCode + 'NowServing') as string;
+    if (option === 'Pay to Claim') {
+
+      toCashier(transactionRef, 'toClaim');
+      updateNumber('done');
+    } else if (option === 'Pay to Stop') {
+      
+      toCashier(transactionRef, 'toStop');
+      updateNumber('done');
+    }
+  };
+
+  async function toCashier(transactionRef: string, passTo: string) {
     await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/${transactionRef}`)
       .then(async function (response) {
         const currentDate = localStorage.getItem('currentDate');
@@ -559,6 +612,7 @@ export default function TransactionControl() {
             startTime: null,
             endTime: null,
             refQueueNumber: transactionRef,
+            transactionPass: passTo,
           };
           createLog(transactionData);
         } else if(transactionRef.startsWith('LC') || transactionRef.startsWith('LB') || transactionRef.startsWith('LD') || transactionRef.startsWith('LM')){
@@ -573,6 +627,7 @@ export default function TransactionControl() {
             startTime: null,
             endTime: null,
             refQueueNumber: transactionRef,
+            transactionPass: passTo,
           };
         createLog(transactionData);
         }
@@ -690,9 +745,10 @@ export default function TransactionControl() {
                 variant="h4"
                 align='right'
                 id='nowServing'
-                sx={{ color: '#333', fontWeight: 'bold' }}
+                sx={{ color: nowServingColor, fontWeight: 'bold'
+               }}
               >
-                {localStorage.getItem(transactionCode + 'NowServing') === '0' ? 'No On Going Number' : localStorage.getItem(transactionCode + 'NowServing')}
+                {nowServing}
               </Typography>
               <Box component="form" noValidate sx={{ mt: 2 }}>
                 <Grid container spacing={2} justifyContent="center">
@@ -746,6 +802,58 @@ export default function TransactionControl() {
                       </Button>
                     </Grid>
                   )}
+                  {/* Dialog for selection */}
+                  <Dialog
+                    open={dialogOpen}
+                    onClose={() => setDialogOpen(false)}
+                    PaperProps={{
+                      sx: { padding: 2, borderRadius: 2, boxShadow: 5 },
+                    }}
+                  >
+                    <DialogTitle sx={{ textAlign: 'center', fontWeight: 'bold', fontSize: '1.5rem' }}>
+                      Choose an Option
+                    </DialogTitle>
+                    <DialogContent>
+                      <Typography
+                        variant="body1"
+                        sx={{ textAlign: 'center', fontSize: '1.1rem', color: 'text.secondary', mb: 2 }}
+                      >
+                        Please select one of the following actions:
+                      </Typography>
+                    </DialogContent>
+                    <DialogActions sx={{ justifyContent: 'center', gap: 2 }}>
+                      <Button
+                        onClick={() => handleOptionSelect('Pay to Claim')}
+                        variant="contained"
+                        sx={{
+                          bgcolor: '#388e3c',
+                          color: '#fff',
+                          '&:hover': { bgcolor: '#2e7d32' },
+                          px: 3,
+                          py: 1.5,
+                          fontWeight: 'bold',
+                        }}
+                      >
+                        Pay to Claim
+                      </Button>
+                      <Button
+                        onClick={() => handleOptionSelect('Pay to Stop')}
+                        variant="contained"
+                        sx={{
+                          bgcolor: '#d32f2f',
+                          color: '#fff',
+                          '&:hover': { bgcolor: '#c62828' },
+                          px: 3,
+                          py: 1.5,
+                          fontWeight: 'bold',
+                        }}
+                      >
+                        Pay to Stop
+                      </Button>
+                    </DialogActions>
+                  </Dialog>
+
+
                   {/* Conditionally render the PASS TO CLAIM button based on transactionCode */}
                   {(transactionCode === 'CSH1' || transactionCode === 'CSH2' || transactionCode === 'CSH7' || transactionCode === 'CSH8') && (
                     <Grid item xs={6}>
