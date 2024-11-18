@@ -241,7 +241,7 @@ app.post('/customer/create', async (req, res) => {
   const mobileNumber  = userDetails.mobileNumber;
   try {
     const client = await pool.connect();
-    const result = await client.query('INSERT INTO quexpress.tbl_quexpress_customers (account_id, customer_first_name, customer_last_name, customer_number) VALUES ($1, $2, $3, $4) RETURNING *', [accountId , firstName, lastName, mobileNumber]);
+    const result = await client.query('INSERT INTO quexpress.tbl_quexpress_customers (account_id, customer_first_name, customer_last_name, customer_number, enabled_datetime) VALUES ($1, $2, $3, $4, CURRENT_DATE) RETURNING *', [accountId , firstName, lastName, mobileNumber]);
     res.json(result.rows[0]);
     client.release();
   } catch (err) {
