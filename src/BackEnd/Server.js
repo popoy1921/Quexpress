@@ -21,6 +21,25 @@ const pool = new Pool({
 app.use(express.json());
 app.use(cors());
 
+
+// TABLE - TBL_QUEXPRESS_CUSTOMER
+
+// Route to Customer
+app.get('/customer/get', async (req, res) => {
+  try {
+    var queryString = 'SELECT * FROM quexpress.tbl_quexpress_customers'
+    + ' ORDER BY customer_id ASC';
+
+    const client = await pool.connect();
+    const queryResult = await client.query(queryString);
+    res.json(queryResult.rows);
+    client.release();
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server Error');
+  }
+});
+
 // TABLE - TBL_QUEXPRESS_WINDOW
 
 // Route to windows

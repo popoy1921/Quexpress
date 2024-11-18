@@ -30,6 +30,12 @@ export const mainListItems = (
       </ListItemIcon>
       <ListItemText primary="Status" />
     </ListItemButton>
+    <ListItemButton href="/AdminCustomerWindow">
+      <ListItemIcon>
+        <BadgeIcon />
+      </ListItemIcon>
+      <ListItemText primary="Customer Window" />
+    </ListItemButton>
     <ListItemButton href="/AdminReport">
       <ListItemIcon>
         <AssignmentIcon />

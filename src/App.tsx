@@ -13,6 +13,7 @@ import AdminDashboard from './AdminPage/Dashboard/MainPage'
 import AdminAccountManagement from './AdminPage/AccountManagement/MainPage'
 import AdminReports from './AdminPage/Reports/MainPage'
 import AdminStatus from './AdminPage/StatusWindow/MainPage'
+import AdminCustomerWindow from './AdminPage/CustomerWindow/MainPage'
 import AdminAds from './AdminPage/AdsDisplay/MainPage'
 import AdminAnnouncement from './AdminPage/Announcement/MainPage'
 import UploadPage from './AdminPage/AdsDisplay/UploadPage'
@@ -51,6 +52,7 @@ const App: React.FC = () => {
           <Route path="/AdminAccountManagement" element={<AdminAccountManagement/>} />
           <Route path="/AdminReport" element={<AdminReports/>} />
           <Route path="/AdminStatusWindow" element={<AdminStatus/>} />
+          <Route path="/AdminCustomerWindow" element={<AdminCustomerWindow/>} />
           <Route path="/AdminAds" element={<AdminAds />} />
           <Route path="/AdminAnnouncement" element={<AdminAnnouncement />} />
           <Route path="/AdminAdsUpload" element={<UploadPage/>} />
