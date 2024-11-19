@@ -67,25 +67,28 @@ function useTransactionData(transactionConfigs: {transactionCode: string; window
           newStatuses[transactionCode] = isOnlineResponse.data.window_status; // 'online' or other status
         
           let queueNumber = '';
-          if (transactionCode === 'CSH') {
-            const response = await axios.get(
-              process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/CSH/${transactionCode}`
-            );
+          if(transactionCode.startsWith('CSH')) {
+            const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/CSH/${transactionCode}`);
             queueNumber = response.data.transaction_ref;
-          } else if (transactionCode.startsWith('BPLO2')) {
-            const response = await axios.get(
-              process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/${transactionCode}`
-            );
-            queueNumber =
-              response.data.transaction_ref !== null
-                ? response.data.transaction_ref
-                : response.data.transactions_queue;
+          } else if(transactionCode.startsWith('BPLO3')) {
+            const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/${transactionCode}`);
+            queueNumber = response.data.transaction_ref !== null 
+            ? response.data.transaction_ref 
+            : response.data.transactions_queue;
+          } else if(transactionCode.startsWith('BPLO2')) {
+            const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/${transactionCode}`);
+            queueNumber = response.data.transaction_ref !== null 
+            ? response.data.transaction_ref 
+            : response.data.transactions_queue;
+          } else if(transactionCode.startsWith('LCRT')) {
+            const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/${transactionCode}`);
+            queueNumber = response.data.transaction_ref !== null 
+            ? response.data.transaction_ref 
+            : response.data.transactions_queue;
           } else {
-            const response = await axios.get(
-              process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/${transactionCode}`
-            );
+            const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/${transactionCode}`);
             queueNumber = response.data.transactions_queue;
-          }
+          }     
 
           const nowServingContainer = document.getElementById('NowServing' + transactionCode);
           if (nowServingContainer) {

@@ -73,11 +73,17 @@ export default function BasicTable() {
                           {element.transaction_log_id}
                         </TableCell>
                         <TableCell>
-                          {localStorage.getItem('AccessId') === '3' 
-                            ? (element.transaction_ref || element.transactions_queue)
-                            : localStorage.getItem('AccessId') === '2'
-                            ? (element.transaction_ref || element.transactions_queue)
-                            : null }
+                          {localStorage.getItem('AccessId') === '3' ? (
+                            <span
+                              style={{
+                                color: element.transaction_pass === 'toClaim' ? 'green' : element.transaction_pass === 'toStop' ? 'red' : 'inherit',
+                              }}
+                            >
+                              {element.transaction_ref || element.transactions_queue}
+                            </span>
+                          ) : localStorage.getItem('AccessId') === '2' ? (
+                            element.transaction_ref || element.transactions_queue
+                          ) : null}
                         </TableCell>
                         <TableCell>{element.customer_account_id}</TableCell>
                         <TableCell>

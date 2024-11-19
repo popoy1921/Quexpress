@@ -155,9 +155,13 @@ const SignIn: React.FC = () => {
   
   useEffect(() => {
     const updateWindow = async () => {
-      await axios.get(`${process.env.REACT_APP_OTHER_BACKEND_SERVER}/window/updateOffline/${windowId}`);
-      console.log(windowId);
-      localStorage.removeItem('UserEmail');
+      if (windowId) {
+        await axios.get(`${process.env.REACT_APP_OTHER_BACKEND_SERVER}/window/updateOffline/${windowId}`);
+        console.log(windowId);
+        localStorage.removeItem('UserEmail');
+      } else {
+        localStorage.removeItem('UserEmail');
+      }
     }
     updateWindow();
   }, [windowId]);

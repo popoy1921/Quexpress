@@ -36,7 +36,7 @@ export default function TransactionControl() {
       if (newAccessId !== accessId) {
         setAccessId(newAccessId);
       }
-    }, 5000); // Update every 5 seconds
+    }, 2000); // Update every 2 seconds
 
     // Cleanup interval on component unmount
     return () => clearInterval(interval);
@@ -45,12 +45,17 @@ export default function TransactionControl() {
   // Effect to update nowServing and its color
   React.useEffect(() => {
     const updateNowServing = () => {
-      const newNowServing = localStorage.getItem(transactionCode + 'NowServing') || 'No Available Number';
-      setNowServing(newNowServing);
+      let newNowServing = localStorage.getItem(transactionCode + 'NowServing') || 'No Available Number';
+      if (newNowServing === '0') {
+        newNowServing = 'No Available Number';
+        setNowServing(newNowServing);
+      } else {
+        setNowServing(newNowServing);
+      }
       const nowTransactionPass = localStorage.getItem('TransactionPass') || null;
       setnowTransactionPass(nowTransactionPass);
 
-      if (accessId === '2' && transactionCode !== 'BPLO3' && transactionCode !== 'DTIM' && transactionCode !== 'LCRT') {
+      if (accessId === '2') {
         setNowServingColor('black');
       } else if (transactionCode === 'CSH1' || transactionCode === 'CSH2' || transactionCode === 'CSH7' || transactionCode === 'CSH8') {
         if (nowServing !== 'No Available Number') {
@@ -185,6 +190,7 @@ export default function TransactionControl() {
               endTime: null,
               refQueueNumber: responseData.transaction_ref,
               transactionStatus: null,
+              transactionPass: responseData.transaction_pass,
             };            
             createLog(createData);
             }
