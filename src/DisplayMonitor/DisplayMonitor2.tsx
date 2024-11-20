@@ -56,16 +56,18 @@ function playSound() {
 
 function useTransactionData(transactionConfigs: {transactionCode: string; windowId: number}[]) {
   const [statuses, setStatuses] = React.useState<Record<string, string>>({});
+  const [windows, setWindows] = React.useState<Record<string, string>>({});
   React.useEffect(() => {
     const interval = setInterval(async () => {
       const newStatuses: Record<string, string> = {};
+      const newWindows: Record<string, string> = {};
       for (const { transactionCode, windowId } of transactionConfigs) {
         try {
           const isOnlineResponse = await axios.get(
             process.env.REACT_APP_OTHER_BACKEND_SERVER + `/window/status/${windowId}`
           );
           newStatuses[transactionCode] = isOnlineResponse.data.window_status; // 'online' or other status
-        
+          newWindows[transactionCode] = isOnlineResponse.data.window_id;
           let queueNumber = '';
           if(transactionCode.startsWith('CSH')) {
             const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/CSH/${transactionCode}`);
@@ -131,15 +133,17 @@ function useTransactionData(transactionConfigs: {transactionCode: string; window
         } catch (error) {
           console.error(`Error fetching transaction status for ${transactionCode}:`, error);
           newStatuses[transactionCode] = 'offline'; // Default to offline on error
+          newWindows[transactionCode] = '0';
         }
       }
       setStatuses(newStatuses);
+      setWindows(newWindows);
     }, 2000);
 
     return () => clearInterval(interval);
   }, [transactionConfigs]);
 
-  return statuses;
+  return { statuses, windows };
 }
 
 export default function DisplayMonitor2() {
@@ -201,11 +205,11 @@ export default function DisplayMonitor2() {
       { transactionCode: 'CSH4', windowId: 17 },
       { transactionCode: 'CSH5', windowId: 18 },
       { transactionCode: 'CSH6', windowId: 19 },
-      { transactionCode: 'CSH7', windowId: 21 },
+      { transactionCode: 'CSH7', windowId: 20 },
       { transactionCode: 'CSH8', windowId: 21 },
     ],
  []);
-    const statuses = useTransactionData(transactionConfigs);
+ const { statuses, windows } = useTransactionData(transactionConfigs);
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -306,7 +310,10 @@ export default function DisplayMonitor2() {
                 }}
               >
                 <Typography component="h1" variant="h4" align="center" fontFamily={"serif"} color={'white'} sx={{ textShadow: '2px 2px 6px rgba(0, 0, 0, 0.5)' }}>
-                {transactionCode?.startsWith('CSH') ? `CASHIER ${cshIndex++}` : `WINDOW ${index + 1}`}
+                {transactionCode.startsWith('CSH') 
+                  ? `CASHIER ${cshIndex++}` 
+                  : `WINDOW ${windows[transactionCode]}`
+                }
                 </Typography>
                 <Typography component="h1" variant="h6" align="center" marginTop={0} marginBottom={0} fontFamily={"serif"} color={'white'} sx={{ textShadow: '2px 2px 6px rgba(0, 0, 0, 0.5)' }}>
                   NOW SERVING

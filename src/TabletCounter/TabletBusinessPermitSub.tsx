@@ -113,7 +113,6 @@ export default function SignIn() {
 
   const isWindowOnline = (id: number) => {
     const window = windows.find((win) => win.window_id === id);
-    console.log(window?.window_status === 'online');
     return window?.window_status === 'online';
   };
 
@@ -122,6 +121,7 @@ export default function SignIn() {
   const isDesktop = useMediaQuery({ query: '(min-width: 1025px)' });
   const isPortrait = useMediaQuery({ query: '(orientation: portrait)' });
 
+  console.log(transactionType)
   return (
     <ThemeProvider theme={defaultTheme}>
       <Container component="main" maxWidth={isMobile ? "xs" : isTablet ? "md" : isDesktop ? "lg" : "lg"}>
@@ -149,24 +149,54 @@ export default function SignIn() {
             <Grid container spacing={2}>
               <Grid item xs={4}>
                 <CustomButton details={transactionType + ' INQUIRY'} destination='/CounterConfirmation' windowId={[1, 2, 3, 4, 5, 6, 13]} disabled={!isWindowOnline(1) && !isWindowOnline(2) && !isWindowOnline(3) && !isWindowOnline(4) && !isWindowOnline(5) && !isWindowOnline(6) && !isWindowOnline(13)}>
-                    INQUIRY
+                  INQUIRY
                 </CustomButton>
               </Grid>
               <Grid item xs={4}>
                 <CustomButton details={transactionType + ' REQUIREMENTS'} destination='/CounterConfirmation' windowId={[1, 2, 3, 4, 5, 6, 13]} disabled={!isWindowOnline(1) && !isWindowOnline(2) && !isWindowOnline(3) && !isWindowOnline(4) && !isWindowOnline(5) && !isWindowOnline(6) && !isWindowOnline(13)}>
-                    PASS REQUIREMENTS
+                  PASS REQUIREMENTS
                 </CustomButton>
               </Grid>
               <Grid item xs={4}>
-                <CustomButton details={transactionType + ' PAYMENT'} destination='/CounterConfirmation' windowId={transactionType === 'DTI' ? [13] : [14, 15]} disabled={!isWindowOnline(transactionType === 'DTI' ? 13 : (isWindowOnline(14) ? 14 : 15))}>
-                    PAYMENT
-                </CustomButton>
+              <CustomButton
+                details={transactionType + ' PAYMENT'}
+                destination='/CounterConfirmation'
+                windowId={
+                    transactionType === 'DTI' ? [13] :
+                    (transactionType === 'WORKING PERMIT' || transactionType === 'MAYOR CLEARANCE') ? [2] :
+                    [14, 15]
+                }
+                disabled={
+                    !isWindowOnline(
+                        transactionType === 'DTI' ? 13 :
+                        (transactionType === 'WORKING PERMIT' || transactionType === 'MAYOR CLEARANCE') ? 2 :
+                        (isWindowOnline(14) ? 14 : 15)
+                    )
+                }
+              >
+                PAYMENT
+              </CustomButton>
               </Grid>
               <Grid item xs={4}/>
               <Grid item xs={4}>
-                <CustomButton details={transactionType + ' CLAIM'} destination='/CounterConfirmation' windowId={transactionType === 'DTI' ? [13] : [7]} disabled={!isWindowOnline(transactionType === 'DTI' ? 13 : 7)}>
-                    CLAIM
-                </CustomButton>
+              <CustomButton
+                details={transactionType + ' CLAIM'}
+                destination='/CounterConfirmation'
+                windowId={
+                    transactionType === 'DTI' ? [13] :
+                    (transactionType === 'WORKING PERMIT' || transactionType === 'MAYOR CLEARANCE') ? [2] :
+                    [7]
+                }
+                disabled={
+                    !isWindowOnline(
+                        transactionType === 'DTI' ? 13 :
+                        (transactionType === 'WORKING PERMIT' || transactionType === 'MAYOR CLEARANCE') ? 2 :
+                        7
+                    )
+                }
+              >
+                CLAIM
+              </CustomButton>
               </Grid>
               <Grid item xs={4}/>
               
