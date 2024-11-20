@@ -69,7 +69,9 @@ function useTransactionData(transactionConfigs: {transactionCode: string; window
           let queueNumber = '';
           if(transactionCode.startsWith('CSH')) {
             const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/CSH/${transactionCode}`);
-            queueNumber = response.data.transaction_ref;
+            queueNumber = response.data.transaction_ref !== null 
+            ? response.data.transaction_ref 
+            : response.data.transactions_queue;
           } else if(transactionCode.startsWith('BPLO3')) {
             const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/${transactionCode}`);
             queueNumber = response.data.transaction_ref !== null 
@@ -181,7 +183,7 @@ export default function DisplayMonitor1() {
       .catch(err => {
         console.log(err);
       })
-    }, 3000);
+    }, 2000);
   }
 
   React.useEffect(() => {

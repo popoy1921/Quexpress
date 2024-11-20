@@ -158,13 +158,13 @@ export default function SignIn() {
                 </CustomButton>
               </Grid>
               <Grid item xs={4}>
-                <CustomButton details={transactionType + ' PAYMENT'} destination='/CounterConfirmation' windowId={[14, 15]} disabled={!isWindowOnline(14) && !isWindowOnline(15)}>
+                <CustomButton details={transactionType + ' PAYMENT'} destination='/CounterConfirmation' windowId={transactionType === 'DTI' ? [13] : [14, 15]} disabled={!isWindowOnline(transactionType === 'DTI' ? 13 : (isWindowOnline(14) ? 14 : 15))}>
                     PAYMENT
                 </CustomButton>
               </Grid>
               <Grid item xs={4}/>
               <Grid item xs={4}>
-                <CustomButton details={transactionType + ' CLAIM'} destination='/CounterConfirmation' windowId={[7]} disabled={!isWindowOnline(7)}>
+                <CustomButton details={transactionType + ' CLAIM'} destination='/CounterConfirmation' windowId={transactionType === 'DTI' ? [13] : [7]} disabled={!isWindowOnline(transactionType === 'DTI' ? 13 : 7)}>
                     CLAIM
                 </CustomButton>
               </Grid>

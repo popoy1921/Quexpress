@@ -1014,7 +1014,7 @@ app.put('/transaction_log/updateBlink/:transactionLogId', async (req, res) => {
     const transactionBlink   = requestBody.blink;
     var queryString = 'UPDATE quexpress.tbl_quexpress_transactions'
       + ' SET blink = $1'
-      + ' where transaction_code = $2'
+      + ' where transaction_code LIKE $2'
       + ' RETURNING *';
     var transactionData = [transactionBlink, transactionLogId];
     const client = await pool.connect();

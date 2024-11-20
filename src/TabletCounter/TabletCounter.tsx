@@ -144,7 +144,7 @@ export default function SignIn() {
                 <CustomButton details={'BUSINESS PERMIT'} destination='/CounterBusinessPermit' windowId={[1, 7]} disabled={!isWindowOnline(1) && !isWindowOnline(7)}>
                 BUSINESS PERMIT
                 </CustomButton>
-                <CustomButton details={'LOCAL CIVIL REGISTRY'} destination='/CounterLocalCivilRegistry' windowId={[8, 9, 10, 11, 13]} disabled={!isWindowOnline(8) && !isWindowOnline(9) && !isWindowOnline(10) && !isWindowOnline(11) && !isWindowOnline(13)}>
+                <CustomButton details={'LOCAL CIVIL REGISTRY'} destination='/CounterLocalCivilRegistry' windowId={[8, 9, 10, 11, 12]} disabled={!isWindowOnline(8) && !isWindowOnline(9) && !isWindowOnline(10) && !isWindowOnline(11)}>
                 LOCAL CIVIL REGISTRY
                 </CustomButton>
                 <CustomButton details={'WORKING PERMIT'} destination='/CounterBusinessPermitSub' windowId={[2]} disabled={!isWindowOnline(2)}>
@@ -156,7 +156,7 @@ export default function SignIn() {
                 <CustomButton details={'DTI'} destination='/CounterBusinessPermitSub' windowId={[13]} disabled={!isWindowOnline(13)}>
                 DTI REGISTRATION
                 </CustomButton>
-                <CustomButton details={'CEDULA'} destination='/CounterConfirmation' windowId={[5, 6]} disabled={!isWindowOnline(5) && !isWindowOnline(6)}>
+                <CustomButton details={'CEDULA'} destination='/CounterConfirmation' windowId={[16, 17]} disabled={!isWindowOnline(16) && !isWindowOnline(17)}>
                 CEDULA
                 </CustomButton>
                 <CustomButton details={'MAYOR CLEARANCE'} destination='/CounterBusinessPermitSub' windowId={[2]} disabled={!isWindowOnline(2)}>

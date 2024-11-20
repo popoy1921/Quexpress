@@ -27,7 +27,7 @@ export default function TransactionControl() {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [nowServing, setNowServing] = useState(localStorage.getItem(transactionCode + 'NowServing') || 'No Available Number');
   const [nowTransactionPass, setnowTransactionPass] = useState(localStorage.getItem('TransactionPass') || null);
-  const [nowServingColor, setNowServingColor] = useState('red'); // Default color
+  const [nowServingColor, setNowServingColor] = useState('black'); // Default color
 
   // Set interval to update accessId
   React.useEffect(() => {
@@ -54,20 +54,6 @@ export default function TransactionControl() {
       }
       const nowTransactionPass = localStorage.getItem('TransactionPass') || null;
       setnowTransactionPass(nowTransactionPass);
-
-      if (accessId === '2') {
-        setNowServingColor('black');
-      } else if (transactionCode === 'CSH1' || transactionCode === 'CSH2' || transactionCode === 'CSH7' || transactionCode === 'CSH8') {
-        if (nowServing !== 'No Available Number') {
-          if (nowTransactionPass === 'toClaim') {
-            setNowServingColor('green');
-          } else if (nowTransactionPass === 'toStop') {
-            setNowServingColor('red'); 
-          }
-        } else {
-          setNowServingColor('black');
-        }
-      }      
     };
 
     updateNowServing(); // Initial update
@@ -447,7 +433,7 @@ export default function TransactionControl() {
           transactionData.transactionQueue = queueNumber;
         }
       }
-  
+      
       await axios.put(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/update`, transactionData)
         .then(async response => {
           var staffIdData = {
@@ -539,7 +525,7 @@ export default function TransactionControl() {
               console.log('No matching transaction code.');
               return; // exit early if no matching code
           }
-  
+          setNowServingColor(transactionPass === 'toClaim' ? 'green' : 'red');
           // Update window data if a transaction code matches
           if (windowData.windowId) {
             await axios.put(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/updateWindow`, windowData);
@@ -557,6 +543,7 @@ export default function TransactionControl() {
       alert('Next Number Unavailable');
       let nowServingContainer = document.getElementById('nowServing') ?? document as any;
       nowServingContainer.innerText = 'No Available Number';
+      setNowServingColor('black');
     }
   
     let nowServingContainer = document.getElementById('nowServing') ?? document as any;
