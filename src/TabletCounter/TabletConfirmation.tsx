@@ -120,26 +120,40 @@ export default function ConfirmQueue() {
     })
   }
 
-  const sendPrintRequest = async (textToPrint: string) => {
+  const sendPrintRequest = async (textToPrint1: string, textToPrint2: string, textToPrint3: string) => {
     try {
-      const response = await fetch(process.env.REACT_APP_OTHER_BACKEND_SERVER + '/api/print', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ textToPrint }),
+      const device = await (navigator as any).bluetooth.requestDevice({
+        acceptAllDevices: true,
+        optionalServices: ['printer_service']
       });
-  
-      const data = await response.json();
-      if (response.ok) {
-        console.log('Print request sent:', data.message);
-      } else {
-        console.error('Error sending print request:', data.error);
-      }
+
+      const server = await device.gatt.connect();
+      console.log('Connected to printer:', device.name);
+
+      // Replace with the correct service and characteristic UUIDs
+      const service = await server.getPrimaryService('printer_service');
+      const characteristic = await service.getCharacteristic('printer_characteristic');
+
+      // ESC/POS command formatting
+      const escposCommands = new Uint8Array([
+        0x1B, 0x40, // Initialize printer
+        0x1B, 0x61, 0x01, // Center align
+        ...new TextEncoder().encode(textToPrint1 + '\n'),
+        0x1B, 0x21, 0x30, // Set quadruple size
+        0x1B, 0x45, 0x01, // Bold
+        ...new TextEncoder().encode(textToPrint2 + '\n'),
+        0x1B, 0x21, 0x00, // Reset size
+        0x1B, 0x45, 0x00, // Disable bold
+        ...new TextEncoder().encode(textToPrint3 + '\n'),
+        0x1D, 0x56, 0x00 // Full cut
+      ]);
+
+      await characteristic.writeValue(escposCommands);
+      console.log('Print request sent successfully');
     } catch (error) {
-      console.error('Network error:', error);
+      console.error('Bluetooth error:', error);
     }
-  };
+  }
 
   const yesButton = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -173,13 +187,11 @@ export default function ConfirmQueue() {
         }
         createLog(transactionData);
         
-        const toPrint = `
-          ${document.querySelector('#TransactionType')?.textContent}\n
-          ${document.querySelector('#QueueNumber')?.textContent}\n
-          ${document.querySelector('#FormattedDate')?.textContent}
-        `;
+        const toPrint1 = `${document.querySelector('#TransactionType')?.textContent}`;
+        const toPrint2 = `${document.querySelector('#QueueNumber')?.textContent}`;
+        const toPrint3 = `${document.querySelector('#FormattedDate')?.textContent}`;
 
-        sendPrintRequest(toPrint);
+        sendPrintRequest(toPrint1, toPrint2, toPrint3);
         navigate("/SignInCustomer");
       })
       .catch(function (error) {

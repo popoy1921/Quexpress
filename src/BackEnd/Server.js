@@ -1054,6 +1054,9 @@ app.use(bodyParser.json());
 function generateOTP() {
   return crypto.randomInt(100000, 999999).toString();
 }
+  const accountSid = process.env.REACT_APP_TWILIO_ACCOUNTSID;
+  const authToken = process.env.REACT_APP_TWILIO_AUTHTOKEN;
+  const verifySid = process.env.REACT_APP_TWILIO_VERIFYSID;
   const client = require("twilio")(accountSid, authToken);
 
   app.post('/send-otp', (req, res) => {
@@ -1110,31 +1113,44 @@ function generateOTP() {
   });
 
 // printer
+// const bluetooth = require('node-bluetooth');
 
-let printQueue = [];
+// const device = new bluetooth.DeviceINQ();
 
-app.post('/api/print', (req, res) => {
-  const { textToPrint } = req.body;
+// device.listPairedDevices((devices) => {
+//   console.log('Paired devices:', devices);
+// });
 
-  if (!textToPrint) {
-    return res.status(400).json({ error: 'textToPrint is required' });
-  }
+// app.post('/api/print', (req, res) => {
+//   const { textToPrint1, textToPrint2, textToPrint3 } = req.body;
+//   const connection = new bluetooth.DeviceINQ();
+//   connection.findSerialPortChannel('Printer-Name', (channel) => {
+//     console.log('Channel found:', channel);
 
-  // Add the print job to the queue
-  printQueue.push({ textToPrint });
-  console.log('Added to print queue:', textToPrint);
+//     const printer = new bluetooth.SerialPort();
+//     printer.connect('Printer-Address', channel, (err) => {
+//       if (err) return console.error('Error connecting:', err);
 
-  res.status(200).json({ message: 'Print job added to queue' });
-});
-
-app.get('/api/print/next', (req, res) => {
-  if (printQueue.length === 0) {
-    return res.status(204).send(); // No Content
-  }
-
-  const nextJob = printQueue.shift(); // Get the next print job
-  res.status(200).json(nextJob);
-});
+//       console.log('Connected to printer!');
+//       const escposCommands = `
+//         \x1B\x40                // Initialize printer
+//         \x1B\x61\x01            // Align center
+//         ${textToPrint1}\x0A     // Print textToPrint1 (normal size, centered)
+//         \x1B\x21\x30            // Set quadruple size (double height + double width)
+//         \x1B\x45\x01            // Enable bold
+//         ${textToPrint2}\x0A     // Print textToPrint2 (quadruple size, bold, centered)
+//         \x1B\x21\x00            // Reset size to normal
+//         \x1B\x45\x00            // Disable bold
+//         ${textToPrint3}\x0A     // Print textToPrint3 (normal size, centered)
+//         \x1D\x56\x00            // Full cut
+//       `;
+//       printer.write(Buffer.from(escposCommands), () => {
+//         console.log('Data sent to printer.');
+//         printer.close();
+//       });
+//     });
+//   });  
+// });
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
