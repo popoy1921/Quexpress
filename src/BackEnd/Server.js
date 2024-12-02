@@ -1055,7 +1055,7 @@ function generateOTP() {
   return crypto.randomInt(100000, 999999).toString();
 }
   const accountSid = process.env.REACT_APP_TWILIO_ACCOUNTSID;
-  const authToken = process.env.REACT_APP_TWILIO_AUTHTOKEN;
+  const authToken = process.env.REACT_APP_TWILIO_TOKEN;
   const verifySid = process.env.REACT_APP_TWILIO_VERIFYSID;
   const client = require("twilio")(accountSid, authToken);
 
