@@ -10,11 +10,11 @@ const PORT = process.env.PORT || 5000;
 const { Pool } = require('pg');
 // Create a new Pool instance with database connection details
 const pool = new Pool({
-    user: 'postgres',
-    host: 'localhost',
-    database: 'QuExpress',
-    password: '497663',
-    port: 5432, // Default PostgreSQL port
+    user: 'postgres.ayhfyztprntbaftgrypt',
+    host: 'aws-0-ap-southeast-1.pooler.supabase.com',
+    database: 'postgres',
+    password: 'mqbOcfznnBdoIudP',
+    port: 6543, 
 });
 
 // Middleware
