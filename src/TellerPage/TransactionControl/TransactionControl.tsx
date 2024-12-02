@@ -427,6 +427,7 @@ export default function TransactionControl() {
             } else {
               transactionData.transactionRef = queueNumber;
               transactionData.forCashier = true;
+              setNowServingColor(transactionPass === 'toClaim' ? 'green' : 'red');
             }
           }
         } else {
@@ -525,7 +526,7 @@ export default function TransactionControl() {
               console.log('No matching transaction code.');
               return; // exit early if no matching code
           }
-          setNowServingColor(transactionPass === 'toClaim' ? 'green' : 'red');
+          
           // Update window data if a transaction code matches
           if (windowData.windowId) {
             await axios.put(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/updateWindow`, windowData);

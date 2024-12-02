@@ -156,7 +156,7 @@ export default function SignIn() {
                 <CustomButton details={'DTI'} destination='/CounterBusinessPermitSub' windowId={[13]} disabled={!isWindowOnline(13)}>
                 DTI REGISTRATION
                 </CustomButton>
-                <CustomButton details={'CEDULA'} destination='/CounterConfirmation' windowId={[16, 17]} disabled={!isWindowOnline(16) && !isWindowOnline(17)}>
+                <CustomButton details={'CEDULA'} destination='/CounterConfirmation' windowId={[18, 19]} disabled={!isWindowOnline(18) && !isWindowOnline(19)}>
                 CEDULA
                 </CustomButton>
                 <CustomButton details={'MAYOR CLEARANCE'} destination='/CounterBusinessPermitSub' windowId={[2]} disabled={!isWindowOnline(2)}>
