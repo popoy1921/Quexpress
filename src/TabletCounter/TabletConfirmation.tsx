@@ -121,44 +121,29 @@ export default function ConfirmQueue() {
   }
 
   const sendPrintRequest = async (textToPrint1: string, textToPrint2: string, textToPrint3: string) => {
-    try {
-      const device = await (navigator as any).bluetooth.requestDevice({
-        acceptAllDevices: true,
-        optionalServices: ['printer_service']
-      });
+    const queryParams = new URLSearchParams({
+      text1: textToPrint1,
+      text2: textToPrint2,
+      text3: textToPrint3,
+    }).toString();
 
-      const server = await device.gatt.connect();
-      console.log('Connected to printer:', device.name);
-
-      // Replace with the correct service and characteristic UUIDs
-      const service = await server.getPrimaryService('printer_service');
-      const characteristic = await service.getCharacteristic('printer_characteristic');
-
-      // ESC/POS command formatting
-      const escposCommands = new Uint8Array([
-        0x1B, 0x40, // Initialize printer
-        0x1B, 0x61, 0x01, // Center align
-        ...new TextEncoder().encode(textToPrint1 + '\n'),
-        0x1B, 0x21, 0x30, // Set quadruple size
-        0x1B, 0x45, 0x01, // Bold
-        ...new TextEncoder().encode(textToPrint2 + '\n'),
-        0x1B, 0x21, 0x00, // Reset size
-        0x1B, 0x45, 0x00, // Disable bold
-        ...new TextEncoder().encode(textToPrint3 + '\n'),
-        0x1D, 0x56, 0x00 // Full cut
-      ]);
-
-      await characteristic.writeValue(escposCommands);
-      console.log('Print request sent successfully');
-    } catch (error) {
-      console.error('Bluetooth error:', error);
-    }
+    const responseUrl = process.env.REACT_APP_OTHER_BACKEND_SERVER + `/print?${queryParams}`; 
+    const printLink = `my.bluetoothprint.scheme://${responseUrl}`;
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = printLink;
+  
+    document.body.appendChild(iframe);
+  
+    setTimeout(() => {
+      document.body.removeChild(iframe); // Clean up
+      navigate("/SignInCustomer");
+    }, 5000); // Adjust delay as needed
   }
 
   const yesButton = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    console.log(transactionType)
+
     const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transactions/get/${transactionType}`)
     .then(async function (response) {
       
@@ -192,7 +177,7 @@ export default function ConfirmQueue() {
         const toPrint3 = `${document.querySelector('#FormattedDate')?.textContent}`;
 
         sendPrintRequest(toPrint1, toPrint2, toPrint3);
-        navigate("/SignInCustomer");
+        
       })
       .catch(function (error) {
         alert(' ' + error);

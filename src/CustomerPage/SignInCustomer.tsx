@@ -165,6 +165,7 @@ const defaultTheme = createTheme({
 });
 
 const SignIn: React.FC = () => {
+  
   const [accountId, setAccountId] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
@@ -185,7 +186,9 @@ const SignIn: React.FC = () => {
       const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/customer/get/${accountId}`)
       .then(async function (response) {
         console.log(response.data)
+        console.log(accountId)
         if(response.data.account_id === accountId){
+          console.log(1)
           localStorage.setItem('AccountId', response.data.account_id);
           localStorage.setItem('UserFirstName', response.data.customer_first_name);
           localStorage.setItem('UserLastName', response.data.customer_last_name);
@@ -193,6 +196,7 @@ const SignIn: React.FC = () => {
           localStorage.setItem('UserID', response.data.customer_id);
           navigate('/CounterTablet');
         }
+        console.log(2)
       })
       .catch(function (error) {
         setErrorMessage('Invalid Account ID');

@@ -37,11 +37,6 @@
   }
 }
 
-/* @page{
-  size: 80mm 80mm;
-  margin:0;
-} */
-
 .WebContainer{
   width: 100%;
   height: auto;
@@ -78,4 +73,10 @@
 
 .hiddenColumn {
   display: none !important; /* or use visibility: hidden; to hide the content but maintain layout space */
+}
+
+@media print {
+  body {
+    width: 48mm;
+  }
 }

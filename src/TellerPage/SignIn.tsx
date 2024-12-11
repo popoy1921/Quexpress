@@ -157,7 +157,6 @@ const SignIn: React.FC = () => {
     const updateWindow = async () => {
       if (windowId) {
         await axios.get(`${process.env.REACT_APP_OTHER_BACKEND_SERVER}/window/updateOffline/${windowId}`);
-        console.log(windowId);
         localStorage.removeItem('UserEmail');
       } else {
         localStorage.removeItem('UserEmail');
@@ -179,7 +178,7 @@ const SignIn: React.FC = () => {
         return;
       }
       await axios.get(`${process.env.REACT_APP_OTHER_BACKEND_SERVER}/window/updateOnline/${user.window_id}`);
-      grantAccess(user, user.window_desc);
+      grantAccess(user, user.tbl_quexpress_window.window_desc);
       resetCountersIfNewDay();
     } catch (error) {
       setErrorMessage('Server Error');
