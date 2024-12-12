@@ -442,153 +442,32 @@ app.get('/transaction_log/get/:transactionCode', async (req, res) => {
   const transactionCode = req.params.transactionCode + '%';
 
   try {
-    const { data, error } = await supabase.rpc('transaction_log_query', {
-      transaction_code: transactionCode,
-    });
-
+    const { data, error } = await supabase.rpc('get_monitor_transaction_log', { transaction_code: transactionCode });
     if (error) {
-      console.log(data)
-      console.error('Supabase query error:', error);
-      return res.status(500).send('Server Error');
+      throw error;
     }
 
-    if (!data || data.length === 0) {
-      return res.json("Hello"); // Respond with `undefined` for null or no data
+    res.json(data);
+    } catch (err) {
+      console.error(err);
+      res.status(500).send('Server Error');
     }
-      
-    res.json(data[0]);
-    
-  } catch (err) {
-    console.error('Unexpected error:', err);
-    res.status(500).send('Server Error');
-  }
 });
 
 app.get('/transaction_log/CSH/:transactionCode', async (req, res) => {
   const transactionCode = req.params.transactionCode;
 
   try {
-    let query = supabase
-      .from('tbl_quexpress_transaction_log')
-      .select('*')
-      .gte('transaction_datetime', new Date().toISOString().split('T')[0])
-      .not('transaction_status', 'is', null);
-
-    // Conditional query based on transactionCode
-    if (transactionCode === 'CSH1') {
-      query = query
-        .or(
-          `(
-            (transaction_ref.ilike.BP% OR
-             transaction_ref.ilike.MY% OR
-             transaction_ref.ilike.WP% OR
-             transaction_ref.ilike.BS% OR
-             transaction_ref.ilike.BB% OR
-             transaction_ref.ilike.BZ% OR
-             transaction_ref.ilike.BF% OR
-             transaction_ref.ilike.PO%) 
-            AND transactions_queue.ilike.CSH%)
-           OR transactions_queue.ilike.BPP% OR
-           transactions_queue.ilike.POP% OR
-           transactions_queue.ilike.MYP% OR
-           transactions_queue.ilike.WPP% OR
-           transactions_queue.ilike.BSP% OR
-           transactions_queue.ilike.BBP% OR
-           transactions_queue.ilike.BZP% OR
-           transactions_queue.ilike.BFP%`
-        )
-        .eq('window_id', 14);
-    } else if (transactionCode === 'CSH2') {
-      query = query
-        .or(
-          `(
-            (transaction_ref.ilike.BP% OR
-             transaction_ref.ilike.MY% OR
-             transaction_ref.ilike.WP% OR
-             transaction_ref.ilike.BS% OR
-             transaction_ref.ilike.BB% OR
-             transaction_ref.ilike.BZ% OR
-             transaction_ref.ilike.BF% OR
-             transaction_ref.ilike.PO%) 
-            AND transactions_queue.ilike.CSH%)
-           OR transactions_queue.ilike.BPP% OR
-           transactions_queue.ilike.POP% OR
-           transactions_queue.ilike.MYP% OR
-           transactions_queue.ilike.WPP% OR
-           transactions_queue.ilike.BSP% OR
-           transactions_queue.ilike.BBP% OR
-           transactions_queue.ilike.BZP% OR
-           transactions_queue.ilike.BFP%`
-        )
-        .eq('window_id', 15);
-    } else if (transactionCode === 'CSH3') {
-      query = query.ilike('transactions_queue', 'RPT%')
-      .eq('window_id', 16);
-    } else if (transactionCode === 'CSH4') {
-      query = query.ilike('transactions_queue', 'RPT%')
-      .eq('window_id', 17);
-    } else if (transactionCode === 'CSH5') {
-      query = query.or(
-        'transactions_queue.ilike.CDL%,' +
-        'transactions_queue.ilike.RTP%'
-      )
-      .eq('window_id', 18);
-    } else if (transactionCode === 'CSH6') {
-      query = query.or(
-        'transactions_queue.ilike.CDL%,' +
-        'transactions_queue.ilike.RTP%'
-      )
-      .eq('window_id', 19);
-    } else if (transactionCode === 'CSH7') {
-      query = query.or(
-        `
-        transaction_ref.ilike.LC% OR
-        transaction_ref.ilike.LB% OR
-        transaction_ref.ilike.LD% OR
-        transaction_ref.ilike.LM% OR
-        transactions_queue.ilike.VLP% OR
-        transactions_queue.ilike.OTP% OR
-        transactions_queue.ilike.LBP% OR
-        transactions_queue.ilike.LDP% OR
-        transactions_queue.ilike.LMP% OR
-        transactions_queue.ilike.LCP%
-        `
-      )
-      .eq('window_id', 20);
-    } else if (transactionCode === 'CSH8') {
-      query = query.or(
-        `
-        transaction_ref.ilike.LC% OR
-        transaction_ref.ilike.LB% OR
-        transaction_ref.ilike.LD% OR
-        transaction_ref.ilike.LM% OR
-        transactions_queue.ilike.VLP% OR
-        transactions_queue.ilike.OTP% OR
-        transactions_queue.ilike.LBP% OR
-        transactions_queue.ilike.LDP% OR
-        transactions_queue.ilike.LMP% OR
-        transactions_queue.ilike.LCP%
-        `
-      )
-      .eq('window_id', 21);
-    }
-
-    // Apply ordering and limit
-    query = query.order('transaction_log_id', { ascending: false }).limit(1);
-
-    // Execute the query
-    const { data, error } = await query;
-
+    const { data, error } = await supabase.rpc('get_monitor_csh_transaction_log', { transaction_code: transactionCode });
     if (error) {
-      console.error('Supabase query error:', error);
-      return res.status(500).send('Server Error');
+      throw error;
     }
 
-    res.json(data[0] || undefined);
-  } catch (err) {
-    console.error('Unexpected error:', err);
-    res.status(500).send('Server Error');
-  }
+    res.json(data);
+    } catch (err) {
+      console.error(err);
+      res.status(500).send('Server Error');
+    }
 });
 
 app.get('/transaction_log/get', async (req, res) => {
@@ -686,199 +565,27 @@ app.get('/transaction_log/get_count', async (req, res) => {
   }
 });
 
-
 // Route for Displaying QueueNumber
 app.get('/transaction_log/get/:transactionCode/:transactionStatus', async (req, res) => {
   const { transactionCode, transactionStatus } = req.params;
 
   try {
-    let filters = [
-      { transaction_datetime: { gte: new Date().toISOString().split('T')[0] } } // Filter by today's date
-    ];
-
-    let transactionQueueCondition = '';
-    let statusCondition = '';
-
-    if (transactionStatus === 'toQueue') {
-      statusCondition = { transaction_status: { is: null } };
-    } else if (transactionStatus === 'notForQueue') {
-      statusCondition = { transaction_status: { not: null } };
-    }
-
-    // Define the queue patterns based on transactionCode
-    switch (transactionCode) {
-      case 'BPLO1':
-        transactionQueueCondition = {
-          transactions_queue: {
-            ilike: ['BPI%', 'BPN%', 'BPR%', 'BPC%', 'POI%', 'POR%']
-          }
-        };
-        break;
-      case 'BPLO2':
-        transactionQueueCondition = {
-          transactions_queue: {
-            ilike: ['MYI%', 'MYR%', 'MYT%', 'WPI%', 'WPR%', 'WPT%']
-          },
-          transaction_ref: {
-            ilike: ['MY%', 'WP%']
-          }
-        };
-        filters.push({
-          transactions_queue: {
-            ilike: 'BTC%'
-          }
-        });
-        break;
-      case 'BPLO3':
-        transactionQueueCondition = {
-          transactions_queue: {
-            ilike: ['BPT%', 'BST%', 'BBT%', 'BZT%', 'BFT%', 'POT%']
-          },
-          transaction_ref: {
-            ilike: ['BS%', 'BB%', 'BZ%', 'BF%', 'BP%', 'PO%']
-          }      
-        };
-        filters.push({
-          transactions_queue: {
-            ilike: 'BTC%'
-          }
-        });
-        break;
-      case 'DTIM':
-        transactionQueueCondition = {
-          transactions_queue: {
-            ilike: ['DTI%', 'DTR%', 'DTP%', 'DTT%']
-          }
-        };
-        break;
-      case 'BPS':
-        transactionQueueCondition = {
-          transactions_queue: {
-            ilike: ['BSI%', 'BSR%']
-          }
-        };
-        break;
-      case 'BPB':
-        transactionQueueCondition = {
-          transactions_queue: {
-            ilike: ['BBI%', 'BBR%']
-          }
-        };
-        break;
-      case 'BPZ':
-        transactionQueueCondition = {
-          transactions_queue: {
-            ilike: ['BZI%', 'BZR%']
-          }
-        };
-        break;
-      case 'BPF':
-        transactionQueueCondition = {
-          transactions_queue: {
-            ilike: ['BFI%', 'BFR%']
-          }
-        };
-        break;
-      case 'LBC':
-        transactionQueueCondition = {
-          transactions_queue: {
-            ilike: ['LBI%', 'LBR%']
-          }
-        };
-        break;
-      case 'LDC':
-        transactionQueueCondition = {
-          transactions_queue: {
-            ilike: ['LDI%', 'LDR%']
-          }
-        };
-        break;
-      case 'LMC':
-        transactionQueueCondition = {
-          transactions_queue: {
-            ilike: ['LMI%', 'LMR%']
-          }
-        };
-        break;
-      case 'LCC':
-        transactionQueueCondition = {
-          transactions_queue: {
-            ilike: ['LCB%', 'LCD%', 'LCM%']
-          }
-        };
-        break;
-      case 'LCRT':
-        transactionQueueCondition = {
-          transactions_queue: {
-            ilike: ['LCT%', 'LBT%', 'LDT%', 'LMT%', 'LTC%']
-          }
-        };
-        break;
-      case 'CSH1':
-      case 'CSH2':
-        transactionQueueCondition = {
-          transactions_queue: {
-            ilike: ['CSH%']
-          },
-          transaction_ref: {
-            ilike: ['BP%', 'MY%', 'WP%', 'BS%', 'BB%', 'BZ%', 'BF%', 'PO%']
-          }
-        };
-        break;
-      case 'CSH3':
-      case 'CSH4':
-        transactionQueueCondition = {
-          transactions_queue: {
-            ilike: ['RPT%']
-          }
-        };
-        break;
-      case 'CSH5':
-      case 'CSH6':
-        transactionQueueCondition = {
-          transactions_queue: {
-            ilike: ['CDL%', 'RTP%']
-          }
-        };
-        break;
-      case 'CSH7':
-      case 'CSH8':
-        transactionQueueCondition = {
-          transactions_queue: {
-            ilike: ['CSH%']
-          },
-          transaction_ref: {
-            ilike: ['LC%', 'LB%', 'LD%', 'LM%', 'VLP%', 'OTP%', 'LBP%', 'LDP%', 'LMP%', 'LCP%']
-          }
-        };
-        break;
-      default:
-        transactionQueueCondition = {
-          transactions_queue: {
-            ilike: `${transactionCode}%`
-          }
-        };
-        break;
-    }
-
-    // Query Supabase with filters
     const { data, error } = await supabase
-      .from('tbl_quexpress_transaction_log')
-      .select('*')
-      .match(transactionQueueCondition)
-      .filter('transaction_datetime', 'gte', new Date().toISOString().split('T')[0])
-      .filter('transaction_status', statusCondition)
-      .order('transaction_log_id', { ascending: false });
+      .rpc('get_account_transaction_log', {
+        r_transaction_code: transactionCode,
+        r_transaction_status: transactionStatus,
+      })
+      .select('*');
 
     if (error) {
-      console.error('Supabase error:', error);
-      return res.status(400).json({ error: error.message });
+      console.error(error);
+      res.status(500).json({ message: 'Error fetching transaction log' });
+    } else {
+      res.json(data);
     }
-
-    res.status(200).json(data);
   } catch (err) {
-    console.error('Server error:', err);
-    res.status(500).send('Server Error');
+    console.error(err);
+    res.status(500).json({ message: 'Error fetching transaction log' });
   }
 });
 
@@ -976,109 +683,109 @@ app.get('/transaction_log/admin/:windowId', async (req, res) => {
   }
 });
 
-// Route to update status and end time
+// Route to update transaction log
 app.put('/transaction_log/update', async (req, res) => {
   const transactionData = req.body;
   const transactionLogId = transactionData.transactionLogId;
   const transactionQueue = transactionData.transactionQueue;
   const status = transactionData.status;
-  const transactionRef = transactionData.transactionRef ?? null; 
+  const transactionRef = transactionData.transactionRef ?? null;
   const transactionEndTime = transactionData.transactionEndTime ?? null;
   const transactionStartTime = transactionData.transactionStartTime ?? null;
   const forClaim = transactionData.forClaim ?? null;
   const forCashier = transactionData.forCashier ?? null;
 
   try {
-    let query = supabase
-      .from('tbl_quexpress_transaction_log')
-      .update({ transaction_status: status })
-      .eq('transaction_datetime', '>= CURRENT_DATE');
+    let data = { transaction_status: status };
 
     if (transactionStartTime !== null) {
-      query = query.update({ transaction_starttime: transactionStartTime });
-    } else if (transactionEndTime !== null) {
-      query = query.update({ transaction_endtime: transactionEndTime });
+      data.transaction_starttime = transactionStartTime;
+    } else {
+      data.transaction_endtime = transactionEndTime;
     }
 
+    let filter = {};
+
     if (transactionRef) {
-      query = query.eq('transaction_ref', transactionRef);
+      filter.transaction_ref = { eq: transactionRef };
     } else {
-      query = query.eq('transactions_queue', transactionQueue);
+      filter.transactions_queue = { eq: transactionQueue };
     }
 
     if (transactionLogId) {
-      query = query.eq('transaction_log_id', transactionLogId);
+      filter.transaction_log_id = { eq: transactionLogId };
+      filter.transaction_datetime = { gte: new Date().toISOString().split('T')[0] };
     }
 
     if (forClaim === true) {
-      query = query.not('transactions_queue', 'like', 'CSH%');
+      filter.transactions_queue = { not_ilike: 'CSH%' };
     }
-
     if (forCashier === true) {
-      query = query.like('transactions_queue', 'CSH%');
+      filter.transactions_queue = { ilike: 'CSH%' };
     }
 
-    const { data, error } = await query.select('*').single();
+    const { data: result, error } = await supabase
+      .from('quexpress_transaction_log')
+      .update(data)
+      .match(filter)
+      .select('*')
+      .single();
 
     if (error) {
-      console.error(error);
-      return res.status(500).send('Database Error: ' + error.message);
+      throw error;
     }
 
-    res.json(data);
+    res.json(result);
   } catch (err) {
     console.error(err);
     res.status(500).send('Server Error');
   }
 });
 
-
-// Route to update staff id 
+// Route to update staff id
 app.put('/transaction_log/updateStaff', async (req, res) => {
   const transactionData = req.body;
   const transactionLogId = transactionData.transactionLogId;
   const staffId = transactionData.staffId;
 
   try {
-    const { data, error } = await supabase
-      .from('tbl_quexpress_transaction_log')
+    const { data: result, error } = await supabase
+      .from('quexpress_transaction_log')
       .update({ staff_id: staffId })
-      .eq('transaction_log_id', transactionLogId)
+      .match({ transaction_log_id: transactionLogId })
       .select('*')
       .single();
 
     if (error) {
-      console.error(error);
-      return res.status(500).send('Database Error: ' + error.message);
+      throw error;
     }
 
-    res.json(data);
+    res.json(result);
   } catch (err) {
     console.error(err);
     res.status(500).send('Server Error');
   }
 });
 
-
+// Route to update window id
 app.put('/transaction_log/updateWindow', async (req, res) => {
   const transactionData = req.body;
   const transactionLogId = transactionData.transactionLogId;
   const windowId = transactionData.windowId;
 
   try {
-    const { data, error } = await supabase
-      .from('tbl_quexpress_transaction_log')
+    const { data: result, error } = await supabase
+      .from('quexpress_transaction_log')
       .update({ window_id: windowId })
-      .eq('transaction_log_id', transactionLogId)
+      .match({ transaction_log_id: transactionLogId })
       .select('*')
       .single();
 
     if (error) {
-      console.error(error);
-      return res.status(500).send('Database Error: ' + error.message);
+      throw error;
     }
 
-    res.json(data);
+    res.json(result);
   } catch (err) {
     console.error(err);
     res.status(500).send('Server Error');
@@ -1234,26 +941,24 @@ app.put('/transaction_log/updateBlink/:transactionLogId', async (req, res) => {
 // Route for transaction types blink status
 app.get('/transactions/getBlink/:transactionCode', async (req, res) => {
   const transactionCode = req.params.transactionCode;
-
+  console.log(transactionCode)
   try {
+    // Query the Supabase database
     const { data, error } = await supabase
-      .from('tbl_quexpress_transactions')
+      .from('tbl_quexpress_transactions') // Replace with your table name
       .select('*')
       .eq('transaction_code', transactionCode)
-      .single();
+      .single(); // Use .single() to get a single row
 
     if (error) {
-      console.error('Supabase error:', error);
-      return res.status(500).send('Failed to fetch transaction.');
+      console.error(error);
+      return res.status(500).send('Server Error');
     }
 
-    if (!data) {
-      return res.status(404).send('Transaction not found.');
-    }
-
+    // Send the response
     res.json(data);
   } catch (err) {
-    console.error('Server error:', err);
+    console.error(err);
     res.status(500).send('Server Error');
   }
 });
