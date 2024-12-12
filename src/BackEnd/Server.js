@@ -1090,7 +1090,7 @@ app.put('/transaction_log/updateWindow', async (req, res) => {
 // Set up multer storage for file uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/'); // Ensure this directory exists
+    cb(null, '../../public/uploads/'); // Ensure this directory exists
   },
   filename: (req, file, cb) => {
     cb(null, Date.now() + path.extname(file.originalname)); // Append timestamp to file name
