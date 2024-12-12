@@ -10,9 +10,11 @@
 
 # production
 /build
+/public
 
 # uploads
 /src/BackEnd/uploads
+/public/uploads
 
 # misc
 .DS_Store

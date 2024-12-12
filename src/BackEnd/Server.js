@@ -794,10 +794,13 @@ app.put('/transaction_log/updateWindow', async (req, res) => {
 
 // Route to admin dashboard
 
+// Route to admin dashboard
+
 // Set up multer storage for file uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/'); // Ensure this directory exists
+    // cb(null, 'uploads/'); // Ensure this directory exists
+    cb(null, '../../public/uploads/'); // Ensure this directory exists
   },
   filename: (req, file, cb) => {
     cb(null, Date.now() + path.extname(file.originalname)); // Append timestamp to file name
@@ -811,11 +814,10 @@ const upload = multer({ storage });
 const uploadsDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir);
-  
 }
 
 // Serve uploaded files
-app.use('/uploads', express.static(uploadsDir));
+app.use('../../public/uploads/', express.static(uploadsDir));
 
 // Route for video ads upload
 app.put('/users/updateAdvertisement', upload.single('file'), async (req, res) => {
