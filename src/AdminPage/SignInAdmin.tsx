@@ -66,10 +66,7 @@ const SignIn: React.FC = () => {
     e.preventDefault();
 
       // Send a request to your backend to retrieve user info based on the email
-      // For Servered API
-      // const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/users/get/${email}`) 
-      // For Vercel API
-      const response = await axios.get(`api` + `/users/get/${email}`)
+      const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/users/get/${email}`)
       .then(async function (response) {
         console.log(response.data);
         const isMatch = await comparePasswords(password, response.data.user_pass);
