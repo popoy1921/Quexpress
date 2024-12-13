@@ -102,7 +102,6 @@ export default function TransactionControl() {
     let transactionQueue = localStorage.getItem(transactionCode + 'NowServing');
     let isTransactionRef = localStorage.getItem('IsTransactionRef');
     let transactionData: any = {};
-    console.log(isTransactionRef)
     
     if (!transactionData.transactionRef) {
       if (accessId === '2') {
@@ -159,11 +158,13 @@ export default function TransactionControl() {
     console.log(params)
     await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get_count?${params}`)
       .then(async response2 => {
-      console.log(response2.data[0].finalcount);
-      if(response2.data[0].finalcount <= 2){
-        await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get?${params}`)
+        let transactionCount = parseInt(response2.data);
+        console.log(transactionCount)
+      if(transactionCount <= 2){
+        await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get_ref/${transactionData.transactionQueue ?? transactionData.transactionRef}`)
           .then(async response => {
-            var responseData = response.data[0];
+            console.log(1)
+            var responseData = response.data;
             const createData = {
               transactionId: responseData.transaction_id,
               customerId: responseData.customer_id,
@@ -259,12 +260,12 @@ export default function TransactionControl() {
       .then(async response => {
         var staffIdData = {
           staffId: localStorage.getItem('UserID'),
-          transactionLogId: response.data.transaction_log_id,
+          transactionLogId: transactionLogId,
         };
         await axios.put(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/updateStaff`, staffIdData);
         
         var windowData: any = {
-          transactionLogId: response.data.transaction_log_id,
+          transactionLogId: transactionLogId,
         };
         switch (transactionCode) {
           case 'BPLO1':
@@ -434,17 +435,17 @@ export default function TransactionControl() {
           transactionData.transactionQueue = queueNumber;
         }
       }
-      
+      console.log(transactionData)
       await axios.put(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/update`, transactionData)
         .then(async response => {
           var staffIdData = {
             staffId: localStorage.getItem('UserID'),
-            transactionLogId: response.data.transaction_log_id,
+            transactionLogId: transactionLogId,
           };
           await axios.put(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/updateStaff`, staffIdData);
   
           var windowData: any = {
-            transactionLogId: response.data.transaction_log_id,
+            transactionLogId: transactionLogId,
           };  
           switch (transactionCode) {
             case 'BPLO1':
@@ -580,8 +581,10 @@ export default function TransactionControl() {
   };
 
   async function toCashier(transactionRef: string, passTo: string) {
-    await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/${transactionRef}`)
+    console.log(transactionRef)
+    await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get_ref/${transactionRef}`)
       .then(async function (response) {
+        console.log(response)
         const currentDate = localStorage.getItem('currentDate');
         const dateToday = format(new Date(), "yyyy-MM-dd");
         // reset counters
@@ -642,7 +645,7 @@ export default function TransactionControl() {
   }
 
   async function toClaim(transactionRef: string) {
-    await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/${transactionRef}`)
+    await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get_ref/${transactionRef}`)
       .then(async function (response) {
         const currentDate = localStorage.getItem('currentDate');
         const dateToday = format(new Date(), "yyyy-MM-dd");

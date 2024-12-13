@@ -71,6 +71,7 @@ function useTransactionData(transactionConfigs: {transactionCode: string; window
           let queueNumber = '';
           if(transactionCode.startsWith('BPLO3')) {
             const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/${transactionCode}`);
+            alert(response.data)
             queueNumber = response.data.transaction_ref !== null 
             ? response.data.transaction_ref 
             : response.data.transactions_queue;
@@ -79,16 +80,11 @@ function useTransactionData(transactionConfigs: {transactionCode: string; window
             queueNumber = response.data.transaction_ref !== null 
             ? response.data.transaction_ref 
             : response.data.transactions_queue;
-          } else if(transactionCode.startsWith('LCRT')) {
-            const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/${transactionCode}`);
-            queueNumber = response.data.transaction_ref !== null 
-            ? response.data.transaction_ref 
-            : response.data.transactions_queue;
           } else {
             const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/${transactionCode}`);
             queueNumber = response.data.transactions_queue;
           }  
-
+          
           const nowServingContainer = document.getElementById('NowServing' + transactionCode);
           if (nowServingContainer) {
             // const blinkResponse = await axios.get(
@@ -114,15 +110,15 @@ function useTransactionData(transactionConfigs: {transactionCode: string; window
             
             if (isOnlineResponse.data.window_status === 'online') {
               if (queueNumber === undefined) {
-                nowServingContainer.innerText = transactionCode + '00000';
+                nowServingContainer.innerText = transactionCode;
                 nowServingContainer.style.opacity = '0';
               } else {
                 nowServingContainer.innerText = queueNumber;
-                nowServingContainer.style.opacity = '1';
+                nowServingContainer.style.opacity = 'initial';
               }
             } else {
               nowServingContainer.innerText = 'Not Available';
-              nowServingContainer.style.opacity = '1';
+              nowServingContainer.style.opacity = 'initial';
             }
           }
         } catch (error) {

@@ -79,11 +79,6 @@ function useTransactionData(transactionConfigs: {transactionCode: string; window
             queueNumber = response.data.transaction_ref !== null 
             ? response.data.transaction_ref 
             : response.data.transactions_queue;
-          } else if(transactionCode.startsWith('BPLO2')) {
-            const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/${transactionCode}`);
-            queueNumber = response.data.transaction_ref !== null 
-            ? response.data.transaction_ref 
-            : response.data.transactions_queue;
           } else if(transactionCode.startsWith('LCRT')) {
             const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/${transactionCode}`);
             queueNumber = response.data.transaction_ref !== null 
@@ -95,39 +90,39 @@ function useTransactionData(transactionConfigs: {transactionCode: string; window
           }     
 
           const nowServingContainer = document.getElementById('NowServing' + transactionCode);
-          if (nowServingContainer && queueNumber) {
-            const blinkResponse = await axios.get(
-              process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transactions/getBlink/${queueNumber}`
-            );
-            if (blinkResponse.data['blink'] === 1) {
-              nowServingContainer.innerText = queueNumber;
-              playSound();
-              nowServingContainer.classList.add('animate');
+          if (nowServingContainer) {
+            // const blinkResponse = await axios.get(
+            //   process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transactions/getBlink/${transactionCode}`
+            // );
+            // if (blinkResponse.data['blink'] === 1) {
+            //   nowServingContainer.innerText = queueNumber;
+            //   playSound();
+            //   nowServingContainer.classList.add('animate');
 
-              setTimeout(async () => {
-                await axios.put(
-                  process.env.REACT_APP_OTHER_BACKEND_SERVER +
-                    `/transaction_log/updateBlink/` +
-                    queueNumber,
-                  { blink: 0 }
-                );
-                if (nowServingContainer) {
-                  nowServingContainer.classList.remove('animate');
-                }
-              }, 2000);
-            } 
+            //   setTimeout(async () => {
+            //     await axios.put(
+            //       process.env.REACT_APP_OTHER_BACKEND_SERVER +
+            //         `/transaction_log/updateBlink/` +
+            //         transactionCode,
+            //       { blink: 0 }
+            //     );
+            //     if (nowServingContainer) {
+            //       nowServingContainer.classList.remove('animate');
+            //     }
+            //   }, 2000);
+            // } 
             
             if (isOnlineResponse.data.window_status === 'online') {
               if (queueNumber === undefined) {
-                nowServingContainer.innerText = transactionCode + '00000';
+                nowServingContainer.innerText = transactionCode;
                 nowServingContainer.style.opacity = '0';
               } else {
                 nowServingContainer.innerText = queueNumber;
-                nowServingContainer.style.opacity = '1';
+                nowServingContainer.style.opacity = 'initial';
               }
             } else {
               nowServingContainer.innerText = 'Not Available';
-              nowServingContainer.style.opacity = '1';
+              nowServingContainer.style.opacity = 'initial';
             }
           }
         } catch (error) {

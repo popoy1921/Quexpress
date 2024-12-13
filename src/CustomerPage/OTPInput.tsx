@@ -18,6 +18,8 @@ const OTPInput: React.FC<OTPInputProps> = ({ length, onChange }) => {
   const [otp, setOtp] = useState<string[]>(new Array(length).fill(''));
 
   const handleChange = (value: string, index: number) => {
+    if (!/^\d*$/.test(value)) return; // Allow only numeric input
+
     const newOtp = [...otp];
     newOtp[index] = value;
 
@@ -59,7 +61,7 @@ const OTPInput: React.FC<OTPInputProps> = ({ length, onChange }) => {
               value={digit}
               onChange={(e) => handleChange(e.target.value, index)}
               onFocus={(e) => e.target.select()}
-              inputProps={{ maxLength: 1, style: { textAlign: 'center', fontSize: '24px', color: green[700], width: 15 } }}
+              inputProps={{ maxLength: 1, style: { textAlign: 'center', fontSize: '24px', color: green[700], width: 15}, inputMode: 'numeric', type: 'tel', pattern: '[0-9]', }}
               variant="outlined"
               size="small"
               color="primary" // Apply green color to border and focus
