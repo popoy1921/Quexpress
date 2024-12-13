@@ -57,13 +57,15 @@ export default function BasicTable() {
                 <Table sx={{ minWidth: 650 }} aria-label="simple table" id="QueueTable">
                   <TableHead>
                     <TableRow>
-                      <TableCell className='hiddenColumn'>Transaction ID</TableCell>
+                      <TableCell className='hiddenColumn'>Transaction Log ID</TableCell>
+                      <TableCell className='hiddenColumn'>Transaction ID</TableCell>                      
                       <TableCell>Queue Number</TableCell>
                       <TableCell>Customer Account Number</TableCell>
                       <TableCell>Transaction</TableCell>
                       <TableCell>Customer Name</TableCell>
                       <TableCell className='hiddenColumn'>Status</TableCell>
                       <TableCell className='hiddenColumn'>Claim Status</TableCell>
+                      <TableCell id ='curentTransactionId' className='hiddenColumn'>Current Transaction ID</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -71,6 +73,9 @@ export default function BasicTable() {
                       <TableRow key={index}>
                         <TableCell className='hiddenColumn'>
                           {element.transaction_log_id}
+                        </TableCell>
+                        <TableCell className='hiddenColumn'>
+                          {element.transaction_id}
                         </TableCell>
                         <TableCell>
                           {localStorage.getItem('AccessId') === '3' ? (
@@ -100,7 +105,7 @@ export default function BasicTable() {
                             : null }
                         </TableCell>
                         <TableCell className='hiddenColumn'>{element.transaction_pass}</TableCell>
-                        
+                        <TableCell className='hiddenColumn'></TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

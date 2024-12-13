@@ -63,8 +63,8 @@ export default function TransactionControl() {
   }, [transactionCode]);
 
   async function updateForMonitorBlink() {
-    let transactionId = localStorage.getItem('transactionId') as string;
-    await axios.put(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/updateBlink/` + transactionId, { 'blink': 1 });
+    let TransactionID = localStorage.getItem('TransactionID') as string;
+    await axios.put(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/updateBlink/` + TransactionID, { 'blink': 1 });
   }
 
   function nextNumber(event: any) {
@@ -374,15 +374,21 @@ export default function TransactionControl() {
     let rows = tableQueueBody.getElementsByTagName("tr");
     let queueNumber = '';
     let transactionLogId = '';
+    let transactionId = '';
     let isTransactionRef = '';
     let transactionPass = '';
   
     if (rows.length > 0) {
       // move next number to on going
-      queueNumber = rows[0].getElementsByTagName("td")[1].innerText;
+      queueNumber = rows[0].getElementsByTagName("td")[2].innerText;
       transactionLogId = rows[0].getElementsByTagName("td")[0].innerHTML;
-      isTransactionRef = rows[0].getElementsByTagName("td")[5].innerHTML;
-      transactionPass  = rows[0].getElementsByTagName("td")[6].innerHTML;
+      transactionId    = rows[0].getElementsByTagName("td")[1].innerHTML;
+      let currentTransactionId = document.getElementById('curentTransactionId');
+      if (currentTransactionId) {
+        currentTransactionId.innerHTML = transactionId;
+      }
+      isTransactionRef = rows[0].getElementsByTagName("td")[6].innerHTML;
+      transactionPass  = rows[0].getElementsByTagName("td")[7].innerHTML;
       let transactionData: any = {
         transactionLogId: transactionLogId,
         transactionStartTime: format(date, 'HH:mm:ss'),
@@ -554,6 +560,7 @@ export default function TransactionControl() {
       localStorage.setItem(transactionCode + 'NowServing', nowServingContainer.innerText);
       localStorage.setItem('IsTransactionRef', isTransactionRef);
       localStorage.setItem('TransactionLogID', transactionLogId);
+      localStorage.setItem('TransactionID', transactionId);
       localStorage.setItem('TransactionPass', transactionPass);
     }
   }
@@ -600,7 +607,7 @@ export default function TransactionControl() {
         var responseData = response.data;
         if(transactionRef.startsWith('BP') || transactionRef.startsWith('MY') || transactionRef.startsWith('WP') || transactionRef.startsWith('BS') || transactionRef.startsWith('BB') || transactionRef.startsWith('BZ') || transactionRef.startsWith('BF') || transactionRef.startsWith('PO')){
           const transactionData = {
-            transactionId: responseData.transaction_id,
+            transactionId: 61,
             customerId: responseData.customer_id,
             customerAccountId: responseData.customer_account_id,
             queueNumber: 'CSH1' + transactionCodeCounter,
@@ -615,7 +622,7 @@ export default function TransactionControl() {
           createLog(transactionData);
         } else if(transactionRef.startsWith('LC') || transactionRef.startsWith('LB') || transactionRef.startsWith('LD') || transactionRef.startsWith('LM')){
           const transactionData = {
-            transactionId: responseData.transaction_id,
+            transactionId: 67,
             customerId: responseData.customer_id,
             customerAccountId: responseData.customer_account_id,
             queueNumber: 'CSH7' + transactionCodeCounter,

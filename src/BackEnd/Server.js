@@ -920,16 +920,16 @@ app.get('/users/getAnnouncement', async (req, res) => {
 
 
 // Route for video ads upload
-app.put('/transaction_log/updateBlink/:transactionLogId', async (req, res) => {
+app.put('/transaction_log/updateBlink/:transactionId', async (req, res) => {
   try {
-    const transactionLogId = req.params.transactionLogId;
+    const transactionId = req.params.transactionId;
     const requestBody = req.body;
     const transactionBlink = requestBody.blink;
 
     const { data, error } = await supabase
       .from('tbl_quexpress_transactions')
       .update({ blink: transactionBlink })
-      .like('transaction_code', transactionLogId)
+      .eq('transaction_id', transactionId)
       .select('*')
       .single();
 
@@ -938,7 +938,33 @@ app.put('/transaction_log/updateBlink/:transactionLogId', async (req, res) => {
       return res.status(500).send('Database Error: ' + error.message);
     }
 
-    res.json(true);
+    res.json(data[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server Error');
+  }
+});
+
+// Route for video ads upload
+app.put('/transaction_log/updateBlink1/:transactionCode', async (req, res) => {
+  try {
+    const transactionCode = req.params.transactionCode;
+    const requestBody = req.body;
+    const transactionBlink = requestBody.blink;
+
+    const { data, error } = await supabase
+      .from('tbl_quexpress_transactions')
+      .update({ blink: transactionBlink })
+      .eq('transaction_code', transactionCode)
+      .select('*')
+      .single();
+
+    if (error) {
+      console.error(error);
+      return res.status(500).send('Database Error: ' + error.message);
+    }
+
+    res.json(data[0]);
   } catch (err) {
     console.error(err);
     res.status(500).send('Server Error');
@@ -954,16 +980,23 @@ app.get('/transactions/getBlink/:transactionCode', async (req, res) => {
     const { data, error } = await supabase
       .from('tbl_quexpress_transactions') // Replace with your table name
       .select('*')
-      .eq('transaction_code', transactionCode)
-      .single(); // Use .single() to get a single row
-
+      .eq('transaction_code', transactionCode);
+    if (transactionCode === 'CSH1') {
+      console.log([data, error]);
+    }
     if (error) {
-      console.error(error);
-      return res.status(500).send('Server Error');
+      if (transactionCode === 'CSH1') {
+        console.error(error);
+        return res.status(500).send('Server Error');
+      } 
     }
 
     // Send the response
-    res.json(data);
+    if (data !== null && data.length > 0) {
+      res.json(data[0]);
+    } else {
+      res.json([]);
+    }
   } catch (err) {
     console.error(err);
     res.status(500).send('Server Error');

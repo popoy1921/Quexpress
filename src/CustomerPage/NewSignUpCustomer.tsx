@@ -103,7 +103,8 @@ export default function SignUpCustomer() {
       await axios.post(process.env.REACT_APP_OTHER_BACKEND_SERVER + '/send-otp', { mobileNumber });
       setOtpSent(true); // OTP is sent
     } catch (error) {
-      console.error('Error sending OTP:', error);
+      alert('Unexpected Error on OTP');
+      navigate("/SignInCustomer");
     } finally {
       setIsSendingOtp(false); // stop loading spinner
     }
@@ -119,7 +120,7 @@ export default function SignUpCustomer() {
       await axios.post(process.env.REACT_APP_OTHER_BACKEND_SERVER + '/verify-otp', { mobileNumber, otp });
       setOtpVerified(true); // OTP is verified
     } catch (error) {
-      console.error('Error verifying OTP:', error);
+      alert('Invalid OTP');
     } finally {
       setIsVerifyingOtp(false);
     }
