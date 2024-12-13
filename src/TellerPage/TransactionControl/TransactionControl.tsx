@@ -62,22 +62,23 @@ export default function TransactionControl() {
     return () => clearInterval(interval); // Cleanup on unmount
   }, [transactionCode]);
 
-  // async function updateForMonitorBlink(transactionCode: string) {
-  //   await axios.put(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/updateBlink/` + transactionCode, { 'blink': 1 });
-  // }
+  async function updateForMonitorBlink() {
+    let transactionId = localStorage.getItem('transactionId') as string;
+    await axios.put(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/updateBlink/` + transactionId, { 'blink': 1 });
+  }
 
   function nextNumber(event: any) {
     event.preventDefault();
     updateNumber('done');
     if (document.getElementById('nowServing')?.innerText !== 'No Available Number') {
-      // updateForMonitorBlink(transactionCode);
+      updateForMonitorBlink();
     }
   }
 
   function callAgain(event: any) {
     event.preventDefault();
     if (document.getElementById('nowServing')?.innerText !== 'No Available Number') {
-      // updateForMonitorBlink(transactionCode);
+      updateForMonitorBlink();
     }
   }
 
@@ -88,7 +89,7 @@ export default function TransactionControl() {
     updateTransactionStatus('cancelled');
     getNumber();
     if (document.getElementById('nowServing')?.innerText !== 'No Available Number') {
-      // updateForMonitorBlink(transactionCode);
+      updateForMonitorBlink();
     }
   }
 
@@ -561,7 +562,7 @@ export default function TransactionControl() {
     event.preventDefault();
     setDialogOpen(true);
     if (document.getElementById('nowServing')?.innerText !== 'No Available Number') {
-      // updateForMonitorBlink(transactionCode);
+      updateForMonitorBlink();
     }
   }
 
@@ -640,7 +641,7 @@ export default function TransactionControl() {
     toClaim(transactionRef);
     updateNumber('done');
     if (document.getElementById('nowServing')?.innerText !== 'No Available Number') {
-      // updateForMonitorBlink(transactionCode);
+      updateForMonitorBlink();
     }
   }
 
