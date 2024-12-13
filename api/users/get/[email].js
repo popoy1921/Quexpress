@@ -1,4 +1,5 @@
-// /api/getUserByEmail .js
+// /api/users/[email].js
+
 import { createClient } from '@supabase/supabase-js';
 
 // Initialize Supabase client
@@ -9,7 +10,7 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 export default async function handler(req, res) {
   // Check if the request method is GET
   if (req.method === 'GET') {
-    const { email } = req.query; // Get the email from the query parameters
+    const { email } = req.query; // Get the email from the dynamic route
 
     try {
       let query = supabase
