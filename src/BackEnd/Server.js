@@ -438,10 +438,15 @@ app.post('/transaction_log/create', async (req, res) => {
   }
 });
 
-app.get('/transaction_log/get_ref/:transactionCode', async (req, res) => {
-  const transactionCode = req.params.transactionCode + '%';
+app.get('/transaction_log/get_ref/:transactionLogId', async (req, res) => {
+  const transactionLogId = req.params.transactionLogId;
+  console.log(transactionLogId)
   try {
-    const { data, error } = await supabase.rpc('get_ref_transaction_log', { r_transaction_code: transactionCode });
+    const { data, error } = await supabase
+    .from('tbl_quexpress_transaction_log')
+    .select('*')
+    .eq('transaction_log_id', transactionLogId);
+    
     if (error) {
       throw error;
     }
@@ -544,17 +549,22 @@ app.get('/transaction_log/get_count', async (req, res) => {
     if (!transactionQueue && !transactionRef) {
       return res.status(400).send('Either transactionQueue or transactionRef is required');
     }
-
-    const identifier = transactionRef ?? transactionQueue;
-    console.log(identifier)
-    let { data, error } = await supabase
-      .rpc('get_transaction_log_count', { queue_name: identifier });
+    let query = ""
+    if (transactionQueue) {
+      query = await supabase
+      .rpc('get_transaction_log_count', { queue_name: transactionQueue });
+    } else {
+      query = await supabase
+      .rpc('get_transaction_log_count2', { queue_name: transactionRef });
+    }
+      
+    let { data, error } = query;
 
     if (error) {
       console.error('Error executing query:', error.message);
       return res.status(500).send('Server Error');
     }
-
+    console.log(data)
     res.json(data);
   } catch (err) {
     console.error('Error executing query:', err.message);
@@ -684,10 +694,9 @@ app.get('/transaction_log/admin/:windowId', async (req, res) => {
 app.put('/transaction_log/update', async (req, res) => {
   try {
     const transactionData = req.body;
-
-    // Input validation
-    if (!transactionData.transactionLogId || !transactionData.transactionQueue || !transactionData.status) {
-      return res.status(400).send('Missing required fields');
+    console.log(transactionData.transactionLogId)
+    if (!transactionData.transactionLogId) {
+      return res.status(400).send('transactionLogId is required');
     }
 
     // Build query string
@@ -703,34 +712,35 @@ app.put('/transaction_log/update', async (req, res) => {
 
     if (transactionData.transactionRef) {
       query = query.eq('transaction_ref', transactionData.transactionRef);
-    } else {
+    } else if (transactionData.transactionQueue) {
       query = query.eq('transactions_queue', transactionData.transactionQueue);
     }
-
-    query = query
-      .eq('transaction_log_id', transactionData.transactionLogId)
-      .gte('transaction_datetime', new Date().toISOString().split('T')[0]);
-
-      if (transactionData.forClaim) {
-        query = query.not('transactions_queue', 'like', 'CSH%');
-      }
-  
-      if (transactionData.forCashier) {
-        query = query.like('transactions_queue', 'CSH%');
-      }
-
-    // Execute query
-    console.log(query)
     
-    const { data, error } = await query.select('*');
-    
-    console.log(data)
-    if (error) {
-      console.error('Error executing query:', error.message);
-      return res.status(500).send('Server Error');
+    query = query.eq('transaction_log_id', transactionData.transactionLogId);
+
+    const currentDate = new Date().toISOString().split('T')[0];
+    query = query.gte('transaction_datetime', currentDate);
+ 
+    if (transactionData.forClaim) {
+      query = query.not('transactions_queue', 'like', 'CSH%');
+    } else if (transactionData.forCashier) {
+      query = query.like('transactions_queue', 'CSH%');
     }
 
-    res.json(data);
+    // Execute query
+    const { data, error } = await query.select('*');
+    
+    if (error) {
+      console.error('Error executing query:', error);
+      return res.status(500).json({ error: 'Failed to update transaction log', details: error.message });
+    }
+
+    if (data.length === 0) {
+      return res.status(404).json({ error: 'No matching records found to update' });
+    }
+    
+    res.json(data[0]);
+
   } catch (err) {
     console.error('Error executing query:', err.message);
     res.status(500).send('Server Error');
@@ -742,7 +752,7 @@ app.put('/transaction_log/updateStaff', async (req, res) => {
   const transactionData = req.body;
   const transactionLogId = transactionData.transactionLogId;
   const staffId = transactionData.staffId;
-
+  
   try {
     const { data, error } = await supabase
       .from('tbl_quexpress_transaction_log')
@@ -938,7 +948,7 @@ app.put('/transaction_log/updateBlink/:transactionLogId', async (req, res) => {
 // Route for transaction types blink status
 app.get('/transactions/getBlink/:transactionCode', async (req, res) => {
   const transactionCode = req.params.transactionCode;
-  console.log(transactionCode)
+  
   try {
     // Query the Supabase database
     const { data, error } = await supabase

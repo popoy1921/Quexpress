@@ -101,6 +101,7 @@ export default function TransactionControl() {
     let date: Date = new Date();
     let transactionQueue = localStorage.getItem(transactionCode + 'NowServing');
     let isTransactionRef = localStorage.getItem('IsTransactionRef');
+    let transactionLogId = localStorage.getItem('TransactionLogID');
     let transactionData: any = {};
     
     if (!transactionData.transactionRef) {
@@ -161,9 +162,8 @@ export default function TransactionControl() {
         let transactionCount = parseInt(response2.data);
         console.log(transactionCount)
       if(transactionCount <= 2){
-        await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get_ref/${transactionData.transactionQueue ?? transactionData.transactionRef}`)
+        await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get_ref/${transactionLogId}`)
           .then(async response => {
-            console.log(1)
             var responseData = response.data;
             const createData = {
               transactionId: responseData.transaction_id,
@@ -581,8 +581,8 @@ export default function TransactionControl() {
   };
 
   async function toCashier(transactionRef: string, passTo: string) {
-    console.log(transactionRef)
-    await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get_ref/${transactionRef}`)
+    let transactionLogId = localStorage.getItem('TransactionLogID');
+    await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get_ref/${transactionLogId}`)
       .then(async function (response) {
         console.log(response)
         const currentDate = localStorage.getItem('currentDate');
@@ -645,7 +645,8 @@ export default function TransactionControl() {
   }
 
   async function toClaim(transactionRef: string) {
-    await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get_ref/${transactionRef}`)
+    let transactionLogId = localStorage.getItem('TransactionLogID');
+    await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get_ref/${transactionLogId}`)
       .then(async function (response) {
         const currentDate = localStorage.getItem('currentDate');
         const dateToday = format(new Date(), "yyyy-MM-dd");
