@@ -973,68 +973,69 @@ app.use(bodyParser.json());
 function generateOTP() {
   return crypto.randomInt(100000, 999999).toString();
 }
-  const accountSid = process.env.REACT_APP_TWILIO_ACCOUNTSID;
-  const authToken = process.env.REACT_APP_TWILIO_TOKEN;
-  const verifySid = process.env.REACT_APP_TWILIO_VERIFYSID;
 
-  if (!accountSid || !authToken || !verifySid) {
-    console.error("Twilio credentials missing.");
+const accountSid = process.env.REACT_APP_TWILIO_ACCOUNTSID;
+const authToken = process.env.REACT_APP_TWILIO_TOKEN;
+const verifySid = process.env.REACT_APP_TWILIO_VERIFYSID;
+
+if (!accountSid || !authToken || !verifySid) {
+  console.error("Twilio credentials missing.");
+}
+
+const client = require("twilio")(accountSid, authToken);
+
+app.post('/send-otp', (req, res) => {
+  let { mobileNumber } = req.body;
+
+  if (!mobileNumber) {
+    return res.status(400).json({ message: 'Mobile number is required.' });
   }
 
-  const client = require("twilio")(accountSid, authToken);
+  // Ensure the mobile number starts with '+63' (adjust based on your country code)
+  if (!mobileNumber.startsWith('+63')) {
+    mobileNumber = '+63' + mobileNumber.replace(/^\+63?/, '');
+  }
 
-  app.post('/send-otp', (req, res) => {
-    let { mobileNumber } = req.body;
+  client.verify.v2
+    .services(verifySid)
+    .verifications.create({ to: mobileNumber, channel: "sms" })
+    .then((verification) => {
+      console.log(`Verification sent to ${mobileNumber}: Status - ${verification.status}`);
+      return res.json({ message: 'OTP sent successfully!' });
+    })
+    .catch((err) => {
+      console.error('Error sending OTP:', err.message);
+      return res.status(500).json({ message: 'Failed to send OTP.', error: err.message });
+    });
+});
   
-    if (!mobileNumber) {
-      return res.status(400).json({ message: 'Mobile number is required.' });
-    }
-  
-    // Ensure the mobile number starts with '+63' (adjust based on your country code)
-    if (!mobileNumber.startsWith('+63')) {
-      mobileNumber = '+63' + mobileNumber.replace(/^\+63?/, '');
-    }
-  
-    client.verify.v2
-      .services(verifySid)
-      .verifications.create({ to: mobileNumber, channel: "sms" })
-      .then((verification) => {
-        console.log(`Verification sent to ${mobileNumber}: Status - ${verification.status}`);
-        return res.json({ message: 'OTP sent successfully!' });
-      })
-      .catch((err) => {
-        console.error('Error sending OTP:', err.message);
-        return res.status(500).json({ message: 'Failed to send OTP.', error: err.message });
-      });
-  });
-  
-  // 2. Endpoint to verify OTP
-  app.post('/verify-otp', (req, res) => {
-    let { mobileNumber, otp } = req.body;
-  
-    if (!mobileNumber || !otp) {
-      return res.status(400).json({ message: 'Mobile number and OTP are required.' });
-    }
+// 2. Endpoint to verify OTP
+app.post('/verify-otp', (req, res) => {
+  let { mobileNumber, otp } = req.body;
 
-    if (!mobileNumber.startsWith('+63')) {
-      mobileNumber = '+63' + mobileNumber.replace(/^\+63?/, '');
-    }
-  
-    client.verify.v2
-      .services(verifySid)
-      .verificationChecks.create({ to: mobileNumber, code: otp })
-      .then((verification_check) => {
-        if (verification_check.status === 'approved') {
-          return res.json({ message: 'OTP verified successfully!' });
-        } else {
-          return res.status(400).json({ message: 'Invalid or expired OTP.' });
-        }
-      })
-      .catch((err) => {
-        console.error('Error verifying OTP:', err.message);
-        return res.status(500).json({ message: 'Failed to verify OTP.', error: err.message });
-      });
-  });
+  if (!mobileNumber || !otp) {
+    return res.status(400).json({ message: 'Mobile number and OTP are required.' });
+  }
+
+  if (!mobileNumber.startsWith('+63')) {
+    mobileNumber = '+63' + mobileNumber.replace(/^\+63?/, '');
+  }
+
+  client.verify.v2
+    .services(verifySid)
+    .verificationChecks.create({ to: mobileNumber, code: otp })
+    .then((verification_check) => {
+      if (verification_check.status === 'approved') {
+        return res.json({ message: 'OTP verified successfully!' });
+      } else {
+        return res.status(400).json({ message: 'Invalid or expired OTP.' });
+      }
+    })
+    .catch((err) => {
+      console.error('Error verifying OTP:', err.message);
+      return res.status(500).json({ message: 'Failed to verify OTP.', error: err.message });
+    });
+});
 
 // printer
 app.get('/print', (req, res) => {
