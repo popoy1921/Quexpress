@@ -1,6 +1,6 @@
 // /api/sendOtp.js
 
-import { createClient } from 'twilio';
+import twilio from 'twilio';
 
 // Initialize Twilio client
 const accountSid = process.env.REACT_APP_TWILIO_ACCOUNTSID;
@@ -11,7 +11,7 @@ if (!accountSid || !authToken || !verifySid) {
   console.error("Twilio credentials missing.");
 }
 
-const client = createClient(accountSid, authToken);
+const client = twilio(accountSid, authToken);
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
