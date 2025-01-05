@@ -440,7 +440,7 @@ app.post('/transaction_log/create', async (req, res) => {
 
 app.get('/transaction_log/get_ref/:transactionLogId', async (req, res) => {
   const transactionLogId = req.params.transactionLogId;
-  console.log(transactionLogId)
+
   try {
     const { data, error } = await supabase
     .from('tbl_quexpress_transaction_log')
@@ -649,7 +649,6 @@ app.get('/transaction_log/admin/total', async (req, res) => {
 
 app.get('/transaction_log/admin/:windowId', async (req, res) => {
   const windowId = req.params.windowId;
-  console.log('Received windowId:', windowId);
   try {
     const query = `
       WITH latest_transactions AS (
