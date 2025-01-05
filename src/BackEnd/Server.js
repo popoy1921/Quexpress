@@ -573,28 +573,46 @@ app.get('/transaction_log/get_count', async (req, res) => {
 });
 
 // Route for Displaying QueueNumber
-app.get('/transaction_log/get/:transactionCode/:transactionStatus', async (req, res) => {
-  const { transactionCode, transactionStatus } = req.params;
+app.get('/transaction_log/get/toQueue/:transactionCode', async (req, res) => {
+  const { transactionCode } = req.params;
 
   try {
     const { data, error } = await supabase
       .rpc('get_account_transaction_log', {
         r_transaction_code: transactionCode,
-        r_transaction_status: transactionStatus,
-      })
-      .select('*');
+        r_transaction_status: 'toQueue',
+      });
 
     if (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Error fetching transaction log' });
-    } else {
-      res.json(data);
+      return res.status(500).json({ message: 'Error fetching transaction log', error });
     }
+    res.json(data);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Error fetching transaction log' });
+    console.error('Unexpected Error:', err);
+    res.status(500).json({ message: 'Unexpected error fetching transaction log' });
   }
 });
+
+app.get('/transaction_log/get/notForQueue/:transactionCode', async (req, res) => {
+  const { transactionCode } = req.params;
+
+  try {
+    const { data, error } = await supabase
+      .rpc('get_account_transaction_log', {
+        r_transaction_code: transactionCode,
+        r_transaction_status: 'notForQueue',
+      });
+
+    if (error) {
+      return res.status(500).json({ message: 'Error fetching transaction log', error });
+    }
+    res.json(data);
+  } catch (err) {
+    console.error('Unexpected Error:', err);
+    res.status(500).json({ message: 'Unexpected error fetching transaction log' });
+  }
+});
+
 
 app.get('/transaction_log/admin/report', async (req, res) => {
   try {

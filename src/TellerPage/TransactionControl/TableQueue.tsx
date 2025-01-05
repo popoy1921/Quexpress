@@ -21,9 +21,9 @@ export default function BasicTable() {
       let transactionCodes: { [key: string]: string } = {};
       transactionCodes = JSON.parse(transactionCodeString);
       let transactionCode = transactionCodes[transaction ?? ''];
-      
+
       try {
-        const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/${transactionCode}/toQueue`);
+        const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/toQueue/${transactionCode}`);
         setQueueNumbers(response.data);
       } catch (error) {
         console.error('Error fetching queue numbers:', error);
@@ -107,7 +107,7 @@ export default function BasicTable() {
                         <TableCell className='hiddenColumn'>{element.transaction_pass}</TableCell>
                         <TableCell className='hiddenColumn'></TableCell>
                       </TableRow>
-                    )): <p>No data available</p>}
+                    )): []}
                   </TableBody>
                 </Table>
               </TableContainer>

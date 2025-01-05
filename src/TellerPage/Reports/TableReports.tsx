@@ -36,10 +36,9 @@ const App = () => {
     transactionCodes = JSON.parse(transactionCodeString);
     let transactionCode = transactionCodes[transaction ?? ''];
 
-    // Fetch data when the component mounts
-    axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/${transactionCode}/notForQueue`)
+    
+    axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/notForQueue/${transactionCode}`)
       .then(response => {
-        console.log(response.data)
         setData(response.data); // Set the data for the table
         setLoading(false); // Turn off the loading indicator
       })
@@ -93,18 +92,18 @@ const App = () => {
         </Alert>
       ) : (
         <DataTableExtensions {...tableDataForTableExtension}>
-            <DataTable
-              columns={tableTransactionLogColumns}
-              data={tableData}
-              pagination
-              responsive
-              highlightOnHover
-              pointerOnHover
-              striped
-              style={{ 
-                boxShadow: '0px 2px 10px rgba(0, 0, 0, 0.1)',
-              }} 
-            />
+              <DataTable
+                columns={tableTransactionLogColumns}
+                data={tableData}
+                pagination
+                responsive
+                highlightOnHover
+                pointerOnHover
+                striped
+                style={{ 
+                  boxShadow: '0px 2px 10px rgba(0, 0, 0, 0.1)',
+                }} 
+              />
         </DataTableExtensions>
       )}
     </Container>
