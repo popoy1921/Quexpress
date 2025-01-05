@@ -69,7 +69,7 @@ export default function BasicTable() {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {queueNumbers.map((element, index) => (
+                    {Array.isArray(queueNumbers) ? queueNumbers.map((element, index) => (
                       <TableRow key={index}>
                         <TableCell className='hiddenColumn'>
                           {element.transaction_log_id}
@@ -107,7 +107,7 @@ export default function BasicTable() {
                         <TableCell className='hiddenColumn'>{element.transaction_pass}</TableCell>
                         <TableCell className='hiddenColumn'></TableCell>
                       </TableRow>
-                    ))}
+                    )): <p>No data available</p>}
                   </TableBody>
                 </Table>
               </TableContainer>
