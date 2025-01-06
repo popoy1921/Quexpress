@@ -10,7 +10,7 @@ const transaction = localStorage.getItem('TransactionAccess');
 
 export const mainListItems = (
   <React.Fragment>
-    <ListItemButton href={"/" + transaction}>
+    <ListItemButton href={"/Teller/" + transaction}>
       <ListItemIcon>
         <DashboardIcon />
       </ListItemIcon>
