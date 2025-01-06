@@ -36,8 +36,12 @@ const App = () => {
     transactionCodes = JSON.parse(transactionCodeString);
     let transactionCode = transactionCodes[transaction ?? ''];
 
-    
-    axios.get(`${process.env.REACT_APP_OTHER_BACKEND_SERVER}/transaction_log/get/notForQueue/${transactionCode}`)
+    const queryParams = new URLSearchParams({
+      transactionCode: transactionCode,
+      queue: 'notForQueue',
+    }).toString();
+
+    axios.get(`${process.env.REACT_APP_OTHER_BACKEND_SERVER}/transaction_log/get/get_queue?${queryParams}`)
       .then(response => {
         setData(response.data); // Set the data for the table
         setLoading(false); // Turn off the loading indicator

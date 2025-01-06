@@ -490,54 +490,54 @@ app.get('/transaction_log/CSH/:transactionCode', async (req, res) => {
     }
 });
 
-app.get('/transaction_log/get', async (req, res) => {
-  const { transactionQueue, transactionRef, forClaim, forCashier } = req.query;
+// app.get('/transaction_log/get', async (req, res) => {
+//   const { transactionQueue, transactionRef, forClaim, forCashier } = req.query;
 
-  try {
-    let filters = [
-      { transaction_datetime: { gte: new Date().toISOString().split('T')[0] } }, // Today's date
-      { transaction_status: { isNot: null } }
-    ];
+//   try {
+//     let filters = [
+//       { transaction_datetime: { gte: new Date().toISOString().split('T')[0] } }, // Today's date
+//       { transaction_status: { isNot: null } }
+//     ];
 
-    // Add filters based on query parameters
-    if (transactionRef) {
-      filters.push({ transaction_ref: transactionRef });
-    } else if (transactionQueue) {
-      filters.push({ transactions_queue: transactionQueue });
-    }
+//     // Add filters based on query parameters
+//     if (transactionRef) {
+//       filters.push({ transaction_ref: transactionRef });
+//     } else if (transactionQueue) {
+//       filters.push({ transactions_queue: transactionQueue });
+//     }
 
-    // Additional filters for 'forClaim' and 'forCashier'
-    if (forClaim === 'true') {
-      filters.push({ transactions_queue: { not: { ilike: 'CSH%' } } });
-    } else if (forCashier === 'true') {
-      filters.push({ transactions_queue: { ilike: 'CSH%' } });
-    }
+//     // Additional filters for 'forClaim' and 'forCashier'
+//     if (forClaim === 'true') {
+//       filters.push({ transactions_queue: { not: { ilike: 'CSH%' } } });
+//     } else if (forCashier === 'true') {
+//       filters.push({ transactions_queue: { ilike: 'CSH%' } });
+//     }
 
-    // Query Supabase with filters and ordering
-    const { data, error } = await supabase
-      .from('tbl_quexpress_transaction_log')
-      .select('*')
-      .filter('transaction_datetime', 'gte', new Date().toISOString().split('T')[0])
-      .filter('transaction_status', 'is', null) // Ensures it's not null
-      .or(filters.map(filter => `${Object.keys(filter)[0]}.${Object.values(filter)[0]}`))
-      .order('transaction_log_id', { ascending: false })
-      .limit(1);
+//     // Query Supabase with filters and ordering
+//     const { data, error } = await supabase
+//       .from('tbl_quexpress_transaction_log')
+//       .select('*')
+//       .filter('transaction_datetime', 'gte', new Date().toISOString().split('T')[0])
+//       .filter('transaction_status', 'is', null) // Ensures it's not null
+//       .or(filters.map(filter => `${Object.keys(filter)[0]}.${Object.values(filter)[0]}`))
+//       .order('transaction_log_id', { ascending: false })
+//       .limit(1);
 
-    if (error) {
-      console.error('Supabase error:', error);
-      return res.status(400).json({ error: error.message });
-    }
+//     if (error) {
+//       console.error('Supabase error:', error);
+//       return res.status(400).json({ error: error.message });
+//     }
 
-    if (data.length === 0) {
-      return res.status(404).json({ message: 'No matching transaction log found' });
-    }
+//     if (data.length === 0) {
+//       return res.status(404).json({ message: 'No matching transaction log found' });
+//     }
 
-    res.status(200).json(data[0]);
-  } catch (err) {
-    console.error('Server error:', err);
-    res.status(500).send('Server Error');
-  }
-});
+//     res.status(200).json(data[0]);
+//   } catch (err) {
+//     console.error('Server error:', err);
+//     res.status(500).send('Server Error');
+//   }
+// });
 
 app.get('/transaction_log/get_count', async (req, res) => {
   try {
@@ -573,14 +573,14 @@ app.get('/transaction_log/get_count', async (req, res) => {
 });
 
 // Route for Displaying QueueNumber
-app.get('/transaction_log/get/toQueue/:transactionCode', async (req, res) => {
-  const { transactionCode } = req.params;
-
+app.get('/transaction_log/get_queue', async (req, res) => {
+  const { transactionCode, queue} = req.query;
+  
   try {
     const { data, error } = await supabase
       .rpc('get_account_transaction_log', {
         r_transaction_code: transactionCode,
-        r_transaction_status: 'toQueue',
+        r_transaction_status: queue,
       });
 
     if (error) {
@@ -588,30 +588,51 @@ app.get('/transaction_log/get/toQueue/:transactionCode', async (req, res) => {
     }
     res.json(data);
   } catch (err) {
+    console.log(2);
     console.error('Unexpected Error:', err);
     res.status(500).json({ message: 'Unexpected error fetching transaction log' });
   }
 });
 
-app.get('/transaction_log/get/notForQueue/:transactionCode', async (req, res) => {
-  const { transactionCode } = req.params;
+// app.get('/transaction_log/get/toQueue/:transactionCode', async (req, res) => {
+//   const { transactionCode } = req.params;
 
-  try {
-    const { data, error } = await supabase
-      .rpc('get_account_transaction_log', {
-        r_transaction_code: transactionCode,
-        r_transaction_status: 'notForQueue',
-      });
+//   try {
+//     const { data, error } = await supabase
+//       .rpc('get_account_transaction_log', {
+//         r_transaction_code: transactionCode,
+//         r_transaction_status: 'toQueue',
+//       });
 
-    if (error) {
-      return res.status(500).json({ message: 'Error fetching transaction log', error });
-    }
-    res.json(data);
-  } catch (err) {
-    console.error('Unexpected Error:', err);
-    res.status(500).json({ message: 'Unexpected error fetching transaction log' });
-  }
-});
+//     if (error) {
+//       return res.status(500).json({ message: 'Error fetching transaction log', error });
+//     }
+//     res.json(data);
+//   } catch (err) {
+//     console.error('Unexpected Error:', err);
+//     res.status(500).json({ message: 'Unexpected error fetching transaction log' });
+//   }
+// });
+
+// app.get('/transaction_log/get/notForQueue/:transactionCode', async (req, res) => {
+//   const { transactionCode } = req.params;
+
+//   try {
+//     const { data, error } = await supabase
+//       .rpc('get_account_transaction_log', {
+//         r_transaction_code: transactionCode,
+//         r_transaction_status: 'notForQueue',
+//       });
+
+//     if (error) {
+//       return res.status(500).json({ message: 'Error fetching transaction log', error });
+//     }
+//     res.json(data);
+//   } catch (err) {
+//     console.error('Unexpected Error:', err);
+//     res.status(500).json({ message: 'Unexpected error fetching transaction log' });
+//   }
+// });
 
 
 app.get('/transaction_log/admin/report', async (req, res) => {
@@ -1135,7 +1156,7 @@ app.get('/print', (req, res) => {
       format: 0 
     }
   };
-
+  
   console.log('Sending JSON response:', JSON.stringify(jsonObject));
   res.json(jsonObject);
 });
