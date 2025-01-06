@@ -12,7 +12,9 @@ export default async function handler(req, res) {
   if (req.method === 'GET') {
     const { transactionCode } = req.params || {};
 
-    console.log(transactionCode)
+    if (!transactionCode) {
+      return res.status(400).json({ error: "transactionCode is required" });
+    } else {
       try {
         const { data, error } = await supabase
           .rpc('get_account_transaction_log', {
@@ -28,9 +30,10 @@ export default async function handler(req, res) {
         console.error('Unexpected Error:', err);
         res.status(500).json({ message: 'Unexpected error fetching transaction log' });
       }
-    } else {
-    // Handle any other HTTP method
-    res.setHeader('Allow', ['GET']);
-    res.status(405).end(`Method ${req.method} Not Allowed`);
+    }
+  } else {
+  // Handle any other HTTP method
+  res.setHeader('Allow', ['GET']);
+  res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 }
