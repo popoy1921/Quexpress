@@ -23,7 +23,7 @@ export default function BasicTable() {
       let transactionCode = transactionCodes[transaction ?? ''];
 
       try {
-        const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/toQueue/${transactionCode}`);
+        const response = await axios.get(`${process.env.REACT_APP_OTHER_BACKEND_SERVER}/transaction_log/get/toQueue/${transactionCode}`);
         setQueueNumbers(response.data);
       } catch (error) {
         console.error('Error fetching queue numbers:', error);

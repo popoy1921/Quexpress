@@ -37,7 +37,7 @@ const App = () => {
     let transactionCode = transactionCodes[transaction ?? ''];
 
     
-    axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/notForQueue/${transactionCode}`)
+    axios.get(`${process.env.REACT_APP_OTHER_BACKEND_SERVER}/transaction_log/get/notForQueue/${transactionCode}`)
       .then(response => {
         setData(response.data); // Set the data for the table
         setLoading(false); // Turn off the loading indicator
