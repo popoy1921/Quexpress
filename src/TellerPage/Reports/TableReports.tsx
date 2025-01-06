@@ -103,7 +103,7 @@ const App = () => {
         <DataTableExtensions {...tableDataForTableExtension}>
               <DataTable
                 columns={tableTransactionLogColumns}
-                data={tableData}
+                data={tableData || []}
                 pagination
                 responsive
                 highlightOnHover
