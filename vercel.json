@@ -1,0 +1,8 @@
+{
+    "rewrites": [
+      {
+        "source": "/Teller/api/transaction_log/get/toQueue/:transactionCode",
+        "destination": "/api/transaction_log/get/toQueue/:transactionCode"
+      }
+    ]
+  }
