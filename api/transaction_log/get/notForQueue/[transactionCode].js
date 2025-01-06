@@ -10,15 +10,14 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 export default async function handler(req, res) {
   // Check if the request method is GET
   if (req.method === 'GET') {
-    const { transactionCode } = req.query;
+    const { transactionCode } = req.params;
 
       try {
         const { data, error } = await supabase
           .rpc('get_account_transaction_log', {
             r_transaction_code: transactionCode,
             r_transaction_status: 'notForQueue',
-          })
-          .select();
+          });
 
         if (error) {
           return res.status(500).json({ message: 'Error fetching transaction log', error });
