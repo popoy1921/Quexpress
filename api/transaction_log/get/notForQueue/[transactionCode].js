@@ -17,7 +17,8 @@ export default async function handler(req, res) {
           .rpc('get_account_transaction_log', {
             r_transaction_code: transactionCode,
             r_transaction_status: 'notForQueue',
-          });
+          })
+          .select();
 
         if (error) {
           return res.status(500).json({ message: 'Error fetching transaction log', error });
