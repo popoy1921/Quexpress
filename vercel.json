@@ -1,12 +1,12 @@
 {
     "rewrites": [
       {
-        "source": "/Teller/api/transaction_log/get/get_queue",
-        "destination": "/api/transaction_log/get/get_queue"
+        "source": "/Teller/api/transaction_log/get_queue",
+        "destination": "/api/transaction_log/get_queue"
       },
       {
-        "source": "/TellerReports/api/transaction_log/get/get_queue",
-        "destination": "/api/transaction_log/get/get_queue"
+        "source": "/TellerReports/api/transaction_log/get_queue",
+        "destination": "/api/transaction_log/get_queue"
       }
     ]
   }
