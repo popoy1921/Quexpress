@@ -8,7 +8,7 @@ import "../../index.css";
 import { format } from 'date-fns';
 
 const App = () => {
-  const [tableData, setData] = useState<Row[]>([]);
+  const [tableData, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const accessid = localStorage.getItem('AccessId');
@@ -43,12 +43,7 @@ const App = () => {
 
     axios.get(`${process.env.REACT_APP_OTHER_BACKEND_SERVER}/transaction_log/get/get_queue?${queryParams}`)
       .then(response => {
-        if (Array.isArray(response.data)) {
-          setData(response.data); // Set the data for the table
-        } else {
-          console.error("API response is not an array:", response.data);
-          setData([]); // Default to an empty array
-        }
+        setData(response.data); // Set the data for the table
         setLoading(false); // Turn off the loading indicator
       })
       .catch(err => {
