@@ -41,7 +41,7 @@ const App = () => {
       queue: 'notForQueue',
     }).toString();
 
-    axios.get(`${process.env.REACT_APP_OTHER_BACKEND_SERVER}/transaction_log/get/get_queue?${queryParams}`)
+    axios.get(`${process.env.REACT_APP_OTHER_BACKEND_SERVER}/transaction_log/get_queue?${queryParams}`)
       .then(response => {
         setData(response.data); // Set the data for the table
         setLoading(false); // Turn off the loading indicator
@@ -96,9 +96,23 @@ const App = () => {
         </Alert>
       ) : (
         <DataTableExtensions {...tableDataForTableExtension}>
+              {Array.isArray(tableData) ?
+                <DataTable
+                  columns={tableTransactionLogColumns}
+                  data={tableData}
+                  pagination
+                  responsive
+                  highlightOnHover
+                  pointerOnHover
+                  striped
+                  style={{ 
+                    boxShadow: '0px 2px 10px rgba(0, 0, 0, 0.1)',
+                  }} 
+                />
+              : 
               <DataTable
                 columns={tableTransactionLogColumns}
-                data={tableData || []}
+                data={[]}
                 pagination
                 responsive
                 highlightOnHover
@@ -107,7 +121,7 @@ const App = () => {
                 style={{ 
                   boxShadow: '0px 2px 10px rgba(0, 0, 0, 0.1)',
                 }} 
-              />
+              />}
         </DataTableExtensions>
       )}
     </Container>
