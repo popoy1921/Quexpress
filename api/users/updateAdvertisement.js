@@ -21,8 +21,9 @@ const uploadHandler = async (req, res) => {
       res.status(500).json({ error: 'Error parsing the files' });
       return;
     }
-
-    const file = files.file; // Assuming the input name is 'file'
+    console.warn(files);
+    console.warn(files.file);
+    const file = '{' + files.file + '}'; // Assuming the input name is 'file'
     console.warn('1. ' + file);
     const tempPath = file.Path; // Temporary path
     const tempPath1 = file.filepath; // Temporary path
