@@ -891,6 +891,15 @@ app.put('/users/updateAdvertisement', upload.single('file'), async (req, res) =>
   }
 });
 
+app.post('/users/updateAdvertisementx', upload.single('file'), async (req, res) => {
+  const x = require('formidable');
+  const IncomingForm = x.IncomingForm;
+  const form = new IncomingForm();
+  form.parse(req, async (err, fields, files) => {
+    console.log(1)
+  });
+});
+
 // Route to get user details
 app.get('/users/getAdvertisement', async (req, res) => {
   try {
