@@ -4,42 +4,42 @@ import path from 'path';
 import { createClient } from '@supabase/supabase-js';
 
 // Initialize Supabase client
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+const SUPABASE_URL = 'https://ayhfyztprntbaftgrypt.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF5aGZ5enRwcm50YmFmdGdyeXB0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzMxMjYxNDAsImV4cCI6MjA0ODcwMjE0MH0.krmujGeIdEwo_zfrnLLMw1aWQniR-OXnxTG4ZVBPnM4'; 
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-export default async (req, res) => {
-  if (req.method !== 'PUT') {
-    return res.status(405).json({ message: 'Method Not Allowed' });
-  }
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
 
+const uploadHandler = async (req, res) => {
   const form = new formidable.IncomingForm();
-  form.uploadDir = path.join(process.cwd(), 'uploads'); // Directory for temporary storage
-  form.keepExtensions = true;
-
-  // Ensure the upload directory exists
-  if (!fs.existsSync(form.uploadDir)) {
-    fs.mkdirSync(form.uploadDir);
-  }
 
   form.parse(req, async (err, fields, files) => {
     if (err) {
-      console.error(err);
-      return res.status(500).json({ message: 'File upload failed.' });
+      res.status(500).json({ error: 'Error parsing the files' });
+      return;
     }
 
-    const uploadedFile = files.file;
-    if (!uploadedFile) {
-      return res.status(400).json({ message: 'No file uploaded.' });
-    }
+    const file = files.file; // Assuming the input name is 'file'
+    const tempPath = file.filepath; // Temporary path
+    const publicPath = path.join(process.cwd(), 'public/uploads', file.originalFilename); // Destination path in public folder
 
-    const fileName = `${Date.now()}-${uploadedFile.originalFilename}`;
-    const filePath = path.join(form.uploadDir, fileName);
+    // Move the file from temp to public folder
+    fs.rename(tempPath, publicPath, (err) => {
+      if (err) {
+        res.status(500).json({ error: 'Error saving the file' });
+        return;
+      }
 
-    fs.renameSync(uploadedFile.filepath, filePath); // Move file to uploads directory
+      res.status(200).json({ message: 'File uploaded successfully', filename: file.originalFilename });
+    });
 
-    // Generate a public URL
-    const fileUrl = `${process.env.HOST}/uploads/${fileName}`;
+    const fileUrl = `/uploads/${req.file.filename}`; // Adjust URL as needed
 
-    // Update the advertisement in the database
+    // Update user table for advertisement
     const { data, error } = await supabase
       .from('tbl_quexpress_users')
       .update({ advertisement: fileUrl })
@@ -49,15 +49,11 @@ export default async (req, res) => {
 
     if (error) {
       console.error(error);
-      return res.status(500).json({ message: `Database error: ${error.message}` });
+      return res.status(500).send('Database Error: ' + error.message);
     }
-
-    res.status(200).json({ file: fileUrl, data });
+    console.log(fileUrl)
+    res.json({ file: fileUrl, data });
   });
 };
 
-export const config = {
-  api: {
-    bodyParser: false, // Disable default body parsing to allow file uploads
-  },
-};
+export default uploadHandler;
