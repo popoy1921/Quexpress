@@ -23,7 +23,7 @@ const uploadHandler = async (req, res) => {
     }
     console.warn(files);
     console.warn(files.file);
-    const file = '{' + files.file + '}'; // Assuming the input name is 'file'
+    const file = files.file.PersistentFile; // Assuming the input name is 'file'
     console.warn('1. ' + file);
     const tempPath = file.Path; // Temporary path
     const tempPath1 = file.filepath; // Temporary path
