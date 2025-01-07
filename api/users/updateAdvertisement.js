@@ -23,10 +23,8 @@ const uploadHandler = async (req, res) => {
     }
 
     const file = files.file; // Assuming the input name is 'file'
-    // const tempPath = file.filepath; // Temporary path
-    const tempPath = 'file.filepath'; // Temporary path
-    // const publicPath = path.join(process.cwd(), 'public/uploads', file.originalFilename); // Destination path in public folder
-    const publicPath = '1234';
+    const tempPath = file.Path; // Temporary path
+    const publicPath = path.join(process.cwd(), 'public/uploads', file.Original); // Destination path in public folder
     console.warn('1. ' + file);
     console.warn('2. ' + tempPath);
     console.warn('3. ' + publicPath);
@@ -37,10 +35,10 @@ const uploadHandler = async (req, res) => {
         return;
       }
 
-      res.status(200).json({ message: 'File uploaded successfully', filename: file.originalFilename });
+      res.status(200).json({ message: 'File uploaded successfully', filename: file.Original });
     });
 
-    const fileUrl = `/uploads/${req.file.filename}`; // Adjust URL as needed
+    const fileUrl = `/uploads/${file.filename}`; // Adjust URL as needed
 
     // Update user table for advertisement
     const { data, error } = await supabase
