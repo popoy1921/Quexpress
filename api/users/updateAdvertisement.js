@@ -15,7 +15,7 @@ export const config = {
 };
 
 const uploadHandler = async (req, res) => {
-  const form = new formidable.IncomingForm();
+  const form = new formidable();
 
   form.parse(req, async (err, fields, files) => {
     if (err) {
