@@ -1,11 +1,27 @@
 {
     "rewrites": [
       {
-        "source": "/Teller/api/transaction_log/get_queue",
+        "source": "/(Teller|Cashier)/api/transaction_log/get_queue",
         "destination": "/api/transaction_log/get_queue"
       },
       {
-        "source": "/TellerReports/api/transaction_log/get_queue",
+        "source": "/(Teller|Cashier)/api/transaction_log/update",
+        "destination": "/api/transaction_log/update"
+      },
+      {
+        "source": "/(Teller|Cashier)/api/transaction_log/updateBlink/:transactionId",
+        "destination": "/api/transaction_log/updateBlink/:transactionId"
+      },
+      {
+        "source": "/(Teller|Cashier)/api/transaction_log/get_count",
+        "destination": "/api/transaction_log/get_count"
+      },
+      {
+        "source": "/(Teller|Cashier)/api/transaction_log/get_ref/:transactionLogId",
+        "destination": "/api/transaction_log/get_ref/:transactionLogId"
+      },
+      {
+        "source": "/(Teller|Cashier)Reports/api/transaction_log/get_queue",
         "destination": "/api/transaction_log/get_queue"
       }
     ]
