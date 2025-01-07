@@ -1,6 +1,10 @@
 {
     "rewrites": [
       {
+        "source": "/SuccessfulRegistration/api/customer/get/:accountId",
+        "destination": "/api/customer/get/:accountId"
+      },
+      {
         "source": "/(Teller|Cashier)/api/transaction_log/get_queue",
         "destination": "/api/transaction_log/get_queue"
       },

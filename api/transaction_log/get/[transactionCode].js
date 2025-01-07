@@ -10,7 +10,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 export default async function handler(req, res) {
   // Check if the request method is GET
   if (req.method === 'GET') {
-    const transactionCode = req.params.transactionCode + '%';
+    const transactionCode = req.query.transactionCode + '%';
   
     try {
         const { data, error } = await supabase.rpc('get_monitor_transaction_log', { r_transaction_code: transactionCode });
