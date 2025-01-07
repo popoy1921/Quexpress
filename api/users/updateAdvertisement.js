@@ -21,18 +21,12 @@ const uploadHandler = async (req, res) => {
       res.status(500).json({ error: 'Error parsing the files' });
       return;
     }
-    console.warn(files);
-    console.warn(files.file);
-    const file = files.file.PersistentFile; // Assuming the input name is 'file'
+    const file = files.file[0]; // Assuming the input name is 'file'
     console.warn('1. ' + file);
-    const tempPath = file.Path; // Temporary path
-    const tempPath1 = file.filepath; // Temporary path
+    const tempPath = file.filepath; // Temporary path
     console.warn('2. ' + tempPath);
-    console.warn('3. ' + tempPath1);
-    const publicPath = typeof file.Original !== 'undefined' ? path.join(process.cwd(), 'public/uploads', file.Original) : '1'; // Destination path in public folder
-    const publicPath1 = typeof file.originalFilename !== 'undefined' ? path.join(process.cwd(), 'public/uploads', file.originalFilename) : '2';
-    console.warn('4. ' + publicPath);
-    console.warn('5. ' + publicPath1);
+    const publicPath = typeof file.originalFilename !== 'undefined' ? path.join(process.cwd(), 'public/uploads', file.originalFilename) : '2';
+    console.warn('3. ' + publicPath);
     // Move the file from temp to public folder
     fs.rename(tempPath, publicPath, (err) => {
       if (err) {
