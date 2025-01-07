@@ -10,7 +10,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 export default async function handler(req, res) {
   // Check if the request method is GET
   if (req.method === 'PUT') {
-    const userId = req.params.userId;
+    const userId = req.query.userId;
     const userDetails = req.body;
     const { firstName, lastName, email, password, removed, userRole } = userDetails;
 

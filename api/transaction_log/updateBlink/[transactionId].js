@@ -11,7 +11,7 @@ export default async function handler(req, res) {
   // Check if the request method is GET
   if (req.method === 'PUT') {
     try {
-        const transactionId = req.params.transactionId;
+        const transactionId = req.query.transactionId;
         const requestBody = req.body;
         const transactionBlink = requestBody.blink;
     

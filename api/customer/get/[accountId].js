@@ -10,7 +10,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 export default async function handler(req, res) {
   // Check if the request method is GET
   if (req.method === 'GET') {
-    const accountId = req.query;
+    const { accountId } = req.query;
     try {
         // Query to get customer data based on accountId
         const { data, error } = await supabase
