@@ -25,9 +25,13 @@ const uploadHandler = async (req, res) => {
     const file = files.file; // Assuming the input name is 'file'
     console.warn('1. ' + file);
     const tempPath = file.Path; // Temporary path
+    const tempPath1 = file.filepath; // Temporary path
     console.warn('2. ' + tempPath);
+    console.warn('3. ' + tempPath1);
     const publicPath = path.join(process.cwd(), 'public/uploads', file.Original); // Destination path in public folder
-    console.warn('3. ' + publicPath);
+    const publicPath1 = path.join(process.cwd(), 'public/uploads', file.originalFilename);
+    console.warn('4. ' + publicPath);
+    console.warn('5. ' + publicPath1);
     // Move the file from temp to public folder
     fs.rename(tempPath, publicPath, (err) => {
       if (err) {
