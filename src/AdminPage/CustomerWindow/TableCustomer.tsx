@@ -25,7 +25,7 @@ interface Row {
 useEffect(() => {
     // Fetch data when the component mounts
     const fetchData = async () => {
-      axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/customer/get`)
+      axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/customer/get_data`)
       .then(response => {
         console.log(response.data);
         setData(response.data); // Set the data for the table

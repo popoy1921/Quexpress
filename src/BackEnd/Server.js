@@ -21,7 +21,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 // TABLE - TBL_QUEXPRESS_CUSTOMER
 
 // Route to Customer
-app.get('/customer/get', async (req, res) => {
+app.get('/customer/get_data', async (req, res) => {
   try {
     const { data, error } = await supabase
       .from('tbl_quexpress_customers') // Table name in Supabase

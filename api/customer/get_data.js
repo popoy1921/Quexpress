@@ -1,4 +1,4 @@
-// /api/customer/get.js
+// /api/customer/get_data.js
 
 import { createClient } from '@supabase/supabase-js';
 
