@@ -1,4 +1,4 @@
-import formidable from 'formidable';
+import { IncomingForm } from 'formidable';
 import fs from 'fs';
 import path from 'path';
 import { createClient } from '@supabase/supabase-js';
@@ -15,8 +15,7 @@ export const config = {
 };
 
 const uploadHandler = async (req, res) => {
-  const form = new formidable();
-
+  const form = new IncomingForm();
   form.parse(req, async (err, fields, files) => {
     if (err) {
       res.status(500).json({ error: 'Error parsing the files' });
