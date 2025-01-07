@@ -11,9 +11,9 @@ export default async function handler(req, res) {
   // Check if the request method is GET
   if (req.method === 'GET') {
     try {
-        // Using a raw SQL query with Supabase's `rpc` method to execute a complex query
         const { data, error } = await supabase
-          .rpc('get_admin_report'); // You'd need to create this function in Supabase
+        .from('tbl_quexpress_transaction_log_view2')
+        .select('*');
     
         if (error) {
           throw new Error(error.message);
