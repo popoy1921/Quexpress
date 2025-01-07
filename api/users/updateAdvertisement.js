@@ -24,17 +24,6 @@ const uploadHandler = async (req, res) => {
     const file = files.file[0]; // Assuming the input name is 'file'
     const tempPath = file.filepath; // Temporary path
     const publicPath = typeof file.originalFilename;
-    // Move the file from temp to public folder
-    fs.rename(tempPath, publicPath, (err) => {
-      if (err) {
-        res.status(500).json({ error: 'Error saving the file' });
-        return;
-      }
-
-      res.status(200).json({ message: 'File uploaded successfully', filename: file.Original });
-    });
-
-    const fileUrl = `/uploads/${file.filename}`; // Adjust URL as needed
 
     // Update user table for advertisement
     const { data, error } = await supabase
@@ -48,6 +37,17 @@ const uploadHandler = async (req, res) => {
       console.error(error);
       return res.status(500).send('Database Error: ' + error.message);
     }
+    // Move the file from temp to public folder
+    fs.rename(tempPath, publicPath, (err) => {
+      if (err) {
+        res.status(500).json({ error: 'Error saving the file' });
+        return;
+      }
+
+      res.status(200).json({ message: 'File uploaded successfully', filename: file.Original });
+    });
+
+    const fileUrl = `/uploads/${file.filename}`; // Adjust URL as needed
     console.log(fileUrl)
     res.json({ file: fileUrl, data });
   });
