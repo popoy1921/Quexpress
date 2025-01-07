@@ -138,7 +138,7 @@ export default function ConfirmQueue() {
     setTimeout(() => {
       document.body.removeChild(iframe); // Clean up
       navigate("/SignInCustomer");
-    }, 5000); // Adjust delay as needed
+    }, 2000); // Adjust delay as needed
   }
 
   const yesButton = async (e: React.FormEvent) => {

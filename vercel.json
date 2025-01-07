@@ -5,8 +5,20 @@
         "destination": "/api/transaction_log/get_queue"
       },
       {
+        "source": "/(Teller|Cashier)/api/transaction_log/create",
+        "destination": "/api/transaction_log/create"
+      },
+      {
         "source": "/(Teller|Cashier)/api/transaction_log/update",
         "destination": "/api/transaction_log/update"
+      },
+      {
+        "source": "/(Teller|Cashier)/api/transaction_log/updateStaff",
+        "destination": "/api/transaction_log/updateStaff"
+      },
+      {
+        "source": "/(Teller|Cashier)/api/transaction_log/updateWindow",
+        "destination": "/api/transaction_log/updateWindow"
       },
       {
         "source": "/(Teller|Cashier)/api/transaction_log/updateBlink/:transactionId",
@@ -15,6 +27,10 @@
       {
         "source": "/(Teller|Cashier)/api/transaction_log/get_count",
         "destination": "/api/transaction_log/get_count"
+      },
+      {
+        "source": "/(Teller|Cashier)/api/transaction_log/get_ref/:transactionLogId",
+        "destination": "/api/transaction_log/get_ref/:transactionLogId"
       },
       {
         "source": "/(Teller|Cashier)/api/transaction_log/get_ref/:transactionLogId",
