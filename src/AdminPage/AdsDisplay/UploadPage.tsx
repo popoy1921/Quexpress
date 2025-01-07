@@ -31,7 +31,7 @@ const UploadPage: React.FC = () => {
     }
 
     setLoading(true);
-    const url = process.env.REACT_APP_OTHER_BACKEND_SERVER + `/users/updateAdvertisementx`;
+    const url = process.env.REACT_APP_OTHER_BACKEND_SERVER + `/users/updateAdvertisement`;
     const formData = new FormData();
     
     formData.append('file', file);
