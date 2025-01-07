@@ -1,6 +1,10 @@
 {
     "rewrites": [
       {
+        "source": "/EditAccount/api/users/get_data/:userId",
+        "destination": "/api/users/get_data/:userId"
+      },
+      {
         "source": "/SuccessfulRegistration/api/customer/get/:accountId",
         "destination": "/api/customer/get/:accountId"
       },
