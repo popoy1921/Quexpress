@@ -37,7 +37,7 @@ const UploadPage: React.FC = () => {
     formData.append('file', file);
 
     try {
-      const response = await axios.put(url, formData, {
+      const response = await axios.post(url, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
