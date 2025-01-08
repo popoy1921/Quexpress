@@ -69,7 +69,7 @@ function useTransactionData(transactionConfigs: {transactionCode: string; window
           newStatuses[transactionCode] = isOnlineResponse.data.window_status; // 'online' or other status
           newWindows[transactionCode] = isOnlineResponse.data.window_id;
           let queueNumber = '';
-          let currentTransactionId;
+          let currentTransactionId = '';
           if(transactionCode.startsWith('CSH')) {
             const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/CSH/${transactionCode}`);
             queueNumber = response.data.transaction_ref !== null 
