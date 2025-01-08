@@ -95,7 +95,6 @@ function useTransactionData(transactionConfigs: {transactionCode: string; window
               process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transactions/getBlink/${transactionCode}`
             );
             if (blinkResponse.data['blink'] === 1) {
-              console.log('hello')
               nowServingContainer.innerText = queueNumber;
               playSound();
               nowServingContainer.classList.add('animate');
@@ -134,7 +133,7 @@ function useTransactionData(transactionConfigs: {transactionCode: string; window
       }
       setStatuses(newStatuses);
       setWindows(newWindows);
-    }, 2000);
+    }, 3000);
 
     return () => clearInterval(interval);
   }, [transactionConfigs]);
