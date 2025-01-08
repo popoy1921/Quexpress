@@ -66,26 +66,27 @@ function useTransactionData(transactionConfigs: {transactionCode: string; window
           const isOnlineResponse = await axios.get(
             process.env.REACT_APP_OTHER_BACKEND_SERVER + `/window/status/${windowId}`
           );
+          let response;
           newStatuses[transactionCode] = isOnlineResponse.data.window_status; // 'online' or other status
           newWindows[transactionCode] = isOnlineResponse.data.window_id;
           let queueNumber = '';
           if(transactionCode.startsWith('CSH')) {
-            const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/CSH/${transactionCode}`);
+            response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/CSH/${transactionCode}`);
             queueNumber = response.data.transaction_ref !== null 
             ? response.data.transaction_ref 
             : response.data.transactions_queue;
           } else if(transactionCode.startsWith('BPLO3')) {
-            const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/${transactionCode}`);
+            response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/${transactionCode}`);
             queueNumber = response.data.transaction_ref !== null 
             ? response.data.transaction_ref 
             : response.data.transactions_queue;
           } else if(transactionCode.startsWith('LCRT')) {
-            const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/${transactionCode}`);
+            response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/${transactionCode}`);
             queueNumber = response.data.transaction_ref !== null 
             ? response.data.transaction_ref 
             : response.data.transactions_queue;
           } else {
-            const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/${transactionCode}`);
+            response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/${transactionCode}`);
             queueNumber = response.data.transactions_queue;
           }     
 
@@ -94,7 +95,7 @@ function useTransactionData(transactionConfigs: {transactionCode: string; window
             const blinkResponse = await axios.get(
               process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transactions/getBlink/${transactionCode}`
             );
-            if (blinkResponse.data['blink'] === 1) {
+            if (response.data['blink'] === 1) {
               nowServingContainer.innerText = queueNumber;
               playSound();
               nowServingContainer.classList.add('animate');
@@ -103,7 +104,7 @@ function useTransactionData(transactionConfigs: {transactionCode: string; window
                 await axios.put(
                   process.env.REACT_APP_OTHER_BACKEND_SERVER +
                     `/transaction_log/updateBlink/` +
-                    blinkResponse.data['transaction_id'],
+                    response.data['transaction_id'],
                   { blink: 0 }
                 );
                 if (nowServingContainer) {
