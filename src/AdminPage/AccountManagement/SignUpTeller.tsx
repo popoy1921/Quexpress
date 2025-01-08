@@ -119,7 +119,7 @@ export default function SignUp() {
 
   function registerUser(userDetails : Object)
   {
-    axios.post(`http://localhost:5000/users/create`, userDetails)
+    axios.post(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/users/create`, userDetails)
     .then(response => {
       console.log('Response:', response.data);
       navigate('/AdminAccountManagement');
