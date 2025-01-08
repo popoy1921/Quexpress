@@ -31,7 +31,8 @@ import DisplayMonitor2 from './DisplayMonitor/DisplayMonitor2';
 import TellerControl from './TellerPage/TransactionControl/MainPage'
 import TellerReports from './TellerPage/Reports/MainPage'
 import { FileProvider } from './AdminPage/AdsDisplay/FileContext';
-import Printing from './TabletCounter/Printing'
+import Printing from './TabletCounter/Printing';
+import UploadingPage from './AdminPage/AdsDisplay/UploadPage2';
 
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 
@@ -71,6 +72,7 @@ const App: React.FC = () => {
           <Route path="/DisplayMonitor1" element={<DisplayMonitor1/>}/>
           <Route path="/DisplayMonitor2" element={<DisplayMonitor2/>}/>
           <Route path="/Printing" element={<Printing/>}/>
+          <Route path="/UploadingPage" element={<UploadingPage/>}/>
           
         </Routes>
       </Router>

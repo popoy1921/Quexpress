@@ -8,13 +8,30 @@ const SUPABASE_URL = 'https://ayhfyztprntbaftgrypt.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF5aGZ5enRwcm50YmFmdGdyeXB0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzMxMjYxNDAsImV4cCI6MjA0ODcwMjE0MH0.krmujGeIdEwo_zfrnLLMw1aWQniR-OXnxTG4ZVBPnM4';
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
+const CDNURL = 'https://ayhfyztprntbaftgrypt.supabase.co/storage/v1/object/public/uploads/'
 
-function UploadPage() {
+function UploadPage2() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [video, setVideo] = useState<FileObject[]>([]);
 
+  async function getVideo() {
+    const { data, error } = await supabase.storage
+      .from('uploads')
+      .list('', { limit: 1, sortBy: { column: 'created_at', order: 'desc' } });
+  
+    if (data !== null && data.length > 0) {
+      setVideo([data[0]]); // Set only the latest video
+    } else {
+      console.error('Error grabbing file:', error?.message);
+      setError(error?.message || 'Failed to fetch video.');
+    }
+  }
+
+  useEffect(() => {
+    getVideo();
+  }, []);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -146,6 +163,17 @@ function UploadPage() {
                 </Typography>
               </Grid>
             )}
+            <Grid item xs={12}>
+                {video.map((video) =>{
+                    return (
+                        <Card>
+                            <video width={850} height={600} autoPlay loop muted>
+                                <source src={CDNURL + video.name} type="video/mp4" />
+                            </video>
+                        </Card>
+                    )
+                })}
+              </Grid>
           </Grid>
         </form>
       </Paper>
@@ -153,4 +181,4 @@ function UploadPage() {
   );
 }
 
-export default UploadPage;
+export default UploadPage2;
