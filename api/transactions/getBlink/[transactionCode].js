@@ -17,7 +17,7 @@ export default async function handler(req, res) {
             const { data, error } = await supabase
             .from('tbl_quexpress_transactions') // Replace with your table name
             .select('*')
-            .eq('transaction_code', transactionCode);
+            .eq('transaction_id', transactionCode);
             if (transactionCode === 'CSH1') {
             console.log([data, error]);
             }
