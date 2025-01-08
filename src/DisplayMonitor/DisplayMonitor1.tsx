@@ -69,27 +69,30 @@ function useTransactionData(transactionConfigs: {transactionCode: string; window
           newStatuses[transactionCode] = isOnlineResponse.data.window_status; // 'online' or other status
           newWindows[transactionCode] = isOnlineResponse.data.window_id;
           let queueNumber = '';
-          let response;
+          let currentTransactionId;
           if(transactionCode.startsWith('BPLO3')) {
-            response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/${transactionCode}`);
+            const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/${transactionCode}`);
             alert(response.data)
             queueNumber = response.data.transaction_ref !== null 
             ? response.data.transaction_ref 
             : response.data.transactions_queue;
+            currentTransactionId = response.data.transaction_id
           } else if(transactionCode.startsWith('BPLO2')) {
-            response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/${transactionCode}`);
+            const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/${transactionCode}`);
             queueNumber = response.data.transaction_ref !== null 
             ? response.data.transaction_ref 
             : response.data.transactions_queue;
+            currentTransactionId = response.data.transaction_id
           } else {
-            response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/${transactionCode}`);
+            const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/${transactionCode}`);
             queueNumber = response.data.transactions_queue;
+            currentTransactionId = response.data.transaction_id
           }  
           
           const nowServingContainer = document.getElementById('NowServing' + transactionCode);
           if (nowServingContainer) {
             const blinkResponse = await axios.get(
-              process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transactions/getBlink/${response.data.transaction_id}`
+              process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transactions/getBlink/${currentTransactionId}`
             );
             if (blinkResponse.data['blink'] === 1) {
               nowServingContainer.innerText = queueNumber;
