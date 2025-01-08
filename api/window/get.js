@@ -25,6 +25,7 @@ export default async function handler(req, res) {
             ON a.window_id = b.window_id
             AND DATE(b.transaction_datetime) >= CURRENT_DATE
             AND (b.transaction_status IS NOT NULL)
+          WHERE a.window_id <> 24
           GROUP BY a.window_id, a.window_desc
           ORDER BY a.window_id ASC
         `;

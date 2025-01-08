@@ -3,14 +3,15 @@ import DataTable from 'react-data-table-component';
 import DataTableExtensions from "react-data-table-component-extensions";
 import "react-data-table-component-extensions/dist/index.css";
 import axios from 'axios';
-import { Alert, CircularProgress, Container, Typography } from '@mui/material';
+import { Alert, CircularProgress, Container, Typography, ButtonGroup, Button } from '@mui/material';
 import "../../index.css";
-import { format } from 'date-fns';
+import { format, isThisWeek, isThisMonth, parseISO } from 'date-fns';
 
 const App = () => {
-  const [tableData, setData] = useState([]);
+  const [tableData, setData] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [filter, setFilter] = useState('all');
 
   interface Row {
     transactions_queue :  string,
@@ -45,7 +46,15 @@ const App = () => {
     fetchData();
   }, []);
 
-  
+  const filteredData = tableData.filter((row) => {
+      const transactionDate = parseISO(row.transaction_datetime);
+      if (filter === 'weekly') {
+        return isThisWeek(transactionDate);
+      } else if (filter === 'monthly') {
+        return isThisMonth(transactionDate);
+      }
+      return true; // 'all' shows all records
+    });
 
   // Define the columns for the DataTable
   const tableTransactionLogColumns = [
@@ -62,21 +71,31 @@ const App = () => {
   ];
 
   if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
-
-  const tableDataForTableExtension = {
-    columns: tableTransactionLogColumns,
-    data: tableData,
-    filter: true,
-  };
+      return <CircularProgress />;
+    }
+  
+    if (error) {
+      return <Alert severity="error">Error: {error}</Alert>;
+    }
+    
+    const tableDataForTableExtension = {
+      columns: tableTransactionLogColumns,
+      data: filteredData
+    };
 
   return (
     <Container maxWidth='xl' sx={{ mt: 2 }}>
+      <ButtonGroup variant="contained" sx={{ mb: 2 }}>
+        <Button onClick={() => setFilter('all')}>
+          All
+        </Button>
+        <Button onClick={() => setFilter('weekly')}>
+          Weekly
+        </Button>
+        <Button onClick={() => setFilter('monthly')}>
+          Monthly
+        </Button>
+      </ButtonGroup>
       {loading ? (
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
           <CircularProgress />
@@ -88,18 +107,32 @@ const App = () => {
         </Alert>
       ) : (
         <DataTableExtensions {...tableDataForTableExtension}>
-            <DataTable
-              columns={tableTransactionLogColumns}
-              data={tableData}
-              pagination
-              responsive
-              highlightOnHover
-              pointerOnHover
-              striped
-              style={{ 
-                boxShadow: '0px 2px 10px rgba(0, 0, 0, 0.1)',
-              }} 
-            />
+              {Array.isArray(filteredData) ?
+                <DataTable
+                  columns={tableTransactionLogColumns}
+                  data={filteredData}
+                  pagination
+                  responsive
+                  highlightOnHover
+                  pointerOnHover
+                  striped
+                  style={{ 
+                    boxShadow: '0px 2px 10px rgba(0, 0, 0, 0.1)',
+                  }} 
+                />
+              : 
+              <DataTable
+                columns={tableTransactionLogColumns}
+                data={[]}
+                pagination
+                responsive
+                highlightOnHover
+                pointerOnHover
+                striped
+                style={{ 
+                  boxShadow: '0px 2px 10px rgba(0, 0, 0, 0.1)',
+                }} 
+              />}
         </DataTableExtensions>
       )}
     </Container>

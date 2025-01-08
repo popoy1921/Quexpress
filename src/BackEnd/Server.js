@@ -58,6 +58,7 @@ app.get('/window/get', async (req, res) => {
         ON a.window_id = b.window_id
         AND DATE(b.transaction_datetime) >= CURRENT_DATE
         AND (b.transaction_status IS NOT NULL)
+      WHERE a.window_id <> 24
       GROUP BY a.window_id, a.window_desc
       ORDER BY a.window_id ASC
     `;
@@ -639,7 +640,8 @@ app.get('/transaction_log/admin/report', async (req, res) => {
   try {
     // Using a raw SQL query with Supabase's `rpc` method to execute a complex query
     const { data, error } = await supabase
-      .rpc('get_admin_report'); // You'd need to create this function in Supabase
+    .from('tbl_quexpress_transaction_log_view2')
+    .select('*');
 
     if (error) {
       throw new Error(error.message);
