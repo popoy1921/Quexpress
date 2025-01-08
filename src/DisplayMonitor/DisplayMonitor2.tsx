@@ -93,9 +93,9 @@ function useTransactionData(transactionConfigs: {transactionCode: string; window
           const nowServingContainer = document.getElementById('NowServing' + transactionCode);
           if (nowServingContainer) {
             const blinkResponse = await axios.get(
-              process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transactions/getBlink/${transactionCode}`
+              process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transactions/getBlink/${response.data.transaction_id}`
             );
-            if (response.data['blink'] === 1) {
+            if (blinkResponse.data['blink'] === 1) {
               nowServingContainer.innerText = queueNumber;
               playSound();
               nowServingContainer.classList.add('animate');
