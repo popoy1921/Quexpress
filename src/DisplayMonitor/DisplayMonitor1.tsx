@@ -76,17 +76,17 @@ function useTransactionData(transactionConfigs: {transactionCode: string; window
             queueNumber = response.data.transaction_ref !== null 
             ? response.data.transaction_ref 
             : response.data.transactions_queue;
-            currentTransactionId = response.data.transaction_id
+            currentTransactionId = response.data.transaction_id;
           } else if(transactionCode.startsWith('BPLO2')) {
             const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/${transactionCode}`);
             queueNumber = response.data.transaction_ref !== null 
             ? response.data.transaction_ref 
             : response.data.transactions_queue;
-            currentTransactionId = response.data.transaction_id
+            currentTransactionId = response.data.transaction_id;
           } else {
             const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/${transactionCode}`);
             queueNumber = response.data.transactions_queue;
-            currentTransactionId = response.data.transaction_id
+            currentTransactionId = response.data.transaction_id;
           }  
           
           const nowServingContainer = document.getElementById('NowServing' + transactionCode);
