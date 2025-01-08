@@ -103,7 +103,7 @@ function useTransactionData(transactionConfigs: {transactionCode: string; window
                 await axios.put(
                   process.env.REACT_APP_OTHER_BACKEND_SERVER +
                     `/transaction_log/updateBlink/` +
-                    response.data['transaction_id'],
+                    currentTransactionId,
                   { blink: 0 }
                 );
                 if (nowServingContainer) {

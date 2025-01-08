@@ -75,22 +75,23 @@ function useTransactionData(transactionConfigs: {transactionCode: string; window
             queueNumber = response.data.transaction_ref !== null 
             ? response.data.transaction_ref 
             : response.data.transactions_queue;
-            currentTransactionId = response.data.transaction_id
+            currentTransactionId = response.data.transaction_id;
           } else if(transactionCode.startsWith('BPLO3')) {
             const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/${transactionCode}`);
             queueNumber = response.data.transaction_ref !== null 
             ? response.data.transaction_ref 
             : response.data.transactions_queue;
+            currentTransactionId = response.data.transaction_id;
           } else if(transactionCode.startsWith('LCRT')) {
             const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/${transactionCode}`);
             queueNumber = response.data.transaction_ref !== null 
             ? response.data.transaction_ref 
             : response.data.transactions_queue;
-            currentTransactionId = response.data.transaction_id
+            currentTransactionId = response.data.transaction_id;
           } else {
             const response = await axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/transaction_log/get/${transactionCode}`);
             queueNumber = response.data.transactions_queue;
-            currentTransactionId = response.data.transaction_id
+            currentTransactionId = response.data.transaction_id;
           }     
 
           const nowServingContainer = document.getElementById('NowServing' + transactionCode);
@@ -107,7 +108,7 @@ function useTransactionData(transactionConfigs: {transactionCode: string; window
                 await axios.put(
                   process.env.REACT_APP_OTHER_BACKEND_SERVER +
                     `/transaction_log/updateBlink/` +
-                    response.data['transaction_id'],
+                    currentTransactionId,
                   { blink: 0 }
                 );
                 if (nowServingContainer) {
