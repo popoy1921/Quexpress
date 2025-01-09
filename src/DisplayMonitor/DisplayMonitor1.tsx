@@ -7,6 +7,15 @@ import axios from 'axios';
 import Grid from '@mui/material/Grid';
 import Background from '../Photos/BackgroundDesktop.jpg';
 import DigitalClock from './DigitalClock';
+import { createClient } from '@supabase/supabase-js';
+import type { FileObject } from '@supabase/storage-js';
+import { useEffect, useState } from 'react';
+
+const SUPABASE_URL = 'https://ayhfyztprntbaftgrypt.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF5aGZ5enRwcm50YmFmdGdyeXB0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzMxMjYxNDAsImV4cCI6MjA0ODcwMjE0MH0.krmujGeIdEwo_zfrnLLMw1aWQniR-OXnxTG4ZVBPnM4';
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const CDNURL = 'https://ayhfyztprntbaftgrypt.supabase.co/storage/v1/object/public/uploads/'
 
 const Ping = require('../Sounds/din-ding-89718.mp3');
 const Logo = require('../Photos/coollogo_com-178391066.png');
@@ -142,32 +151,28 @@ function useTransactionData(transactionConfigs: {transactionCode: string; window
 }
 
 export default function DisplayMonitor1() {
-  const [videoUrl, setVideoUrl] = React.useState<string | null>('');
-  const [vidKey, setVidKey] = React.useState<any>('');; 
-  const [showVideoAd, setShowVideoAd] = React.useState(true);
   const [announcement, setAnnouncement] = React.useState<string>('');
+  const [error, setError] = useState<string | null>(null);
+  const [video, setVideo] = useState<FileObject[]>([]);
+  const [currentVideoId, setCurrentVideoId] = useState<string | null>(null);
   let cshIndex = 1;
-
-  const handleVideoEnd = () => {
-    setShowVideoAd(false); 
-  };
-
-  var currentAdvertisementLink = '';
+  
   function updateDisplayedAdsLink () {
-    var displayAsInterval = setInterval(async () => {
-      axios.get(process.env.REACT_APP_OTHER_BACKEND_SERVER + `/users/getAdvertisement`)
-      .then(response => {
-        if (currentAdvertisementLink !== response.data.advertisement) {
-          currentAdvertisementLink = response.data.advertisement;
-          setVideoUrl(currentAdvertisementLink);
-          setVidKey(currentAdvertisementLink);
-        }
-      })
-      .catch(err => {
-        console.log(err);
-      })
-    }, 3000);
-  }
+    var displayAsInterval = setInterval(async() => {
+    const { data, error } = await supabase.storage
+      .from('uploads')
+      .list('', { limit: 1, sortBy: { column: 'created_at', order: 'desc' } });
+  
+    if (data !== null && data.length > 0) {
+      setVideo([data[0]]); // Set only the latest video
+      
+    } else {
+      setVideo([]);
+      console.error('Error grabbing file:', error?.message);
+      setError(error?.message || 'Failed to fetch video.');
+    }
+  }, 3000);
+}
 
   var currentAnnouncement = '';
   function updateDisplayedAnnouncement () {
@@ -185,9 +190,10 @@ export default function DisplayMonitor1() {
     }, 2000);
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     updateDisplayedAdsLink();
     updateDisplayedAnnouncement();
+    
   }, []);
 
   const transactionConfigs = React.useMemo(
@@ -229,11 +235,12 @@ export default function DisplayMonitor1() {
               <center>
               <DigitalClock />
               {/* Show video advertisement if available, fallback to logo otherwise */}
-                {showVideoAd && videoUrl ? (
-                  <video key={vidKey} width={850} height={600} autoPlay loop muted onEnded={handleVideoEnd}>
-                    <source src={videoUrl} type="video/mp4" />
-                    Your browser does not support the video tag.
-                  </video>
+                {video && video.length > 0 ? (
+                  video.map((video) => (
+                    <video key={CDNURL + video.name} width={850} height={600} autoPlay loop muted>
+                      <source src={CDNURL + video.name} type="video/mp4" />
+                    </video>
+                  ))
                 ) : (
                   <img src={MLogo} width={600} height={600} alt="MLogo" />
                 )}

@@ -63,7 +63,6 @@ function UploadPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     handleUpload();
-    
   };
 
   return (
