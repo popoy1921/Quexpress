@@ -128,7 +128,7 @@ export default function ConfirmQueue() {
     }).toString();
 
     const responseUrl = process.env.REACT_APP_OTHER_BACKEND_SERVER + `/print?${queryParams}`; 
-    const printLink = `my.bluetoothprint.scheme://${responseUrl}`;
+    const printLink = `my.bluetoothprint.scheme://quexpress.vercel.app/${responseUrl}`;
     const iframe = document.createElement('iframe');
     iframe.style.display = 'none';
     iframe.src = printLink;
